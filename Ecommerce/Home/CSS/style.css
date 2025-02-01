@@ -21,7 +21,7 @@
     padding: 0 30px;
     color:black;
     transition: 0.5s ease;
-    font-weight: 500;
+    font-weight: 600;
     
 }
 
@@ -65,6 +65,53 @@
 .cards-wrapper2 img {
     height: 25em;
     width: 35em;
+}
+
+footer{
+    width: 100%;
+    padding: 30px 0 0 20px;
+    background: darkgray;
+    
+}
+
+footer .footer_main{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+
+footer .footer_main .footer_tag{
+    text-align: center;
+}
+
+footer .footer_main .footer_tag h2{
+    color: #000;
+    margin-bottom: 25px;
+    font-size: 30px;
+}
+
+footer .footer_main .footer_tag p{
+    margin: 10px 0;
+}
+
+footer .footer_main .footer_tag i{
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+footer .footer_main .footer_tag i:hover{
+    color: #284e94;
+}
+
+footer .end{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+footer .end span{
+    color: #284e94;
+    margin-left: 10px;
 }
 
 /* body{
