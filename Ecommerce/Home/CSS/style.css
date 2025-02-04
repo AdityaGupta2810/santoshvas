@@ -1,36 +1,46 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
  /* from fonts.google.com imported */
-.nav-buttons{
 
-    margin-left:5%;
+html{
+    scroll-behavior: smooth;
 }
-
-.nav-button{
-    margin-left:15%;
-}
+ 
 
 *{
     margin:0px;
     padding:0px;
     box-sizing: border-box;
+    text-decoration:none;
 }
 
-.nav-link{
+.logo{
+    margin-right: 60px;
+}
+.custom-toggler.navbar-toggler {
+    border-color: rgb(251, 245, 245);
+}
+/* .nav-link{
     
     padding: 0 30px;
     color:black;
     transition: 0.5s ease;
     font-weight: 600;
     
-}
+} */
 
 .nav-link.active:hover,.nav-link:hover, .nav-item i:hover{
-    color:red;
+    color:maroon;
 }
-.nav-item i{
-    margin:0 30px;
-   justify-content: center;
+.navbar-custom .navbar-nav .nav-item>a{
+    color: rgb(61, 59, 59);
+}
+.nav-item a {
+    display:grid;
+    margin:8px 0;
+    text-align: center;
+   font-weight: bold;
+   justify-content: space-evenly;
 }
 /* .carousel-item img{
     width: 600px;
@@ -82,7 +92,7 @@ footer{
 
 footer .footer_main{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     
 }
 
@@ -183,7 +193,7 @@ footer .end span{
 
     footer .footer_main{
         display: grid;
-        grid-template-columns: auto auto auto auto auto;
+        grid-template-columns: auto auto auto auto ;
     }
     
     footer .footer_main .footer_tag{
