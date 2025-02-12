@@ -11,7 +11,7 @@ require(__DIR__."/includes/header.php");
                 <p class="text-2xl text-center font-semibold text-gray-600 p-4">Don't have an account? Register Now!!! <a href="#" class="text-blue-700 text-xl ">Create Your Account</a></p>
             </div>
     <div class=" text-xl font-semibold m-8  ">
-         <form>
+         <form method="post" action="../actions/logaction.php">
          <input class="  border-b-2  w-full px-2 py-1 outline-none my-2 border-gray-500" type="email" name="uname" placeholder="Enter your Email" required> <br>
          <input class=" border-b-2 w-full px-2 py-1  outline-none my-4 border-gray-500" type="password" name="upass" placeholder="Password" required> <br>
          <div class="flex items-center space-x-2 my-3">

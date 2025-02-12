@@ -11,10 +11,10 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/user/includes/header.php";
                 <p class="text-2xl text-center font-semibold text-gray-600 p-4">Already have an account? <a href="#" class="text-blue-700 text-xl ">Login Now</a></p>
             </div>
     <div class=" text-xl font-semibold m-8  ">
-         <form>
+         <form method="post" action="../actions/regaction.php">
         <input class="border-b-2  w-full my-2 py-1 px-2 border-gray-500 outline-none" name="uname" placeholder="User Name" required>
          <input class="  border-b-2  w-full px-2 py-1 outline-none my-2 border-gray-500" type="email" name="umail" placeholder="Email Id" required> <br>
-         <input class="border-b-2 w-full px-2 py-1 outline-none my-2 border-gray-500 " type="number" name="uphone" required placeholder="Phone no.">
+         
          <input class=" border-b-2 w-full px-2 py-1  outline-none my-4 border-gray-500" type="password" name="upass" placeholder="Password" required> <br>
          <div class="flex items-center space-x-2 my-3">
             <input class="w-5 h-5 border-2 border-green-500 rounded accent-green-500 focus:ring focus:ring-green-300" 
