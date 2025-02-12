@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="/Ecommerce/output.css">
-</head>
-<body class="container flex justify-center items-center bg-[url('/Ecommerce/Home/images/logback.webp')] bg-cover bg-center " >
+<?php
+$title="Register page";
+require "C:/xampp/htdocs/santoshvas/Ecommerce/user/includes/header.php";
+?>
+<body class="container flex justify-center items-center bg-[url('/santoshvas/Ecommerce/Home/images/logiback.webp')] bg-cover bg-center " >
     <div class="bg-gradient-to-r from-white to-red-200 box-content py-4 sm:w-1/2 xl:w-1/3  w-full  border-0 border-solid rounded-xl border-black mt-12 m-7">
         
        
@@ -35,4 +31,6 @@
   
 </div>
 </body>
-</html>
+<?php
+require "C:/xampp/htdocs/santoshvas/Ecommerce/user/includes/header.php";
+?>
