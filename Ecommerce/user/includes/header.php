@@ -1,3 +1,6 @@
+<?php
+require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
