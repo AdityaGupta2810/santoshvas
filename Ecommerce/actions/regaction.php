@@ -34,18 +34,21 @@ if($post['upass'] && $post['uname'] && $post['uemail']  ){
    
     $fn->setAlert('Registered Successfully !');
     $fn->redirect('../user/login.php');
+    die();
 
 }
 
    catch(Exception $error){
    $fn->setError($error->getMessage()); 
    $fn->redirect('../user/reg.php');
+   die();
 
    }                                                  
 }
 else{
     $fn->setError('Please fill the all required field');
     $fn->redirect('../user/reg.php');
+    die();
 }
 
 }
@@ -54,6 +57,7 @@ else{
 
     // header("Location:".'../user/reg.php');  we can directly use this to redirect but we create class show we can use same fun many times
  $fn->redirect('../user/reg.php');
+ die();
 }
 
 

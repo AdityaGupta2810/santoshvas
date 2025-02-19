@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Santosh Vastralay - Home</title>
-    <!-- Tailwind CSS CDN -->
-    <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/Ecommerce/output.css">
-</head>
-<body class="bg-gray-100 ">
-    <!-- Sidebar for Mobile (Hidden on Larger Screens) -->
+<?php
+require_once './user/includes/header.php';
+?>
+<!-- <body class="bg-gray-100 ">
+    Sidebar for Mobile (Hidden on Larger Screens)
     <div id="sidebar" class="fixed inset-y-0 left-0  bg-gray-800 text-white w-64 transform -translate-x-full sm:hidden transition-transform duration-200 ease-in-out z-50">
         <div class="p-4">
             <h1 class="text-2xl font-bold">Santosh Vastralay</h1>
@@ -32,10 +23,10 @@
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-600">My Orders</a></li>
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-600">Profile</a></li>
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-600">Settings</a></li>
-                    <li><a href="#" class="block px-4 py-2 hover:bg-gray-600">Logout</a></li>
+                    <li><a href="./actions/logoutaction.php" class="block px-4 py-2 hover:bg-gray-600">Logout</a></li>
                 </ul>
             </div>
-            <!-- Search Bar for Mobile -->
+            Search Bar for Mobile
             <div class="p-4">
                 <input type="text" placeholder="Search..." class="w-full p-2 bg-white rounded border border-gray-500 text-black">
                 <button class="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white p-2 rounded mt-2 hover:bg-blue-700" aria-label="Search">Search</button>
@@ -43,22 +34,22 @@
         </nav>
     </div>
 
-    <!-- Header Section -->
+    Header Section
     <header class="bg-gray-400 text-gray-800 p-4 flex flex-wrap justify-between items-center">
-        <!-- Logo and Brand Name -->
+        Logo and Brand Name
         <div class="flex items-center">
-            <img src="/Ecommerce/Home/images/logo.png" alt="Santosh Vastralay Logo" class="h-12">
+            <img src="./Home/images/logo.png" alt="Santosh Vastralay Logo" class="h-12">
             <h1 class="text-2xl font-bold ml-2">Santosh Vastralay</h1>
         </div>
     
-        <!-- Mobile Menu Button (Hamburger Icon) -->
+        Mobile Menu Button (Hamburger Icon)
         <button id="sidebarToggle" class="sm:hidden text-gray-800 focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
             </svg>
         </button>
     
-        <!-- Navigation Menu for Larger Screens -->
+        Navigation Menu for Larger Screens
         <nav class="hidden sm:flex space-x-4">
             <a href="#" class="hover:text-blue-600 font-semibold">Home</a>
             <a href="#" class="hover:text-blue-600 font-semibold">Women</a>
@@ -66,39 +57,40 @@
             <a href="#" class="hover:text-blue-600 font-semibold">Others</a>
         </nav>
     
-        <!-- Search Bar for Larger Screens -->
+        Search Bar for Larger Screens
         <div class="hidden sm:flex items-center">
             <input type="text" placeholder="Search..." class="p-2 rounded border border-gray-500">
             <button class="bg-blue-600 text-white p-2 rounded ml-2 hover:bg-blue-700" aria-label="Search">Search</button>
         </div>
     
-        <!-- User Dropdown and Cart Icon for Larger Screens -->
+        User Dropdown and Cart Icon for Larger Screens
         <div class="hidden sm:flex items-center space-x-4">
             <a href="#" class="hover:text-blue-600 font-bold" aria-label="Cart">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-            </a>
+            </a>   
+            
             <div class="relative">
                 <button id="userMenuButton" class="hover:text-blue-600 font-semibold focus:outline-none">
                     User
-                </button>
-                <ul id="userMenuDropdown" class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg border border-gray-200 hidden">
-                    <li><a href="#" class="block px-4 py-2 hover:bg-gray-100"> <a href="user/login.php"> Login</a>/<a href="user/reg.php">Register</a></a></li>
+                </button>                            the element having higher z value will display above anothe element having lower z value  
+                <ul id="userMenuDropdown" class=" absolute right-0 mt-2 w-45 bg-white text-gray-800 rounded-lg  z-50  shadow-lg border border-gray-200 hidden text-center ">
+                    <li><a href="#" class="block px-3 py-2 hover:bg-gray-100"><a href="./user/login.php">  Login</a>/<a href="./user/reg.php">Register</a></a></li>
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">My Orders</a></li>
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Profile</a></li>
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Settings</a></li>
-                    <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Logout</a></li>
+                    <li><a href="./actions/logoutaction.php" class="block px-4 py-2 hover:bg-gray-100">Logout</a></li>
                 </ul>
             </div>
             <a href="#" class="hover:text-blue-600 font-semibold">Admin</a>
         </div>
-    </header>
+    </header> -->
 
     <!-- Welcome Section -->
-    <section class="text-center  bg-gradient-to-r from-blue-500 to-purple-600 py-4">
-        <h2 class="text-3xl font-bold text-gray-200">Welcome to Santosh Vastralay</h2>
-        <p class="text-gray-200 font-bold mt-2">Your one-stop shop for all fabric needs!</p>
+    <section class="text-center  text-black bg-rose-300 py-4">
+        <h2 class="text-3xl font-semibold ">Welcome to Santosh Vastralay</h2>
+        <p class=" font-semibold mt-2">Your one-stop shop for all fabric needs!</p>
     </section>
     <!-- Offer Banner Section -->
     <!-- <section class="pt-1.5 text-center">
@@ -111,7 +103,7 @@
 
     <!-- Carousel Section -->
    
-    <div id="carousel" class="relative w-full overflow-hidden">
+    <div id="carousel" class="relative w-full overflow-hidden ">
         <div class="carousel-inner flex transition-transform duration-500 ease-in-out">
             <div class="carousel-item w-full flex-shrink-0">
                 <img src="Home/images/carosel1.webp" class="w-full" alt="Slide 1">
@@ -150,7 +142,7 @@
     <!-- Hero Banner Section -->
     <section class="relative w-full max-w-8xl mx-auto py-1.5  mt-6">
         <img src="Home/images/bridal.jpg" alt="Bridal Collection" class="w-full h-auto rounded-lg shadow-lg">
-        <img src="Home/images/mid_coruoser.jpg" alt="Mid Carousel" class="w-full max-h-fit object-cover rounded-lg shadow-lg mt-4">
+        <img src="Home/images/mid_coruoser.jpg" alt="Mid Carousel" class="w-full max-h-[410px] object-cover rounded-lg shadow-lg mt-4">
     </section>
 
     <!-- Product Categories Section -->
@@ -170,23 +162,23 @@
             <h3 class="text-lg font-semibold mt-2">Shirt Fabric</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="/Ecommerce/Home/images/bedsheet.jpg" alt="Bedsheets" class="w-full h-40 object-cover rounded">
+            <img src="Home/images/bedsheet.jpg" alt="Bedsheets" class="w-full h-40 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Bedsheets</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="/Ecommerce/Home/images/mens.gif" alt="Men's Collection" class="w-full h-50 object-cover rounded">
+            <img src="./Home/images/mens.gif" alt="Men's Collection" class="w-full h-50 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Men's Collection</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="/Ecommerce/Home/images/saree.gif" alt="Saree Collection" class="w-full h-50 object-cover rounded">
+            <img src="Home/images/saree.gif" alt="Saree Collection" class="w-full h-50 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Saree Collection</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="/Ecommerce/Home/images/curtain.gif" alt="Curtains" class="w-full h-50 object-cover rounded">
+            <img src="Home/images/curtain.gif" alt="Curtains" class="w-full h-50 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Curtains</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="/Ecommerce/Home/images/lahenga.gif" alt="Lehengas" class="w-full h-50 object-cover rounded">
+            <img src="Home/images/lahenga.gif" alt="Lehengas" class="w-full h-50 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Lehengas</h3>
         </div>
     </section>
@@ -358,51 +350,7 @@
         });
     </script> -->
 
-    <script>
-    // Toggle sidebar for small screens
-const sidebar = document.getElementById("sidebar");
-const sidebarToggle = document.getElementById("sidebarToggle");
-
-sidebarToggle.addEventListener("click", () => {
-    sidebar.classList.toggle("-translate-x-full");
-});
-
-// Toggle user dropdown on hover for larger screens
-const userMenuButton = document.getElementById("userMenuButton");
-const userMenuDropdown = document.getElementById("userMenuDropdown");
-
-// Show dropdown when hovering over the button
-userMenuButton.addEventListener("mouseenter", () => {
-    userMenuDropdown.classList.remove("hidden");
-});
-
-// Keep dropdown open when hovering over it
-userMenuDropdown.addEventListener("mouseenter", () => {
-    userMenuDropdown.classList.remove("hidden");
-});
-
-// Hide dropdown when leaving both button and dropdown
-userMenuButton.addEventListener("mouseleave", () => {
-    setTimeout(() => {
-        if (!userMenuDropdown.matches(":hover")) {
-            userMenuDropdown.classList.add("hidden");
-        }
-    }, 200); // Small delay to allow cursor transition
-});
-
-userMenuDropdown.addEventListener("mouseleave", () => {
-    userMenuDropdown.classList.add("hidden");
-});
-
-// Toggle user dropdown on click for mobile
-const userMenuButtonMobile = document.getElementById("userMenuButtonMobile");
-const userMenuDropdownMobile = document.getElementById("userMenuDropdownMobile");
-
-userMenuButtonMobile.addEventListener("click", () => {
-    userMenuDropdownMobile.classList.toggle("hidden");
-});
-
-</script>
+  
 
     <!-- Carousel Script -->
     <script>
@@ -439,5 +387,6 @@ userMenuButtonMobile.addEventListener("click", () => {
         }, 5000); // Change slide every 5 seconds
     </script>
     
-</body>
-</html>
+<?php
+require './user/includes/footer.php';
+?>

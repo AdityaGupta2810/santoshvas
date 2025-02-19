@@ -10,6 +10,19 @@ public function redirect($address){
 public function setError($msg){
     $_SESSION['error'] = $msg; }
 
+
+  public function setAuth($data){
+    $_SESSION['Auth'] = $data;
+  }                           
+                                                //   this Auth section is for login page for authentication 
+ public function Auth(){
+  if(isset($_SESSION['Auth'])){
+     return $_SESSION['Auth'];
+ }
+ else{
+  return false;
+ }
+ }
 public function error(){
   if(isset($_SESSION['error'])){
     echo "Swal.fire('','".$_SESSION['error']."','error')";
