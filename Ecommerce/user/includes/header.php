@@ -7,11 +7,10 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?=@$title?></title>       <!-- we use @ if title variable is not passed then it will show not throw error  -->
-    <!-- Tailwind CSS CDN -->
-    <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
+    
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/santoshvas/Ecommerce/output.css">
+    <link rel="stylesheet" href="/santoshvas/Ecommerce/output.css"/>
 </head> 
 <body class="bg-gray-100 ">
     <!-- Sidebar for Mobile (Hidden on Larger Screens) -->
@@ -25,7 +24,7 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
             <a href="#" class="block py-2 px-4 hover:bg-gray-700">Men</a>
             <a href="#" class="block py-2 px-4 hover:bg-gray-700">Others</a>
             <a href="#" class="block py-2 px-4 hover:bg-gray-700">Cart</a>
-            <a href="#" class="block py-2 px-4 hover:bg-gray-700">Admin</a>
+            <a href="/santoshvas/Ecommerce/admin/index.php" class="block py-2 px-4 hover:bg-gray-700">Admin</a>
             <div class="relative">
                 <button id="userMenuButtonMobile" class="w-full text-left py-2 px-4 hover:bg-gray-700 focus:outline-none">
                     User
@@ -95,6 +94,6 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
                     <li><a href="/santoshvas/Ecommerce/actions/logoutaction.php" class="block px-4 py-2 hover:bg-gray-100">Logout</a></li>
                 </ul>
             </div>
-            <a href="#" class="hover:text-blue-600 font-semibold">Admin</a>
+            <a href="/santoshvas/Ecommerce/admin/index.php" class="hover:text-blue-600 font-semibold">Admin</a>
         </div>
     </header>

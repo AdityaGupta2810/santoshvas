@@ -82,19 +82,19 @@ require_once './user/includes/header.php';
             <h3 class="text-lg font-semibold mt-2">Bedsheets</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="./Home/images/mens.gif" alt="Men's Collection" class="w-full h-50 object-cover rounded">
+            <img src="./Home/images/mens.gif" alt="Men's Collection" class="w-full h-70 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Men's Collection</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/saree.gif" alt="Saree Collection" class="w-full h-50 object-cover rounded">
+            <img src="Home/images/saree.gif" alt="Saree Collection" class="w-full h-70 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Saree Collection</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/curtain.gif" alt="Curtains" class="w-full h-50 object-cover rounded">
+            <img src="Home/images/curtain.gif" alt="Curtains" class="w-full h-70 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Curtains</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/lahenga.gif" alt="Lehengas" class="w-full h-50 object-cover rounded">
+            <img src="Home/images/lahenga.gif" alt="Lehengas" class="w-full h-70 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Lehengas</h3>
         </div>
     </section>
