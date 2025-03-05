@@ -39,15 +39,15 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
             </div>
             <!-- Search Bar for Mobile -->
             <div class="p-4">
-                <input type="text" placeholder="Search..." class="w-full p-2 bg-white rounded border border-gray-500 text-black">
-                <button class="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white p-2 rounded mt-2 hover:bg-blue-700" aria-label="Search">Search</button>
+                <input type="text" placeholder="Search..." class="w-auto p-2 bg-white rounded border border-gray-500 text-black">
+                <button class="w-auto bg-gradient-to-r from-blue-500 via-cyan-600 to-purple-500 text-white p-2 rounded mt-2 hover:bg-blue-700" aria-label="Search">Search</button>
             </div>
         </nav>
     </div>
 
 
     <!-- Header Section -->
-    <header class="bg-gray-400 text-gray-800 p-4 flex flex-wrap justify-between items-center">
+    <header class="bg-gray-400 text-gray-800 p-4 flex flex-wrap justify-between items-center shrink-1 lg:shrink-0">
         <!-- Logo and Brand Name -->
         <div class="flex items-center">
             <img src="/santoshvas/Ecommerce/Home/images/logo.png" alt="Santosh Vastralay Logo" class="h-12">
@@ -94,9 +94,6 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Logout</a></li>
                 </ul>
             </div>
-            <a href="#" class="hover:text-blue-600 font-semibold">Admin</a>
+            <a href="/santoshvas/Ecommerce/admin/index.php" class="hover:text-blue-600 font-semibold">Admin</a>
         </div>
     </header>
-
-
-
