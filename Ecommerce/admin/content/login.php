@@ -3,7 +3,7 @@ include('../../user/includes/header.php');
 ?>
 <main class=" transition-all duration-300 ease-in-out">
   
-<section class="w-full  p-4 h-screen flex  bg-cover justify-between bg-center items-center">
+<section class=" w-full  p-4 h-screen flex  bg-cover justify-between bg-center items-center">
  <div class="w-full md:m-40 lg:w-5/12 lg:m-0 border-0 rounded-lg shadow-lg p-10 pr-20 md:pr-28 lg:pr-32 flex flex-col justify-start   ">
      <div class="flex justify-start flex-col w-full mb-4">
       <p class="w-full block text-gray-700 font-bold text-3xl pt-3 px-3  ">Admin Login</p>
