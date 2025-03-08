@@ -71,6 +71,7 @@ function getSortIcon($column, $currentSort, $currentOrder) {
     return ($currentOrder == 'ASC') ? 
         '<i class="fas fa-sort-up text-blue-500"></i>' : 
         '<i class="fas fa-sort-down text-blue-500"></i>';
+}
 ?>
 
 <div class="container mx-auto p-4">
