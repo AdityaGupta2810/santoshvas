@@ -10,9 +10,9 @@ $sortColumn = isset($_GET['sort']) ? mysqli_real_escape_string($db, $_GET['sort'
 $sortOrder = isset($_GET['order']) ? mysqli_real_escape_string($db, $_GET['order']) : 'ASC';
 
 // Validate sort column to prevent SQL injection
-$allowedColumns = ['tcat_id', 'tcat_name','show_on_menu'];
+$allowedColumns = ['mcat_id', 'mcat_name', 'tcat_id'];
 if (!in_array($sortColumn, $allowedColumns)) {
-    $sortColumn = 'tcat_id';
+    $sortColumn = 'mcat_id';
 }
 
 // Validate sort order
@@ -27,27 +27,31 @@ $offset = ($currentPage - 1) * $itemsPerPage;
 $searchCondition = '';
 if (!empty($searchTerm)) {
     $searchTerm = strtolower($searchTerm);
-    $searchCondition = " WHERE LOWER(tcat_name) LIKE '%$searchTerm%'";
+    $searchCondition = " WHERE LOWER(mcat_name) LIKE '%$searchTerm%'";
 }
 
 // Count total records for pagination
-$countQuery = "SELECT COUNT(*) as total FROM tbl_top_category" . $searchCondition;
+
+$countQuery = "SELECT COUNT(*) as total FROM tbl_mid_category" . $searchCondition;
 $countResult = mysqli_query($db, $countQuery);
 $totalRecords = mysqli_fetch_assoc($countResult)['total'];
 $totalPages = ceil($totalRecords / $itemsPerPage);
 
-// Get records for current page with sorting
-$query = "SELECT * FROM tbl_top_category" . $searchCondition . " ORDER BY $sortColumn $sortOrder LIMIT $offset, $itemsPerPage";
+// Get records for current page with sorting  ////////////
+$query = "SELECT m.*, t.tcat_name 
+         FROM tbl_mid_category m 
+         LEFT JOIN tbl_top_category t ON m.tcat_id = t.tcat_id" 
+         . $searchCondition . " ORDER BY $sortColumn $sortOrder LIMIT $offset, $itemsPerPage";
 $result = mysqli_query($db, $query);
 
-// Handle Top Level Category deletion if requested
+// Handle mid Level Category deletion if requested
 if (isset($_GET['delete_id']) && !empty($_GET['delete_id'])) {
     $delete_id = (int)$_GET['delete_id'];
-    $delete_query = "DELETE FROM tbl_top_category WHERE tcat_id = $delete_id";
+    $delete_query = "DELETE FROM tbl_mid_category WHERE mcat_id = $delete_id";
     
     if (mysqli_query($db, $delete_query)) {
         // Redirect to avoid resubmission on page refresh
-        header("Location: top-category.php");
+        header("Location: mid-category.php");
         exit();
     }
 }
@@ -73,20 +77,20 @@ function getSortIcon($column, $currentSort, $currentOrder) {
 ?>
 
 <div class="container mx-auto p-4">
-    <!-- Header with View Top Level Categorys and Add New button -->
+    <!-- Header with View mid Level Categorys and Add New button -->
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
       <h1 class="text-2xl font-semibold flex items-center mb-3 sm:mb-0">
-        <i class="fas fa-circle-dot mr-2"></i> View Top Level Categoriess
+        <i class="fas fa-circle-dot mr-2"></i> View mid Level Categoriess
       </h1>
       <button id="addNewBtn" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 w-full sm:w-auto">
-        <a href="top-category-add.php" class="block text-center">Add New</a>
+        <a href="mid-category-add.php" class="block text-center">Add New</a>
       </button>
     </div>
     
     <div class="border-t border-b border-gray-300 my-4"></div>
     
     <!-- Controls and search -->
-    <form method="GET" action="top-category.php" class="flex flex-col sm:flex-row justify-between items-center mb-4">
+    <form method="GET" action="mid-category.php" class="flex flex-col sm:flex-row justify-between items-center mb-4">
       <div class="flex items-center mb-3 sm:mb-0 w-full sm:w-auto">
         <span class="mr-2">Show</span>
         <select name="entries" id="entriesSelect" class="border rounded px-2 py-1 mr-2" onchange="this.form.submit()">
@@ -106,7 +110,7 @@ function getSortIcon($column, $currentSort, $currentOrder) {
       <div class="flex items-center w-full sm:w-auto">
         <span class="mr-2">Search:</span>
         <input type="text" name="search" id="searchInput" class="border rounded px-2 py-1 w-full sm:w-64" 
-               value="<?php echo htmlspecialchars($searchTerm); ?>" placeholder="Search by Top Category Name..." />
+               value="<?php echo htmlspecialchars($searchTerm); ?>" placeholder="Search by mid Category Name..." />
         <button type="submit" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
           <i class="fas fa-search"></i>
         </button>
@@ -119,26 +123,26 @@ function getSortIcon($column, $currentSort, $currentOrder) {
         <thead>
           <tr class="bg-gray-50">
             <th class="py-2 px-4 border text-left w-16 relative">
-              <a href="<?php echo getSortUrl('tcat_id', $sortColumn, $sortOrder); ?>" class="flex items-center justify-between">
+              <a href="<?php echo getSortUrl('mcat_id', $sortColumn, $sortOrder); ?>" class="flex items-center justify-between">
                 # 
                 <span class="ml-1">
+                  <?php echo getSortIcon('mcat_id', $sortColumn, $sortOrder); ?>
+                </span>
+              </a>
+            </th>
+            <th class="py-2 px-4 border text-left relative">
+              <a href="<?php echo getSortUrl('mcat_name', $sortColumn, $sortOrder); ?>" class="flex items-center justify-between">
+                Mid Level Categories 
+                <span class="ml-1">
+                  <?php echo getSortIcon('mcat_name', $sortColumn, $sortOrder); ?>
+                </span>
+              </a>
+            </th>
+            <th class="py-2 px-4 border text-left relative">
+              <a href="<?php echo getSortUrl('tcat_id', $sortColumn, $sortOrder); ?>" class="flex items-center justify-between">
+                Top level Categoriess
+                <span class="ml-1">
                   <?php echo getSortIcon('tcat_id', $sortColumn, $sortOrder); ?>
-                </span>
-              </a>
-            </th>
-            <th class="py-2 px-4 border text-left relative">
-              <a href="<?php echo getSortUrl('tcat_name', $sortColumn, $sortOrder); ?>" class="flex items-center justify-between">
-                Top Category Name
-                <span class="ml-1">
-                  <?php echo getSortIcon('tcat_name', $sortColumn, $sortOrder); ?>
-                </span>
-              </a>
-            </th>
-            <th class="py-2 px-4 border text-left relative">
-              <a href="<?php echo getSortUrl('show_on_menu', $sortColumn, $sortOrder); ?>" class="flex items-center justify-between">
-                Show On Menu ?
-                <span class="ml-1">
-                  <?php echo getSortIcon('show_on_menu', $sortColumn, $sortOrder); ?>
                 </span>
               </a>
             </th>
@@ -147,24 +151,24 @@ function getSortIcon($column, $currentSort, $currentOrder) {
             </th>
           </tr>
         </thead>
-        <tbody id="top-categoryTableBody">
+        <tbody id="mid-categoryTableBody">
           <?php 
           if (mysqli_num_rows($result) > 0) {
               while ($row = mysqli_fetch_assoc($result)) {
                   echo '<tr class="hover:bg-gray-50">';
-                  echo '<td class="py-2 px-4 border">' . $row['tcat_id'] . '</td>';
+                  echo '<td class="py-2 px-4 border">' . $row['mcat_id'] . '</td>';
+                  echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['mcat_name']) . '</td>';
                   echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['tcat_name']) . '</td>';
-                  echo '<td class="py-2 px-4 border">' . ($row['show_on_menu'] == 1? "Yes":"No") . '</td>';
                   echo '<td class="py-2 px-4 border flex flex-col sm:flex-row">';
-                  echo '<a href="top-category-edit.php?tcat_id=' . $row['tcat_id'] . '" class="bg-blue-500 text-white px-3 py-1 rounded mb-1 sm:mb-0 sm:mr-1 text-center hover:bg-blue-600">';
+                  echo '<a href="mid-category-edit.php?mcat_id=' . $row['mcat_id'] . '" class="bg-blue-500 text-white px-3 py-1 rounded mb-1 sm:mb-0 sm:mr-1 text-center hover:bg-blue-600">';
                   echo '<i class="fas fa-edit mr-1"></i> Edit</a>';
-                  echo '<a href="top-category.php?delete_id=' . $row['tcat_id'] . '" class="bg-red-500 text-white px-3 py-1 rounded text-center hover:bg-red-600" ';
-                  echo 'onclick="return confirm(\'Are you sure you want to delete this top-category?\')"><i class="fas fa-trash mr-1"></i> Delete</a>';
+                  echo '<a href="mid-category.php?delete_id=' . $row['mcat_id'] . '" class="bg-red-500 text-white px-3 py-1 rounded text-center hover:bg-red-600" ';
+                  echo 'onclick="return confirm(\'Are you sure you want to delete this mid-category?\')"><i class="fas fa-trash mr-1"></i> Delete</a>';
                   echo '</td>';
                   echo '</tr>';
               }
           } else {
-              echo '<tr><td colspan="3" class="py-4 px-4 text-center">No Top Level Categorys found</td></tr>';
+              echo '<tr><td colspan="3" class="py-4 px-4 text-center">No mid Level Categorys found</td></tr>';
           }
           ?>
         </tbody>

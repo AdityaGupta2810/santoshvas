@@ -10,13 +10,13 @@ $tcatName = '';
 $showOnMenu = '';
 $error = '';
 $success = '';
-$tcatId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$tcatId = isset($_GET['tcat_id']) ? (int)$_GET['tcat_id'] : 0;
 
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get category name from form
     $tcatName = trim($_POST['tcat_name']);
-    $tcatId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+    $tcatId = isset($_POST['tcat_id']) ? (int)$_POST['tcat_id'] : 0;
     $showOnMenu = isset($_POST['show_on_menu']) ? $_POST['show_on_menu'] : '0';
     
     // Validate form input
@@ -28,14 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $showOnMenu = mysqli_real_escape_string($db, $showOnMenu);
         
         // Check if category already exists (except current category)
-        $checkQuery = "SELECT * FROM tbl_top_category WHERE tcat_name = '$tcatName' AND id != $tcatId";
+        $checkQuery = "SELECT * FROM tbl_top_category WHERE tcat_name = '$tcatName' AND tcat_id != $tcatId";
         $checkResult = mysqli_query($db, $checkQuery);
         
         if (mysqli_num_rows($checkResult) > 0) {
             $error = 'This category already exists.';
         } else {
             // Update category
-            $updateQuery = "UPDATE tbl_top_category SET tcat_name = '$tcatName', show_on_menu = '$showOnMenu' WHERE id = $tcatId";
+            $updateQuery = "UPDATE tbl_top_category SET tcat_name = '$tcatName', show_on_menu = '$showOnMenu' WHERE tcat_id = $tcatId";
             
             if (mysqli_query($db, $updateQuery)) {
                 $success = 'Top Level Category updated successfully.';
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     // Fetch category data for editing
     if ($tcatId > 0) {
-        $fetchQuery = "SELECT * FROM tbl_top_category WHERE id = $tcatId";
+        $fetchQuery = "SELECT * FROM tbl_top_category WHERE tcat_id = $tcatId";
         $fetchResult = mysqli_query($db, $fetchQuery);
         
         if (mysqli_num_rows($fetchResult) > 0) {
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Edit Category Form -->
     <div class="bg-white rounded-lg shadow-md p-6 max-w-lg mx-auto">
         <form method="POST" action="">
-            <input type="hidden" name="id" value="<?php echo $tcatId; ?>">
+            <input type="hidden" name="tcat_id" value="<?php echo $tcatId; ?>">
 
             <div class="mb-4">
                 <label for="tcat_name" class="block text-sm font-medium mb-1">Top Level Category Name</label>

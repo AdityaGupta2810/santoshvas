@@ -75,7 +75,7 @@ if(!isset($_SESSION['user'])) {
                     </li>
 
                     <li>
-                        <a href="#" class="flex items-center h-10 pl-5 text-gray-600   hover:text-blue-600 hover:bg-gray-100">
+                        <a href="/santoshvas/Ecommerce/admin/dashboardpages/shopsettings/mid-category.php" class="flex items-center h-10 pl-5 text-gray-600   hover:text-blue-600 hover:bg-gray-100">
                             <span><i class='bx bxs-circle  hover:text-blue-700  bx-rotate-90 mr-5' ></i>Mid Level Category</span>
                         </a>
                     </li>
