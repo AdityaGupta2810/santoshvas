@@ -66,23 +66,24 @@
     <!-- CONTENT -->
     <section id="content" class="ml-72 transition-all duration-300">
         <!-- NAVBAR -->
-        <nav class="h-16 bg-white px-6 flex items-center sticky top-0 z-40 shadow-sm">
-            <i class='bx bx-menu text-2xl text-gray-700 cursor-pointer' id="menu-btn"></i>
-            <a href="#" class="nav-link ml-4 text-gray-700 hover:text-blue-500">Categories</a>
-            
-            <!-- Search toggle for small screens -->
-            <i class='bx bx-search text-2xl text-gray-700 cursor-pointer ml-auto hidden lg:hidden' id="search-toggle"></i>
-            
-            <!-- Search form - hidden on small screens by default -->
-            <form action="#" class="search-form hidden md:flex ml-auto transition-all duration-300">
-                <div class="form-input flex items-center h-9">
-                    <input type="search" placeholder="Search..." class="w-64 h-full px-4 bg-gray-200 rounded-l-full outline-none">
-                    <button type="submit" class="w-9 h-full bg-blue-500 text-white rounded-r-full flex items-center justify-center">
-                        <i class='bx bx-search'></i>
-                    </button>
-                </div>
-            </form>
-            
+
+        <!-- 1. First, fix the search toggle icon in the navbar -->
+<nav class="h-16 bg-white px-6 flex items-center justify-evenly  sticky top-0 z-40 shadow-sm">
+    <i class='bx bx-menu text-2xl text-gray-700 cursor-pointer' id="menu-btn"></i>
+    <a href="#" class="nav-link ml-4 text-gray-700 hover:text-blue-500">Categories</a>
+    
+    <!-- Modified search toggle: hidden on md screens and larger -->
+    <!-- <i class='bx bx-search text-2xl text-gray-700 cursor-pointer ml-auto hidden md:hidden lg:hidden xl:hidden' id="search-toggle"></i> -->
+    
+    <!-- Search form: visible only on md screens and larger -->
+    <form action="#" class="search-form hidden md:flex ml-auto transition-all duration-300">
+        <div class="form-input flex items-center h-9">
+            <input type="search" placeholder="Search..." class="w-max-64 h-full px-4 bg-gray-200 rounded-l-full outline-none">
+            <button type="submit" class="w-9 h-full bg-blue-500 text-white rounded-r-full flex items-center justify-center">
+                <i class='bx bx-search'></i>
+            </button>
+           </div>
+               </form>
             <div class="ml-4 flex items-center">
                 <input type="checkbox" id="switch-mode" hidden>
                 <label for="switch-mode" class="bg-gray-300 w-12 h-6 rounded-full relative cursor-pointer flex items-center p-1">
@@ -101,8 +102,10 @@
         </nav>
         <!-- NAVBAR -->
 
+   
+
         <!-- Mobile Search - Expandable -->
-        <div class="mobile-search hidden bg-white p-3 shadow-md md:hidden">
+        <div class="mobile-search  bg-white p-3 shadow-md md:hidden">
             <form action="#" class="w-full">
                 <div class="form-input flex items-center h-9 w-full">
                     <input type="search" placeholder="Search..." class="flex-grow h-full px-4 bg-gray-200 rounded-l-full outline-none">
@@ -245,8 +248,8 @@
         const toggleSwitch = document.getElementById('toggle-switch');
         const allSideMenu = document.querySelectorAll('#sidebar .side-menu.top li');
         const sidebarText = document.querySelectorAll('.sidebar-text');
-        const searchToggle = document.getElementById('search-toggle');
-        const mobileSearch = document.querySelector('.mobile-search');
+        // const searchToggle = document.getElementById('search-toggle');
+        // const mobileSearch = document.querySelector('.mobile-search');
         const darkIcon = document.querySelector('.dark-icon');
         const lightIcon = document.querySelector('.light-icon');
 
@@ -290,9 +293,9 @@
         });
 
         // Toggle search on mobile
-        searchToggle.addEventListener('click', function() {
-            mobileSearch.classList.toggle('hidden');
-        });
+        // searchToggle.addEventListener('click', function() {
+        //     mobileSearch.classList.toggle('hidden');
+        // });
 
         // Toggle dark mode
         switchMode.addEventListener('change', function() {
@@ -320,10 +323,12 @@
                     el.classList.remove('text-gray-500');
                     el.classList.add('text-gray-400');
                 });
+
+               
                 
                 document.querySelectorAll('.bg-gray-100').forEach(el => {
                     el.classList.remove('bg-gray-100');
-                    el.classList.add('bg-gray-700');
+                    el.classList.add('bg-gray-900');
                 });
                 
                 // Status badges - adjust for dark mode
@@ -472,60 +477,71 @@
         });
 
         // Responsive adjustments
-        function handleResize() {
-            if (window.innerWidth < 768) {
-                sidebar.classList.add('collapsed');
-                sidebar.classList.remove('w-72');
-                sidebar.classList.add('w-16');
-                content.classList.remove('ml-72');
-                content.classList.add('ml-16');
-                
-                // Hide text, keep icons
-                sidebarText.forEach(text => {
-                    text.classList.add('hidden');
-                });
-                
-                // Center icons
-                document.querySelectorAll('#sidebar a').forEach(item => {
-                    item.classList.remove('px-6');
-                    item.classList.add('px-3', 'justify-center');
-                });
-                
-                // Hide desktop search, ensure toggle is visible
-                document.querySelector('.search-form').classList.add('hidden');
-                document.getElementById('search-toggle').classList.remove('hidden');
-                
-            } else if (!sidebar.classList.contains('collapsed')) {
-                sidebar.classList.remove('collapsed');
-                sidebar.classList.add('w-72');
-                sidebar.classList.remove('w-16');
-                content.classList.add('ml-72');
-                content.classList.remove('ml-16');
-                
-                // Show text
-                sidebarText.forEach(text => {
-                    text.classList.remove('hidden');
-                });
-                
-                // Reset icon alignment
-                document.querySelectorAll('#sidebar a').forEach(item => {
-                    item.classList.add('px-6');
-                    item.classList.remove('px-3', 'justify-center');
-                });
-                
-                // Show desktop search
-                document.querySelector('.search-form').classList.remove('hidden');
-                
-                // Ensure mobile search is hidden
-                mobileSearch.classList.add('hidden');
-            }
-        }
 
-        // Check on load and resize
-        window.addEventListener('resize', handleResize);
+       // Add this to your existing script section or modify the handleResize function
+
+function handleResize() {
+    if (window.innerWidth < 768) {
+        // For small screens
+        sidebar.classList.add('collapsed');
+        sidebar.classList.remove('w-72');
+        sidebar.classList.add('w-16');
+        content.classList.remove('ml-72');
+        content.classList.add('ml-16');
         
-        // Initial check
-        handleResize();
+        // Hide text, keep icons
+        sidebarText.forEach(text => {
+            text.classList.add('hidden');
+        });
+        
+        // Center icons
+        document.querySelectorAll('#sidebar a').forEach(item => {
+            item.classList.remove('px-6');
+            item.classList.add('px-3', 'justify-center');
+        });
+
+        // Show the search toggle icon for small screens only
+        // document.getElementById('search-toggle').classList.remove('hidden');
+        
+        // Hide desktop search form
+        // document.querySelector('.search-form').classList.add('hidden');
+        
+    } else if (!sidebar.classList.contains('collapsed')) {
+        // For medium and larger screens
+        sidebar.classList.remove('collapsed');
+        sidebar.classList.add('w-72');
+        sidebar.classList.remove('w-16');
+        content.classList.add('ml-72');
+        content.classList.remove('ml-16');
+        
+        // Show text
+        sidebarText.forEach(text => {
+            text.classList.remove('hidden');
+        });
+        
+        // Reset icon alignment
+        document.querySelectorAll('#sidebar a').forEach(item => {
+            item.classList.add('px-6');
+            item.classList.remove('px-3', 'justify-center');
+        });
+        
+        // Hide the search toggle icon on larger screens
+        document.getElementById('search-toggle').classList.add('hidden');
+        
+        // Show desktop search form
+        // document.querySelector('.search-form').classList.remove('hidden');
+        
+        // Ensure mobile search is hidden
+        // mobileSearch.classList.add('hidden');
+    }
+}
+
+// Make sure this function runs on load and resize
+window.addEventListener('resize', handleResize);
+handleResize();
+
+
+
     </script>
 </body>
 </html>

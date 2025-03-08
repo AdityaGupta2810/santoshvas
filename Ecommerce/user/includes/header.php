@@ -10,13 +10,14 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
     
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/santoshvas/Ecommerce/output.css"/>
 </head> 
 <body class="bg-gray-100 ">
     <!-- Sidebar for Mobile (Hidden on Larger Screens) -->
     <div id="sidebar" class="fixed inset-y-0 left-0  bg-gray-800 text-white w-64 transform -translate-x-full sm:hidden transition-transform duration-200 ease-in-out z-50">
         <div class="p-4">
-            <h1 class="text-2xl font-bold">Santosh Vastralay</h1>
+            <h1 class="text-xl  font-bold">Santosh Vastralay</h1>
         </div>
         <nav class=" mt-4">
             <a href="/santoshvas/Ecommerce/index.php" class="block py-2 px-4 hover:bg-gray-700">Home</a>
@@ -47,11 +48,11 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
 
 
     <!-- Header Section -->
-    <header class="bg-gray-400 text-gray-800 p-4 flex flex-wrap justify-between items-center shrink-1 lg:shrink-0">
+    <header class="bg-gray-400 text-gray-800 p-4 flex   justify-between items-center shrink-1 lg:shrink-0 gap-4">
         <!-- Logo and Brand Name -->
         <div class="flex items-center">
             <img src="/santoshvas/Ecommerce/Home/images/logo.png" alt="Santosh Vastralay Logo" class="h-12">
-            <h1 class="text-2xl font-bold ml-2">Santosh Vastralay</h1>
+            <h1 class="text-xl md:text-2xl font-bold ml-2 ">Santosh Vastralay</h1>
         </div>
     
         <!-- Mobile Menu Button (Hamburger Icon) -->
@@ -62,7 +63,7 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
         </button>
     
         <!-- Navigation Menu for Larger Screens -->
-        <nav class="hidden sm:flex space-x-4">
+        <nav class="hidden sm:flex gap-4">
             <a href="#" class="hover:text-blue-600 font-semibold">Home</a>
             <a href="#" class="hover:text-blue-600 font-semibold">Women</a>
             <a href="#" class="hover:text-blue-600 font-semibold">Men</a>
@@ -70,7 +71,7 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
         </nav>
     
         <!-- Search Bar for Larger Screens -->
-        <div class="hidden sm:flex items-center">
+        <div class="hidden md:flex items-center">
             <input type="text" placeholder="Search..." class="p-2 rounded border border-gray-500">
             <button class="bg-blue-600 text-white p-2 rounded ml-2 hover:bg-blue-700" aria-label="Search">Search</button>
         </div>
@@ -97,3 +98,13 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
             <a href="/santoshvas/Ecommerce/admin/index.php" class="hover:text-blue-600 font-semibold">Admin</a>
         </div>
     </header>
+    <div class=" bg-white p-3 shadow-md md:hidden flex justify-center px-10">
+            <form action="#" class="w-full">
+                <div class="form-input flex items-center h-9 w-full">
+                    <input type="search" placeholder="Search..." class="flex-grow h-full px-4 bg-gray-200 rounded-l-full outline-none">
+                    <button type="submit" class="w-9 h-full bg-blue-500 text-white rounded-r-full flex items-center justify-center">
+                        <i class='bx bx-search'></i>
+                    </button>
+                </div>
+            </form>
+        </div>
