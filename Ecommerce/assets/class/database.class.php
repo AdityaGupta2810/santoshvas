@@ -1,23 +1,28 @@
 <?php
 
-class Database{
-
-    private $host ='localhost';
+class Database {
+    private $host = 'localhost';
     private $username = 'root';
-    private $database  = 'santoshvastralay';
-
+    private $database = 'santoshvastralay';
     private $password = '';
-    private $result=null;
+    private $result = null;
 
-    function __construct(){
-      $this->result= new mysqli($this->host, $this->username,  $this->password, $this->database); 
+    function __construct() {
+        $this->result = new mysqli($this->host, $this->username, $this->password, $this->database);
+        if ($this->result->connect_error) {
+            die("Connection failed: " . $this->result->connect_error);
+        }
     }
-   
-     public function connect(){
+
+    public function connect() {
         return $this->result;
     }
-
 }
 
-$db = new Database();
-$db=$db->connect();
+$dbInstance = new Database();
+// global $db;
+$db = $dbInstance->connect();  // Assigning to global variable separately
+
+
+
+?>
