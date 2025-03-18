@@ -28,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $midCatName = mysqli_real_escape_string($db, $midCatName);
         
         // Check if mid-category already exists
-        $checkQuery = "SELECT * FROM tbl_mid_category WHERE mcat_name = '$midCatName' AND tcat_id = $topCatId";
+        $checkQuery = "SELECT * FROM tbl_mid_category WHERE mcat_name = '$midCatName';
+        //  AND tcat_id = $topCatId";
         $checkResult = mysqli_query($db, $checkQuery);
         
         if (mysqli_num_rows($checkResult) > 0) {

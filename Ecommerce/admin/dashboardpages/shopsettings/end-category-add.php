@@ -2,7 +2,8 @@
 include_once '../../includes/header.php';
 
 // Initialize variables
-$midCatName = '';
+$endCatName = '';
+$midCatId = '';
 $topCatId = '';
 $error = '';
 $success = '';
@@ -10,38 +11,45 @@ $success = '';
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get mid-category name and top category ID from form
-    $midCatName = trim($_POST['mcat_name']);
+    $endCatName = trim($_POST['ecat_name']);
+    $midCatId = isset($_POST['mcat_id']) ? (int)$_POST['mcat_id'] : 0;
     $topCatId = isset($_POST['tcat_id']) ? (int)$_POST['tcat_id'] : 0;
     
     // Validate form input
-    if (empty($midCatName)) {
-        $error = 'Mid Level Category name is required.';
+    if (empty($endCatName)) {
+        $error = 'End Level Category name is required.';
     } elseif (empty($topCatId)) {
         $error = 'Please select a Top Level Category.';
-    } else {
+    } elseif (empty($midCatId)) {
+        $error = 'Please select a Mid Level Category.';
+    }
+    else {
         // Check connection
         if (!$db) {
             die("Connection failed: " . mysqli_connect_error());
         }
         
         // Escape input to prevent SQL injection
-        $midCatName = mysqli_real_escape_string($db, $midCatName);
+        $endCatName = mysqli_real_escape_string($db, $endCatName);
         
         // Check if mid-category already exists
-        $checkQuery = "SELECT * FROM tbl_mid_category WHERE mcat_name = '$midCatName' AND tcat_id = $topCatId";
+        $checkQuery = "SELECT * FROM tbl_end_category e 
+        JOIN tbl_mid_category m ON e.mcat_id = m.mcat_id 
+        -- JOIN tbl_top_category t ON m.tcat_id = t.tcat_id 
+        WHERE e.ecat_name = '$endCatName' AND e.mcat_id = '$midCatId' AND m.tcat_id = '$topCatId'";
         $checkResult = mysqli_query($db, $checkQuery);
         
         if (mysqli_num_rows($checkResult) > 0) {
-            $error = 'This Mid Level Category already exists under the selected Top Level Category.';
+            $error = 'This End Level Category already exists under the selected Mid Level Category.';
         } else {
             // Insert new mid-category
-            $insertQuery = "INSERT INTO tbl_mid_category (mcat_name, tcat_id) VALUES ('$midCatName', $topCatId)";
+            $insertQuery = "INSERT INTO tbl_end_category (ecat_name, mcat_id) VALUES ('$endCatName', $midCatId)";
             if (mysqli_query($db, $insertQuery)) {
-                $success = 'Mid Level Category added successfully.';
-                $midCatName = ''; // Clear form
-                $topCatId = '';
+                $success = 'End Level Category added successfully.';
+                $endCatName = ''; // Clear form
+                $midCatId = '';
             } else {
-                $error = 'Error adding Mid Level Category: ' . mysqli_error($db);
+                $error = 'Error adding End Level Category: ' . mysqli_error($db);
             }
         }
     }
@@ -50,16 +58,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Get top-level categories for dropdown
 $topCatsQuery = "SELECT * FROM tbl_top_category ORDER BY tcat_name ASC";
 $topCatsResult = mysqli_query($db, $topCatsQuery);
+
+
+$midCatsQuery = "SELECT * FROM tbl_mid_category ORDER BY mcat_name ASC";
+$midCatsResult = mysqli_query($db, $midCatsQuery);
 ?>
 
 <div class="container mx-auto p-4">
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold flex items-center">
-            <i class="fas fa-circle-dot mr-2"></i> Add New Mid Level Category
+            <i class="fas fa-circle-dot mr-2"></i> Add New End Level Category
         </h1>
-        <a href="mid-category.php" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">
-            Back to Mid Level Categories
+        <a href="end-category.php" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">
+            Back to End Level Categories
         </a>
     </div>
     
@@ -96,13 +108,27 @@ $topCatsResult = mysqli_query($db, $topCatsQuery);
                 </select>
             </div>
             <div class="mb-4">
-                <label for="mcat_name" class="block text-sm font-medium mb-1">Mid Level Category</label>
-                <input type="text" id="mcat_name" name="mcat_name" value="<?php echo htmlspecialchars($midCatName); ?>" 
+                <label for="mcat_id" class="block text-sm font-medium mb-1">Mid Level Category</label>
+                <select id="mcat_id" name="mcat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <option value="">Select Mid Level Category</option>
+                    <?php 
+                    if ($midCatsResult && mysqli_num_rows($midCatsResult) > 0) {
+                        while ($row = mysqli_fetch_assoc($midCatsResult)) {
+                            $selected = ($midCatId == $row['mcat_id']) ? 'selected' : '';
+                            echo '<option value="' . $row['mcat_id'] . '" ' . $selected . '>' . htmlspecialchars($row['mcat_name']) . '</option>';
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for='ecat_name' class="block text-sm font-medium mb-1">End Level Category</label>
+                <input type="text" id="ecat_name" name='ecat_name' value="<?php echo htmlspecialchars($endCatName); ?>" 
                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
             </div>
             
             <div class="flex justify-end">
-                <a href="mid-category.php" class="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400">Cancel</a>
+                <a href="end-category.php" class="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400">Cancel</a>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
             </div>
         </form>
