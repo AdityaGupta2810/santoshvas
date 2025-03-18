@@ -10,7 +10,7 @@ $success = '';
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get Size name from form
-    $sizeName = trim($_POST['Size_name']);
+    $sizeName = trim($_POST['size_name']);
     
     // Validate form input
     if (empty($sizeName)) {
