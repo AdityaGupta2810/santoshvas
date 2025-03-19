@@ -87,6 +87,12 @@ if(!isset($_SESSION['user'])) {
                 </ul>
             </li>
             <li>
+                <a href="/santoshvas/Ecommerce/admin/dashboardpages/productmanagement/products.php" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
+                    <i class='bx bxs-doughnut-chart text-xl'></i>
+                    <span class="text ml-3 sidebar-text ">Product Management</span>
+                </a>
+            </li>
+            <li>
                 <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-doughnut-chart text-xl'></i>
                     <span class="text ml-3 sidebar-text ">Analytics</span>
