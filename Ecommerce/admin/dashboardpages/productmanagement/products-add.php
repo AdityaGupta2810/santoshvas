@@ -1,250 +1,188 @@
-<?php 
+<?php
 include_once '../../includes/header.php';
 
-// Initialize variables to store form data for persistence
+// Initialize variables for form data
 $p_name = '';
 $p_old_price = '';
 $p_current_price = '';
 $p_qty = '';
-$p_size = '';
-$p_color = '';
 $p_description = '';
 $p_short_description = '';
-$p_is_active = 1; // Default to active
+$p_feature = '';
+$p_is_active = 1;
+$p_is_featured = 0;
+$ecat_id = '';
 
-// Check if form is submitted
+// Arrays to store validation errors and success messages
+$errors = [];
+$success = '';
+
+// Process form submission
 if (isset($_POST['form1'])) {
-    // Collect and sanitize form data
+    // Get form data with validation
     $p_name = mysqli_real_escape_string($db, $_POST['p_name']);
-    $p_old_price = isset($_POST['p_old_price']) && !empty($_POST['p_old_price']) ? (float)$_POST['p_old_price'] : null;
-    $p_current_price = (float)$_POST['p_current_price'];
-    $p_qty = (int)$_POST['p_qty'];
-    $p_size = isset($_POST['p_size']) && !empty($_POST['p_size']) ? (int)$_POST['p_size'] : null;
-    $p_color = isset($_POST['p_color']) && !empty($_POST['p_color']) ? (int)$_POST['p_color'] : null;
+    $p_old_price = mysqli_real_escape_string($db, $_POST['p_old_price']);
+    $p_current_price = mysqli_real_escape_string($db, $_POST['p_current_price']);
+    $p_qty = mysqli_real_escape_string($db, $_POST['p_qty']);
     $p_description = mysqli_real_escape_string($db, $_POST['p_description']);
     $p_short_description = mysqli_real_escape_string($db, $_POST['p_short_description']);
+    $p_feature = mysqli_real_escape_string($db, $_POST['p_feature']);
     $p_is_active = isset($_POST['p_is_active']) ? 1 : 0;
-    $ecat_id = (int)$_POST['ecat_id'];
-    
-    // Validation
-    $valid = true;
-    $error_message = '';
-    
-    if(empty($p_name)) {
-        $valid = false;
-        $error_message .= 'Product name cannot be empty<br>';
+    $p_is_featured = isset($_POST['p_is_featured']) ? 1 : 0;
+    $ecat_id = mysqli_real_escape_string($db, $_POST['ecat_id']);
+
+    // Form validation
+    if (empty($p_name)) {
+        $errors[] = "Product name cannot be empty";
     }
     
-    if(empty($p_current_price)) {
-        $valid = false;
-        $error_message .= 'Current price cannot be empty<br>';
+    if (empty($p_current_price)) {
+        $errors[] = "Current price cannot be empty";
+    } elseif (!is_numeric($p_current_price)) {
+        $errors[] = "Current price must be a number";
     }
     
-    if(empty($p_qty)) {
-        $valid = false;
-        $error_message .= 'Quantity cannot be empty<br>';
+    if (!empty($p_old_price) && !is_numeric($p_old_price)) {
+        $errors[] = "Old price must be a number";
     }
     
-    if(empty($ecat_id)) {
-        $valid = false;
-        $error_message .= 'Please select a category<br>';
+    if (empty($p_qty)) {
+        $errors[] = "Quantity cannot be empty";
+    } elseif (!is_numeric($p_qty)) {
+        $errors[] = "Quantity must be a number";
     }
     
-    // Check if featured photo is uploaded
-    if(!isset($_FILES['p_featured_photo']['name']) || empty($_FILES['p_featured_photo']['name'])) {
-        $valid = false;
-        $error_message .= 'Featured photo is required<br>';
+    if (empty($ecat_id)) {
+        $errors[] = "You must select a category";
     }
-    
+
     // Handle featured photo upload
-    $featured_photo = '';
-    if($valid) {
-        if(isset($_FILES['p_featured_photo']['name']) && !empty($_FILES['p_featured_photo']['name'])) {
-            $file_name = $_FILES['p_featured_photo']['name'];
-            $file_temp = $_FILES['p_featured_photo']['tmp_name'];
-            $ext = pathinfo($file_name, PATHINFO_EXTENSION);
-            $allowed_exts = array('jpg', 'jpeg', 'png', 'gif');
-            
-            if(in_array(strtolower($ext), $allowed_exts)) {
-                $featured_photo = 'product_'.time().'.'.$ext;
-                move_uploaded_file($file_temp, '../../assets/uploads/products/'.$featured_photo);
+    $target_dir = "../../assets/uploads/products/";
+    $p_featured_photo = '';
+    
+    if (isset($_FILES['p_featured_photo']) && $_FILES['p_featured_photo']['error'] == 0) {
+        $filename = basename($_FILES["p_featured_photo"]["name"]);
+        $fileType = pathinfo($filename, PATHINFO_EXTENSION);
+        
+        // Generate unique filename
+        $new_filename = uniqid() . '.' . $fileType;
+        $target_file = $target_dir . $new_filename;
+
+        // Check file type
+        $allowed_types = ["jpg", "jpeg", "png", "gif"];
+        if (!in_array(strtolower($fileType), $allowed_types)) {
+            $errors[] = "Only JPG, JPEG, PNG & GIF files are allowed for the featured photo.";
+        }
+        
+        // Check file size (limit to 5MB)
+        if ($_FILES["p_featured_photo"]["size"] > 5000000) {
+            $errors[] = "Featured photo file is too large. Maximum size: 5MB";
+        }
+        
+        // If no errors, try to upload the file
+        if (empty($errors)) {
+            if (!move_uploaded_file($_FILES["p_featured_photo"]["tmp_name"], $target_file)) {
+                $errors[] = "Sorry, there was an error uploading your featured photo.";
             } else {
-                $valid = false;
-                $error_message .= 'Featured photo must be jpg, jpeg, png or gif file<br>';
+                $p_featured_photo = $new_filename;
             }
         }
+    } else {
+        $errors[] = "Featured photo is required";
     }
+
+    // Handle product photos (multiple)
+    $photo_names = [];
     
-    // Process multiple photos if needed
-    $photos = array();
-    if($valid) {
-        // Process additional photos
-        if(isset($_FILES['p_photos']['name']) && !empty($_FILES['p_photos']['name'][0])) {
-            $total_files = count($_FILES['p_photos']['name']);
-            
-            for($i=0; $i<$total_files; $i++) {
-                $file_name = $_FILES['p_photos']['name'][$i];
-                $file_temp = $_FILES['p_photos']['tmp_name'][$i];
-                $ext = pathinfo($file_name, PATHINFO_EXTENSION);
+    if (!empty($_FILES['p_photos']['name'][0])) {
+        $total = count($_FILES['p_photos']['name']);
+        
+        for ($i = 0; $i < $total; $i++) {
+            if ($_FILES['p_photos']['error'][$i] == 0) {
+                $filename = basename($_FILES["p_photos"]["name"][$i]);
+                $fileType = pathinfo($filename, PATHINFO_EXTENSION);
                 
-                if(in_array(strtolower($ext), $allowed_exts)) {
-                    $photo_name = 'product_'.time().'_'.$i.'.'.$ext;
-                    move_uploaded_file($file_temp, '../../assets/uploads/products/'.$photo_name);
-                    $photos[] = $photo_name;
-                } else {
-                    $valid = false;
-                    $error_message .= 'Photo '.$i.' must be jpg, jpeg, png or gif file<br>';
+                // Generate unique filename
+                $new_filename = uniqid() . '.' . $fileType;
+                $target_file = $target_dir . $new_filename;
+
+                // Check file type
+                $allowed_types = ["jpg", "jpeg", "png", "gif"];
+                if (!in_array(strtolower($fileType), $allowed_types)) {
+                    $errors[] = "Only JPG, JPEG, PNG & GIF files are allowed for product photos.";
                     break;
                 }
+                
+                // Check file size (limit to 5MB)
+                if ($_FILES["p_photos"]["size"][$i] > 5000000) {
+                    $errors[] = "One or more photo files are too large. Maximum size: 5MB";
+                    break;
+                }
+                
+                // Try to upload the file
+                if (empty($errors)) {
+                    if (move_uploaded_file($_FILES["p_photos"]["tmp_name"][$i], $target_file)) {
+                        $photo_names[] = $new_filename;
+                    } else {
+                        $errors[] = "Sorry, there was an error uploading one of your product photos.";
+                        break;
+                    }
+                }
             }
         }
     }
-    
-    // Insert data if valid
-    if($valid) {
-        try {
-            // Start transaction
-            $db->begin_transaction();
+
+    // If no errors, insert product into database
+    if (empty($errors)) {
+        // Insert into tbl_product
+        $stmt = $db->prepare("INSERT INTO tbl_product (p_name, p_old_price, p_current_price, p_qty, p_featured_photo, p_description, p_short_description, p_feature, p_is_active, p_is_featured, ecat_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssssssiis", $p_name, $p_old_price, $p_current_price, $p_qty, $p_featured_photo, $p_description, $p_short_description, $p_feature, $p_is_active, $p_is_featured, $ecat_id);
+        
+        if ($stmt->execute()) {
+            $p_id = $stmt->insert_id;
             
-            // Insert product - Fix: using proper parameter types and handling NULL values
-            $sql = "INSERT INTO tbl_product (
-                p_name, p_old_price, p_current_price, p_qty, 
-                p_featured_photo, p_description, p_short_description, 
-                p_is_active, ecat_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            
-            $statement = $db->prepare($sql);
-            
-            if (!$statement) {
-                throw new Exception("Prepare failed: " . $db->error);
-            }
-            
-            // Updated bind_param with correct types
-            $statement->bind_param(
-                "sddiissii", 
-                $p_name, $p_old_price, $p_current_price, $p_qty,
-                $featured_photo, $p_description, $p_short_description, 
-                $p_is_active, $ecat_id
-            );
-            
-            if (!$statement->execute()) {
-                throw new Exception("Execute failed: " . $statement->error);
-            }
-            
-            $product_id = $db->insert_id;
-            
-            // Handle size relationship if size is selected
-            if($p_size) {
-                $stmt_size = $db->prepare("INSERT INTO tbl_product_size (p_id, size_id) VALUES (?, ?)");
-                if (!$stmt_size) {
-                    throw new Exception("Prepare size failed: " . $db->error);
-                }
-                $stmt_size->bind_param("ii", $product_id, $p_size);
-                if (!$stmt_size->execute()) {
-                    throw new Exception("Execute size failed: " . $stmt_size->error);
+            // Insert product photos if any
+            if (!empty($photo_names)) {
+                foreach ($photo_names as $photo) {
+                    $stmt = $db->prepare("INSERT INTO tbl_product_photo (p_id, photo) VALUES (?, ?)");
+                    $stmt->bind_param("is", $p_id, $photo);
+                    $stmt->execute();
                 }
             }
             
-            // Handle color relationship if color is selected
-            if($p_color) {
-                $stmt_color = $db->prepare("INSERT INTO tbl_product_color (p_id, color_id) VALUES (?, ?)");
-                if (!$stmt_color) {
-                    throw new Exception("Prepare color failed: " . $db->error);
-                }
-                $stmt_color->bind_param("ii", $product_id, $p_color);
-                if (!$stmt_color->execute()) {
-                    throw new Exception("Execute color failed: " . $stmt_color->error);
-                }
-            }
+            $success = "Product added successfully!";
             
-            // Insert additional photos if any
-            if(!empty($photos)) {
-                foreach($photos as $photo) {
-                    $statement = $db->prepare("INSERT INTO tbl_product_photo (p_id, photo) VALUES (?, ?)");
-                    
-                    if (!$statement) {
-                        throw new Exception("Prepare failed: " . $db->error);
-                    }
-                    
-                    $statement->bind_param("is", $product_id, $photo);
-                    
-                    if (!$statement->execute()) {
-                        throw new Exception("Execute failed: " . $statement->error);
-                    }
-                }
-            }
-            
-            // Commit transaction
-            $db->commit();
-            
-            $success_message = 'Product has been added successfully!';
-            
-            // Clear form data
+            // Reset form fields
             $p_name = '';
             $p_old_price = '';
             $p_current_price = '';
             $p_qty = '';
-            $p_size = '';
-            $p_color = '';
             $p_description = '';
             $p_short_description = '';
+            $p_feature = '';
             $p_is_active = 1;
-            
-        } catch (Exception $e) {
-            // Rollback transaction on error
-            $db->rollback();
-            $error_message = 'Database error: ' . $e->getMessage();
+            $p_is_featured = 0;
+            $ecat_id = '';
+        } else {
+            $errors[] = "Error adding product: " . $stmt->error;
         }
     }
 }
 
-// Get categories for dropdown selection
-try {
-    $stmt_categories = $db->prepare("
-        SELECT e.ecat_id, e.ecat_name, m.mcat_name, t.tcat_name 
-        FROM tbl_end_category e
-        JOIN tbl_mid_category m ON e.mcat_id = m.mcat_id
-        JOIN tbl_top_category t ON m.tcat_id = t.tcat_id
-        ORDER BY t.tcat_name, m.mcat_name, e.ecat_name
-    ");
-    
-    if (!$stmt_categories) {
-        throw new Exception("Prepare failed: " . $db->error);
-    }
-    
-    $stmt_categories->execute();
-    $result_categories = $stmt_categories->get_result();
-    
-    // Get sizes for dropdown
-    $stmt_sizes = $db->prepare("SELECT id, size_name FROM tbl_size ORDER BY size_name");
-    
-    if (!$stmt_sizes) {
-        throw new Exception("Prepare failed: " . $db->error);
-    }
-    
-    $stmt_sizes->execute();
-    $result_sizes = $stmt_sizes->get_result();
-    
-    // Get colors for dropdown
-    $stmt_colors = $db->prepare("SELECT id, color_name FROM tbl_color ORDER BY color_name");
-    
-    if (!$stmt_colors) {
-        throw new Exception("Prepare failed: " . $db->error);
-    }
-    
-    $stmt_colors->execute();
-    $result_colors = $stmt_colors->get_result();
-    
-} catch (Exception $e) {
-    $error_message = 'Database error: ' . $e->getMessage();
-}
+// Get categories for dropdown
+$categories_query = "SELECT e.ecat_id, e.ecat_name, m.mcat_name, t.tcat_name 
+                    FROM tbl_end_category e
+                    JOIN tbl_mid_category m ON e.mcat_id = m.mcat_id
+                    JOIN tbl_top_category t ON m.tcat_id = t.tcat_id
+                    ORDER BY t.tcat_name, m.mcat_name, e.ecat_name";
+$categories_result = mysqli_query($db, $categories_query);
 ?>
 
 <div class="container mx-auto p-4">
-    <!-- Header with title and back button -->
+    <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold flex items-center mb-3 sm:mb-0">
-            <i class="fas fa-plus-circle mr-2"></i>Add Product
+            <i class="fas fa-plus-square mr-2"></i>Add Product
         </h1>
         <button class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 w-full sm:w-auto">
             <a href="products.php" class="block text-center">
@@ -252,68 +190,100 @@ try {
             </a>
         </button>
     </div>
-    
+
     <div class="border-t border-b border-gray-300 my-4"></div>
-    
-    <!-- Error/Success Messages -->
-    <?php if(isset($error_message) && !empty($error_message)): ?>
-    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
-        <p class="font-bold">Error</p>
-        <p><?php echo $error_message; ?></p>
-    </div>
+
+    <!-- Display errors if any -->
+    <?php if (!empty($errors)): ?>
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+            <p class="font-bold">Errors:</p>
+            <ul class="ml-4 list-disc">
+                <?php foreach ($errors as $error): ?>
+                    <li><?php echo $error; ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     <?php endif; ?>
-    
-    <?php if(isset($success_message) && !empty($success_message)): ?>
-    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
-        <p class="font-bold">Success</p>
-        <p><?php echo $success_message; ?></p>
-    </div>
+
+    <!-- Display success message if any -->
+    <?php if (!empty($success)): ?>
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+            <p><?php echo $success; ?></p>
+        </div>
     <?php endif; ?>
-    
+
     <!-- Product Add Form -->
     <div class="bg-white rounded shadow p-6">
         <form action="" method="post" enctype="multipart/form-data">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left Column -->
-                <div>
-                    <!-- Categories Section -->
-                    <div class="mb-6">
-                        <label for="ecat_id" class="block mb-2 font-medium">Category Selection <span class="text-red-500">*</span></label>
-                        <select name="ecat_id" id="ecat_id" class="w-full border rounded px-3 py-2" required>
-                            <option value="">Select Category</option>
-                            <?php if(isset($result_categories) && $result_categories->num_rows > 0): ?>
-                                <?php while($row = $result_categories->fetch_assoc()): ?>
-                                <option value="<?php echo htmlspecialchars($row['ecat_id']); ?>" <?php echo (isset($_POST['ecat_id']) && $_POST['ecat_id'] == $row['ecat_id']) ? 'selected' : ''; ?>>
+            <!-- Basic Product Information -->
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-4">Basic Information</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Product Name -->
+                    <div>
+                        <label for="p_name" class="block mb-2 font-medium">Product Name *</label>
+                        <input type="text" name="p_name" id="p_name" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($p_name); ?>">
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label for="ecat_id" class="block mb-2 font-medium">Category *</label>
+                        <select name="ecat_id" id="ecat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select a category</option>
+                            <?php while ($row = mysqli_fetch_assoc($categories_result)): ?>
+                                <option value="<?php echo $row['ecat_id']; ?>" <?php echo ($ecat_id == $row['ecat_id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($row['tcat_name'] . ' → ' . $row['mcat_name'] . ' → ' . $row['ecat_name']); ?>
                                 </option>
-                                <?php endwhile; ?>
-                            <?php endif; ?>
+                            <?php endwhile; ?>
                         </select>
                     </div>
-                    
-                    <!-- Basic Info Section -->
-                    <div class="mb-6">
-                        <label for="p_name" class="block mb-2 font-medium">Product Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="p_name" id="p_name" class="w-full border rounded px-3 py-2" value="<?php echo htmlspecialchars($p_name); ?>" required>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <!-- Old Price -->
+                    <div>
+                        <label for="p_old_price" class="block mb-2 font-medium">Old Price ($)</label>
+                        <input type="text" name="p_old_price" id="p_old_price" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($p_old_price); ?>">
                     </div>
-                    
-                    <div class="mb-6">
-                        <label for="p_old_price" class="block mb-2 font-medium">Old Price (in USD)</label>
-                        <input type="number" step="0.01" name="p_old_price" id="p_old_price" class="w-full border rounded px-3 py-2" value="<?php echo htmlspecialchars($p_old_price); ?>">
+
+                    <!-- Current Price -->
+                    <div>
+                        <label for="p_current_price" class="block mb-2 font-medium">Current Price ($) *</label>
+                        <input type="text" name="p_current_price" id="p_current_price" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($p_current_price); ?>">
                     </div>
-                    
-                    <div class="mb-6">
-                        <label for="p_current_price" class="block mb-2 font-medium">Current Price (in USD) <span class="text-red-500">*</span></label>
-                        <input type="number" step="0.01" name="p_current_price" id="p_current_price" class="w-full border rounded px-3 py-2" value="<?php echo htmlspecialchars($p_current_price); ?>" required>
+
+                    <!-- Quantity -->
+                    <div>
+                        <label for="p_qty" class="block mb-2 font-medium">Quantity *</label>
+                        <input type="text" name="p_qty" id="p_qty" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($p_qty); ?>">
                     </div>
-                    
-                    <div class="mb-6">
-                        <label for="p_qty" class="block mb-2 font-medium">Quantity <span class="text-red-500">*</span></label>
-                        <input type="number" name="p_qty" id="p_qty" class="w-full border rounded px-3 py-2" value="<?php echo htmlspecialchars($p_qty); ?>" required>
-                    </div>
-                    
-                    <!-- Size and Color Dropdowns -->
-                    <div class="mb-6">
+                </div>
+            </div>
+
+            <div class="border-t border-gray-300 my-6"></div>
+
+            <!-- Product Images -->
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-4">Product Images</h2>
+                
+                <div class="mb-4">
+                    <label for="p_featured_photo" class="block mb-2 font-medium">Featured Photo *</label>
+                    <input type="file" name="p_featured_photo" id="p_featured_photo" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" accept="image/*">
+                    <p class="text-sm text-gray-500 mt-1">Maximum file size: 5MB. Allowed formats: JPG, JPEG, PNG, GIF</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="p_photos" class="block mb-2 font-medium">Other Photos (Multiple)</label>
+                    <input type="file" name="p_photos[]" id="p_photos" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" accept="image/*" multiple>
+                    <p class="text-sm text-gray-500 mt-1">Maximum file size: 5MB per image. Allowed formats: JPG, JPEG, PNG, GIF</p>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-300 my-6"></div>
+
+             <!-- Size and Color Dropdowns -->
+             <div class="mb-6">
                         <label for="p_size" class="block mb-2 font-medium">Size</label>
                         <select name="p_size" id="p_size" class="w-full border rounded px-3 py-2">
                             <option value="">Select Size</option>
@@ -341,90 +311,127 @@ try {
                         </select>
                     </div>
                 </div>
+
+            <!-- Product Description -->
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-4">Product Description</h2>
                 
-                <!-- Right Column -->
-                <div>
-                    <!-- Images Section -->
-                    <div class="mb-6">
-                        <label for="p_featured_photo" class="block mb-2 font-medium">Featured Photo <span class="text-red-500">*</span></label>
-                        <input type="file" name="p_featured_photo" id="p_featured_photo" class="w-full border rounded px-3 py-2" required>
-                        <p class="text-sm text-gray-500 mt-1">Main product image (jpg, jpeg, png, gif only)</p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label for="p_photos" class="block mb-2 font-medium">Other Photos</label>
-                        <input type="file" name="p_photos[]" id="p_photos" class="w-full border rounded px-3 py-2" multiple>
-                        <p class="text-sm text-gray-500 mt-1">You can select multiple photos (jpg, jpeg, png, gif only)</p>
-                    </div>
-                    
-                    <!-- Description Sections -->
-                    <div class="mb-6">
-                        <label for="p_short_description" class="block mb-2 font-medium">Short Description</label>
-                        <textarea name="p_short_description" id="p_short_description" rows="3" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($p_short_description); ?></textarea>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label for="p_description" class="block mb-2 font-medium">Full Description</label>
-                        <textarea name="p_description" id="p_description" rows="6" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($p_description); ?></textarea>
-                    </div>
-                    
-                    <!-- Status Section -->
-                    <div class="mb-6">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="p_is_active" value="1" <?php echo ($p_is_active == 1) ? 'checked' : ''; ?> class="mr-2">
-                            <span>Active</span>
-                        </label>
-                        <p class="text-sm text-gray-500 mt-1">Uncheck to hide this product from the store</p>
-                    </div>
+                <div class="mb-4">
+                    <label for="p_short_description" class="block mb-2 font-medium">Short Description</label>
+                    <textarea name="p_short_description" id="p_short_description" rows="3" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($p_short_description); ?></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="p_description" class="block mb-2 font-medium">Full Description</label>
+                    <textarea name="p_description" id="p_description" rows="6" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($p_description); ?></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="p_feature" class="block mb-2 font-medium">Features (One feature per line)</label>
+                    <textarea name="p_feature" id="p_feature" rows="4" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($p_feature); ?></textarea>
                 </div>
             </div>
-            
-            <!-- Submit Buttons -->
-            <div class="border-t border-gray-300 mt-6 pt-6 flex flex-col sm:flex-row justify-end">
-                <button type="submit" name="form1" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mb-2 sm:mb-0 sm:mr-2">
-                    <i class="fas fa-save mr-2"></i>Save Product
+
+            <div class="border-t border-gray-300 my-6"></div>
+
+            <!-- Product Settings -->
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-4">Product Settings</h2>
+                
+                <div class="flex items-center mb-4">
+                    <input type="checkbox" name="p_is_active" id="p_is_active" class="mr-2" <?php echo $p_is_active ? 'checked' : ''; ?>>
+                    <label for="p_is_active" class="font-medium">Active (Product is visible on the website)</label>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" name="p_is_featured" id="p_is_featured" class="mr-2" <?php echo $p_is_featured ? 'checked' : ''; ?>>
+                    <label for="p_is_featured" class="font-medium">Featured (Product appears in featured section)</label>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-300 my-6"></div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+                <button type="submit" name="form1" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-plus-circle mr-2"></i>Add Product
                 </button>
-                <a href="products.php" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 text-center">
-                    <i class="fas fa-times mr-2"></i>Cancel
-                </a>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Initialize rich text editors -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize rich text editors if available
-    if(typeof tinymce !== 'undefined') {
-        tinymce.init({
-            selector: '#p_description',
-            height: 300,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media table paste code help wordcount'
-            ],
-            toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                alignleft aligncenter alignright alignjustify | \
-                bullist numlist outdent indent | removeformat | help'
-        });
-        
-        tinymce.init({
-            selector: '#p_short_description',
-            height: 150,
-            menubar: false,
-            plugins: [
-                'advlist autolink lists link charmap print preview anchor',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media table paste code help wordcount'
-            ],
-            toolbar: 'undo redo | formatselect | bold italic | \
-                alignleft aligncenter alignright alignjustify | \
-                bullist numlist | removeformat'
-        });
+// Add rich text editor for product description if you have one integrated
+// Example: if you have CKEditor included in your project
+if (typeof CKEDITOR !== 'undefined') {
+    CKEDITOR.replace('p_description');
+}
+
+// Preview image on file select for featured photo
+document.getElementById('p_featured_photo').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.createElement('div');
+            preview.innerHTML = `
+                <div class="mt-2 flex items-center">
+                    <img src="${e.target.result}" alt="Preview" class="w-24 h-24 object-cover rounded border">
+                    <span class="ml-2 text-sm text-gray-500">Preview</span>
+                </div>
+            `;
+            
+            // Remove previous preview if exists
+            const oldPreview = document.querySelector('.preview-container');
+            if (oldPreview) {
+                oldPreview.remove();
+            }
+            
+            preview.classList.add('preview-container');
+            e.target.parentNode.appendChild(preview);
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    let errors = [];
+    const required = ['p_name', 'p_current_price', 'p_qty', 'ecat_id'];
+    
+    required.forEach(field => {
+        const element = document.getElementById(field);
+        if (!element.value.trim()) {
+            errors.push(`${element.previousElementSibling.textContent.replace(' *', '')} is required`);
+            element.classList.add('border-red-500');
+        } else {
+            element.classList.remove('border-red-500');
+        }
+    });
+    
+    // Validate numeric fields
+    ['p_current_price', 'p_old_price', 'p_qty'].forEach(field => {
+        const element = document.getElementById(field);
+        if (element.value.trim() && isNaN(element.value)) {
+            errors.push(`${element.previousElementSibling.textContent.replace(' *', '')} must be a number`);
+            element.classList.add('border-red-500');
+        }
+    });
+    
+    // Featured photo is required for new products
+    const featuredPhoto = document.getElementById('p_featured_photo');
+    if (featuredPhoto.files.length === 0 && !document.querySelector('.preview-container')) {
+        errors.push('Featured photo is required');
+    }
+    
+    if (errors.length > 0) {
+        e.preventDefault();
+        alert(errors.join('\n'));
     }
 });
 </script>
 
-<?php include_once '../../includes/footer.php'; ?>
+<?php 
+include_once '../../includes/footer.php'; 
+?>
