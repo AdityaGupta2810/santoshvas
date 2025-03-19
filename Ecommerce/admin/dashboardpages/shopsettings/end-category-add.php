@@ -10,7 +10,7 @@ $success = '';
 
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get mid-category name and top category ID from form
+    // Get end-category name and parent category IDs from form
     $endCatName = trim($_POST['ecat_name']);
     $midCatId = isset($_POST['mcat_id']) ? (int)$_POST['mcat_id'] : 0;
     $topCatId = isset($_POST['tcat_id']) ? (int)$_POST['tcat_id'] : 0;
@@ -25,29 +25,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     else {
         // Check connection
-        if (!$db) {
+        if (!isset($db) || !$db) {
             die("Connection failed: " . mysqli_connect_error());
         }
         
         // Escape input to prevent SQL injection
         $endCatName = mysqli_real_escape_string($db, $endCatName);
         
-        // Check if mid-category already exists
+        // Check if end-category already exists
         $checkQuery = "SELECT * FROM tbl_end_category e 
         JOIN tbl_mid_category m ON e.mcat_id = m.mcat_id 
-        -- JOIN tbl_top_category t ON m.tcat_id = t.tcat_id 
         WHERE e.ecat_name = '$endCatName' AND e.mcat_id = '$midCatId' AND m.tcat_id = '$topCatId'";
         $checkResult = mysqli_query($db, $checkQuery);
         
         if (mysqli_num_rows($checkResult) > 0) {
             $error = 'This End Level Category already exists under the selected Mid Level Category.';
         } else {
-            // Insert new mid-category
+            // Insert new end-category
             $insertQuery = "INSERT INTO tbl_end_category (ecat_name, mcat_id) VALUES ('$endCatName', $midCatId)";
             if (mysqli_query($db, $insertQuery)) {
                 $success = 'End Level Category added successfully.';
                 $endCatName = ''; // Clear form
                 $midCatId = '';
+                $topCatId = '';
             } else {
                 $error = 'Error adding End Level Category: ' . mysqli_error($db);
             }
@@ -59,9 +59,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $topCatsQuery = "SELECT * FROM tbl_top_category ORDER BY tcat_name ASC";
 $topCatsResult = mysqli_query($db, $topCatsQuery);
 
-
-$midCatsQuery = "SELECT * FROM tbl_mid_category ORDER BY mcat_name ASC";
-$midCatsResult = mysqli_query($db, $midCatsQuery);
+// We'll only load mid-categories based on the selected top category via AJAX
+$midCatsOptions = '<option value="">Select Mid Level Category</option>';
+if (!empty($topCatId)) {
+    $midCatsQuery = "SELECT * FROM tbl_mid_category WHERE tcat_id = $topCatId ORDER BY mcat_name ASC";
+    $midCatsResult = mysqli_query($db, $midCatsQuery);
+    
+    if ($midCatsResult && mysqli_num_rows($midCatsResult) > 0) {
+        while ($row = mysqli_fetch_assoc($midCatsResult)) {
+            $selected = ($midCatId == $row['mcat_id']) ? 'selected' : '';
+            $midCatsOptions .= '<option value="' . $row['mcat_id'] . '" ' . $selected . '>' . htmlspecialchars($row['mcat_name']) . '</option>';
+        }
+    }
+}
 ?>
 
 <div class="container mx-auto p-4">
@@ -90,12 +100,13 @@ $midCatsResult = mysqli_query($db, $midCatsQuery);
     </div>
     <?php endif; ?>
     
-    <!-- Add Mid Category Form -->
+    <!-- Add End Category Form -->
     <div class="bg-white rounded-lg shadow-md p-6 max-w-lg mx-auto">
         <form method="POST" action="">
             <div class="mb-4">
                 <label for="tcat_id" class="block text-sm font-medium mb-1">Top Level Category</label>
-                <select id="tcat_id" name="tcat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <select id="tcat_id" name="tcat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        onchange="loadMidCategories(this.value)" required>
                     <option value="">Select Top Level Category</option>
                     <?php 
                     if ($topCatsResult && mysqli_num_rows($topCatsResult) > 0) {
@@ -110,15 +121,7 @@ $midCatsResult = mysqli_query($db, $midCatsQuery);
             <div class="mb-4">
                 <label for="mcat_id" class="block text-sm font-medium mb-1">Mid Level Category</label>
                 <select id="mcat_id" name="mcat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    <option value="">Select Mid Level Category</option>
-                    <?php 
-                    if ($midCatsResult && mysqli_num_rows($midCatsResult) > 0) {
-                        while ($row = mysqli_fetch_assoc($midCatsResult)) {
-                            $selected = ($midCatId == $row['mcat_id']) ? 'selected' : '';
-                            echo '<option value="' . $row['mcat_id'] . '" ' . $selected . '>' . htmlspecialchars($row['mcat_name']) . '</option>';
-                        }
-                    }
-                    ?>
+                    <?php echo $midCatsOptions; ?>
                 </select>
             </div>
             <div class="mb-4">
@@ -135,4 +138,29 @@ $midCatsResult = mysqli_query($db, $midCatsQuery);
     </div>
 </div>
 
+<script>
+function loadMidCategories(tcatId) {
+    if (tcatId) {
+        // Make an AJAX request to get mid categories for the selected top category
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'get-mid-categories.php?tcat_id=' + tcatId, true);
+        xhr.onload = function() {
+            if (this.status == 200) {
+                document.getElementById('mcat_id').innerHTML = this.responseText;
+            }
+        };
+        xhr.send();
+    } else {
+        document.getElementById('mcat_id').innerHTML = '<option value="">Select Mid Level Category</option>';
+    }
+}
+
+// If top category is already selected on page load, load its mid categories
+document.addEventListener('DOMContentLoaded', function() {
+    var topCatSelect = document.getElementById('tcat_id');
+    if (topCatSelect.value) {
+        loadMidCategories(topCatSelect.value);
+    }
+});
+</script>
 <?php include_once '../../includes/footer.php'; ?>

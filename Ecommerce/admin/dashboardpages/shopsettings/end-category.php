@@ -170,7 +170,7 @@ function getSortIcon($column, $currentSort, $currentOrder) {
                   echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['mcat_name']) . '</td>';
                   echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['tcat_name']) . '</td>';
                   echo '<td class="py-2 px-4 border flex flex-col sm:flex-row">';
-                  echo '<a href="end-category-edit.php?mcat_id=' . $row['ecat_id'] . '" class="bg-blue-500 text-white px-3 py-1 rounded mb-1 sm:mb-0 sm:mr-1 text-center hover:bg-blue-600">';
+                  echo '<a href="end-category-edit.php?ecat_id=' . $row['ecat_id'] . '" class="bg-blue-500 text-white px-3 py-1 rounded mb-1 sm:mb-0 sm:mr-1 text-center hover:bg-blue-600">';
                   echo '<i class="fas fa-edit mr-1"></i> Edit</a>';
                   echo '<a href="end-category.php?delete_id=' . $row['ecat_id'] . '" class="bg-red-500 text-white px-3 py-1 rounded text-center hover:bg-red-600" ';
                   echo 'onclick="return confirm(\'Are you sure you want to delete this end-category?\')"><i class="fas fa-trash mr-1"></i> Delete</a>';
