@@ -12,6 +12,8 @@ $p_feature = '';
 $p_is_active = 1;
 $p_is_featured = 0;
 $ecat_id = '';
+$p_sizes = []; // Changed from selected_sizes to p_sizes for consistency
+$p_colors = []; // Changed from selected_colors to p_colors for consistency
 
 // Arrays to store validation errors and success messages
 $errors = [];
@@ -30,6 +32,10 @@ if (isset($_POST['form1'])) {
     $p_is_active = isset($_POST['p_is_active']) ? 1 : 0;
     $p_is_featured = isset($_POST['p_is_featured']) ? 1 : 0;
     $ecat_id = mysqli_real_escape_string($db, $_POST['ecat_id']);
+    
+    // Get selected sizes and colors (if any) - fixed naming
+    $p_sizes = isset($_POST['p_size']) ? $_POST['p_size'] : []; // Changed from p_sizes to p_size to match form
+    $p_colors = isset($_POST['p_color']) ? $_POST['p_color'] : []; // Changed from p_colors to p_color to match form
 
     // Form validation
     if (empty($p_name)) {
@@ -139,7 +145,7 @@ if (isset($_POST['form1'])) {
         $stmt->bind_param("ssssssssiis", $p_name, $p_old_price, $p_current_price, $p_qty, $p_featured_photo, $p_description, $p_short_description, $p_feature, $p_is_active, $p_is_featured, $ecat_id);
         
         if ($stmt->execute()) {
-            $p_id = $stmt->insert_id;
+            $p_id = $stmt->insert_id; // Store the product ID for later use with sizes and colors
             
             // Insert product photos if any
             if (!empty($photo_names)) {
@@ -147,6 +153,38 @@ if (isset($_POST['form1'])) {
                     $stmt = $db->prepare("INSERT INTO tbl_product_photo (p_id, photo) VALUES (?, ?)");
                     $stmt->bind_param("is", $p_id, $photo);
                     $stmt->execute();
+                }
+            }
+            
+            // Insert sizes for this product
+            if (!empty($p_sizes)) {
+                $stmt_size = $db->prepare("INSERT INTO tbl_product_size (p_id, size_id) VALUES (?, ?)");
+                if (!$stmt_size) {
+                    throw new Exception("Prepare size failed: " . $db->error);
+                }
+                
+                foreach($p_sizes as $size_id) {
+                    $size_id = (int)$size_id; // Ensure it's an integer
+                    $stmt_size->bind_param("ii", $p_id, $size_id); // Use $p_id instead of undefined $product_id
+                    if (!$stmt_size->execute()) {
+                        throw new Exception("Execute size failed: " . $stmt_size->error);
+                    }
+                }
+            }
+            
+            // Insert colors for this product
+            if (!empty($p_colors)) {
+                $stmt_color = $db->prepare("INSERT INTO tbl_product_color (p_id, color_id) VALUES (?, ?)");
+                if (!$stmt_color) {
+                    throw new Exception("Prepare color failed: " . $db->error);
+                }
+                
+                foreach($p_colors as $color_id) {
+                    $color_id = (int)$color_id; // Ensure it's an integer
+                    $stmt_color->bind_param("ii", $p_id, $color_id); // Use $p_id instead of undefined $product_id
+                    if (!$stmt_color->execute()) {
+                        throw new Exception("Execute color failed: " . $stmt_color->error);
+                    }
                 }
             }
             
@@ -161,21 +199,75 @@ if (isset($_POST['form1'])) {
             $p_short_description = '';
             $p_feature = '';
             $p_is_active = 1;
-            $p_is_featured = 0;
+            $p_is_featured = 0; // Also reset this field
             $ecat_id = '';
+            $p_sizes = [];
+            $p_colors = [];
         } else {
             $errors[] = "Error adding product: " . $stmt->error;
         }
     }
 }
 
-// Get categories for dropdown
-$categories_query = "SELECT e.ecat_id, e.ecat_name, m.mcat_name, t.tcat_name 
-                    FROM tbl_end_category e
-                    JOIN tbl_mid_category m ON e.mcat_id = m.mcat_id
-                    JOIN tbl_top_category t ON m.tcat_id = t.tcat_id
-                    ORDER BY t.tcat_name, m.mcat_name, e.ecat_name";
-$categories_result = mysqli_query($db, $categories_query);
+// Get categories for dropdown selection
+try {
+    $stmt_categories = $db->prepare("
+        SELECT e.ecat_id, e.ecat_name, m.mcat_name, t.tcat_name 
+        FROM tbl_end_category e
+        JOIN tbl_mid_category m ON e.mcat_id = m.mcat_id
+        JOIN tbl_top_category t ON m.tcat_id = t.tcat_id
+        ORDER BY t.tcat_name, m.mcat_name, e.ecat_name
+    ");
+    
+    if (!$stmt_categories) {
+        throw new Exception("Prepare failed: " . $db->error);
+    }
+    
+    $stmt_categories->execute();
+    $result_categories = $stmt_categories->get_result();
+    
+    // Get sizes for dropdown
+    $stmt_sizes = $db->prepare("SELECT id, size_name FROM tbl_size ORDER BY size_name");
+    
+    if (!$stmt_sizes) {
+        throw new Exception("Prepare failed: " . $db->error);
+    }
+    
+    $stmt_sizes->execute();
+    $result_sizes = $stmt_sizes->get_result();
+    
+    // Get colors for dropdown
+    $stmt_colors = $db->prepare("SELECT id, color_name FROM tbl_color ORDER BY color_name");
+    
+    if (!$stmt_colors) {
+        throw new Exception("Prepare failed: " . $db->error);
+    }
+    
+    $stmt_colors->execute();
+    $result_colors = $stmt_colors->get_result();
+    
+    // Store size and color maps for displaying selected items
+    $sizes_map = [];
+    $colors_map = [];
+    
+    // Prepare arrays of options for the dropdowns
+    $size_options = [];
+    $color_options = [];
+    
+    while($row = $result_sizes->fetch_assoc()) {
+        $sizes_map[$row['id']] = $row['size_name'];
+        $size_options[] = $row;
+    }
+    
+    while($row = $result_colors->fetch_assoc()) {
+        $colors_map[$row['id']] = $row['color_name'];
+        $color_options[] = $row;
+    }
+    
+} catch (Exception $e) {
+    $error_message = 'Database error: ' . $e->getMessage();
+}
+
 ?>
 
 <div class="container mx-auto p-4">
@@ -228,11 +320,23 @@ $categories_result = mysqli_query($db, $categories_query);
 
                     <!-- Category -->
                     <div>
-                        <label for="ecat_id" class="block mb-2 font-medium">Category *</label>
-                        <select name="ecat_id" id="ecat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label for="tcat_id" class="block mb-2 font-medium">Top Level Category</label>
+                        <select name="tcat_id" id="tcat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">Select a category</option>
-                            <?php while ($row = mysqli_fetch_assoc($categories_result)): ?>
-                                <option value="<?php echo $row['ecat_id']; ?>" <?php echo ($ecat_id == $row['ecat_id']) ? 'selected' : ''; ?>>
+                            <?php while ($row = mysqli_fetch_assoc($result_categories)): ?> <!-- Fixed variable name here -->
+                                <option value="<?php echo $row['tcat_id']; ?>" <?php echo ($tcat_id == $row['tcat_id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($row['tcat_name'] . ' → ' . $row['mcat_name'] . ' → ' . $row['ecat_name']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="mcat_id" class="block mb-2 font-medium">Mid Level Category</label>
+                        <select name="mcat_id" id="mcat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select a category</option>
+                            <?php while ($row = mysqli_fetch_assoc($result_categories)): ?> <!-- Fixed variable name here -->
+                                <option value="<?php echo $row['mcat_id']; ?>" <?php echo ($mcat_id == $row['ecat_id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($row['tcat_name'] . ' → ' . $row['mcat_name'] . ' → ' . $row['ecat_name']); ?>
                                 </option>
                             <?php endwhile; ?>
@@ -243,7 +347,7 @@ $categories_result = mysqli_query($db, $categories_query);
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                     <!-- Old Price -->
                     <div>
-                        <label for="p_old_price" class="block mb-2 font-medium">Old Price ($)</label>
+                        <label for="p_old_price" class="block mb-2 font-medium">Old Price </label>
                         <input type="text" name="p_old_price" id="p_old_price" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="<?php echo htmlspecialchars($p_old_price); ?>">
                     </div>
 
@@ -282,35 +386,77 @@ $categories_result = mysqli_query($db, $categories_query);
 
             <div class="border-t border-gray-300 my-6"></div>
 
-             <!-- Size and Color Dropdowns -->
-             <div class="mb-6">
-                        <label for="p_size" class="block mb-2 font-medium">Size</label>
-                        <select name="p_size" id="p_size" class="w-full border rounded px-3 py-2">
-                            <option value="">Select Size</option>
-                            <?php if(isset($result_sizes) && $result_sizes->num_rows > 0): ?>
-                                <?php while($row = $result_sizes->fetch_assoc()): ?>
-                                <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo ($p_size == $row['id']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($row['size_name']); ?>
-                                </option>
-                                <?php endwhile; ?>
+           <!-- Size Selection with Dropdown -->
+           <div class="mb-6">
+                <label class="block mb-2 font-medium">Size</label>
+                <!-- Selected sizes display -->
+                <div id="selected-sizes" class="flex flex-wrap gap-2 mb-3 min-h-8">
+                    <?php if(!empty($p_sizes)): ?>
+                        <?php foreach($p_sizes as $size_id): ?>
+                            <?php if(isset($sizes_map[$size_id])): ?>
+                            <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center">
+                                <span><?php echo htmlspecialchars($sizes_map[$size_id]); ?></span>
+                                <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-size" data-size-id="<?php echo $size_id; ?>">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <input type="hidden" name="p_size[]" value="<?php echo $size_id; ?>">
+                            </div>
                             <?php endif; ?>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label for="p_color" class="block mb-2 font-medium">Color</label>
-                        <select name="p_color" id="p_color" class="w-full border rounded px-3 py-2">
-                            <option value="">Select Color</option>
-                            <?php if(isset($result_colors) && $result_colors->num_rows > 0): ?>
-                                <?php while($row = $result_colors->fetch_assoc()): ?>
-                                <option value="<?php echo htmlspecialchars($row['id']); ?>" <?php echo ($p_color == $row['id']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($row['color_name']); ?>
-                                </option>
-                                <?php endwhile; ?>
-                            <?php endif; ?>
-                        </select>
-                    </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
+                
+                <!-- Size dropdown -->
+                <div class="flex">
+                    <select id="size-selector" class="w-full border rounded px-3 py-2">
+                        <option value="">Select a size</option>
+                        <?php foreach($size_options as $size): ?>
+                            <option value="<?php echo $size['id']; ?>" 
+                                    data-size-name="<?php echo htmlspecialchars($size['size_name']); ?>"
+                                    <?php echo (in_array($size['id'], $p_sizes)) ? 'disabled' : ''; ?>>
+                                <?php echo htmlspecialchars($size['size_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">Click on a size to add it</p>
+            </div>
+            
+            <!-- Color Selection with Dropdown -->
+            <div class="mb-6">
+                <label class="block mb-2 font-medium">Color</label>
+                <!-- Selected colors display -->
+                <div id="selected-colors" class="flex flex-wrap gap-2 mb-3 min-h-8">
+                    <?php if(!empty($p_colors)): ?>
+                        <?php foreach($p_colors as $color_id): ?>
+                            <?php if(isset($colors_map[$color_id])): ?>
+                            <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center">
+                                <span><?php echo htmlspecialchars($colors_map[$color_id]); ?></span>
+                                <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="<?php echo $color_id; ?>">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <input type="hidden" name="p_color[]" value="<?php echo $color_id; ?>">
+                            </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Color dropdown -->
+                <div class="flex">
+                    <select id="color-selector" class="w-full border rounded px-3 py-2">
+                        <option value="">Select a color</option>
+                        <?php foreach($color_options as $color): ?>
+                            <option value="<?php echo $color['id']; ?>" 
+                                    data-color-name="<?php echo htmlspecialchars($color['color_name']); ?>"
+                                    <?php echo (in_array($color['id'], $p_colors)) ? 'disabled' : ''; ?>>
+                                <?php echo htmlspecialchars($color['color_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">Click on a color to add it</p>
+            </div>
 
             <!-- Product Description -->
             <div class="mb-6">
@@ -430,8 +576,113 @@ document.querySelector('form').addEventListener('submit', function(e) {
         alert(errors.join('\n'));
     }
 });
+
+// Size selection handling
+const sizeSelector = document.getElementById('size-selector');
+const selectedSizesContainer = document.getElementById('selected-sizes');
+
+// Add size when option is clicked
+sizeSelector.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const sizeId = this.value;
+    
+    if (sizeId === '') {
+        return; // Nothing selected
+    }
+    
+    const sizeName = selectedOption.getAttribute('data-size-name');
+    
+    // Create new size tag with remove button
+    const sizeTag = document.createElement('div');
+    sizeTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
+    sizeTag.innerHTML = `
+        <span>${sizeName}</span>
+        <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-size" data-size-id="${sizeId}">
+            <i class="fas fa-times"></i>
+        </button>
+        <input type="hidden" name="p_size[]" value="${sizeId}">
+    `;
+    
+    // Add to container
+    selectedSizesContainer.appendChild(sizeTag);
+    
+    selectedOption.disabled = true;
+    
+    // Reset the dropdown
+    this.selectedIndex = 0;
+});
+
+// Remove size when X button is clicked
+selectedSizesContainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-size') || e.target.closest('.remove-size')) {
+        const removeButton = e.target.classList.contains('remove-size') ? e.target : e.target.closest('.remove-size');
+        const sizeId = removeButton.getAttribute('data-size-id');
+        const sizeTag = removeButton.closest('div');
+        
+        // Remove the tag
+        sizeTag.remove();
+        
+        // Enable the option in the dropdown again
+        const option = sizeSelector.querySelector(`option[value="${sizeId}"]`);
+        if (option) {
+            option.disabled = false;
+        }
+    }
+});
+
+// Color selection handling
+const colorSelector = document.getElementById('color-selector');
+const selectedColorsContainer = document.getElementById('selected-colors');
+
+// Add color when option is clicked
+colorSelector.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const colorId = this.value;
+    
+    if (colorId === '') {
+        return; // Nothing selected
+    }
+    
+    const colorName = selectedOption.getAttribute('data-color-name');
+    
+    // Create new color tag with remove button
+    const colorTag = document.createElement('div');
+    colorTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
+    colorTag.innerHTML = `
+        <span>${colorName}</span>
+        <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="${colorId}">
+            <i class="fas fa-times"></i>
+        </button>
+        <input type="hidden" name="p_color[]" value="${colorId}">
+    `;
+    
+    // Add to container
+    selectedColorsContainer.appendChild(colorTag);
+    
+    // Disable the option in the dropdown
+    selectedOption.disabled = true;
+    
+    // Reset the dropdown
+    this.selectedIndex = 0;
+});
+
+// Remove color when X button is clicked
+selectedColorsContainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-color') || e.target.closest('.remove-color')) {
+        const removeButton = e.target.classList.contains('remove-color') ? e.target : e.target.closest('.remove-color');
+        const colorId = removeButton.getAttribute('data-color-id');
+        const colorTag = removeButton.closest('div');
+        
+        // Remove the tag
+        colorTag.remove();
+        
+        // Enable the option in the dropdown again
+        const option = colorSelector.querySelector(`option[value="${colorId}"]`);
+        if (option) {
+            option.disabled = false;
+        }
+    }
+});
 </script>
 
-<?php 
-include_once '../../includes/footer.php'; 
-?>
+<?php include_once '../../includes/footer.php'; ?>

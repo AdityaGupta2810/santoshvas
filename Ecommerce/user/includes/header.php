@@ -63,7 +63,7 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
         </button>
     
         <!-- Navigation Menu for Larger Screens -->
-        <nav class="hidden sm:flex gap-4">
+        <nav class="hidden sm:flex gap-5 text-xl p-4">
             <a href="#" class="hover:text-blue-600 font-semibold">Home</a>
             <a href="#" class="hover:text-blue-600 font-semibold">Women</a>
             <a href="#" class="hover:text-blue-600 font-semibold">Men</a>
@@ -79,23 +79,23 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
         <!-- User Dropdown and Cart Icon for Larger Screens -->
         <div class="hidden sm:flex items-center space-x-4">
             <a href="#" class="hover:text-blue-600 font-bold" aria-label="Cart">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
             </a>
             <div class="relative">
-                <button id="userMenuButton" class="hover:text-blue-600 font-semibold focus:outline-none">
+                <button id="userMenuButton" class="hover:text-blue-600 text-xl font-semibold focus:outline-none">
                     User
                 </button>
-                <ul id="userMenuDropdown" class="absolute right-0 mt-2  bg-white p-3  text-gray-800 rounded-lg shadow-lg border border-gray-200 hidden z-10 ">
+                <ul id="userMenuDropdown" class="absolute right-0 mt-2  bg-white p-4  text-gray-800 rounded-lg shadow-lg border border-gray-200 hidden z-10 ">
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-100"> <a href="user/login.php"> Login</a>/<a href="user/reg.php">Register</a></a></li>
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">My Orders</a></li>
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Profile</a></li>
                     <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Settings</a></li>
-                    <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Logout</a></li>
+                    <li><a href="/santoshvas/Ecommerce/actions/logoutaction.php" class="block px-4 py-2 hover:bg-gray-100">Logout</a></li>
                 </ul>
             </div>
-            <a href="/santoshvas/Ecommerce/admin/index.php" class="hover:text-blue-600 font-semibold">Admin</a>
+            <a href="/santoshvas/Ecommerce/admin/index.php" class="hover:text-blue-600 text-xl font-semibold">Admin</a>
         </div>
     </header>
     <div class=" bg-white p-3 shadow-md md:hidden flex justify-center px-10">

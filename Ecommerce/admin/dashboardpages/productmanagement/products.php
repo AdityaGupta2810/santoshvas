@@ -193,8 +193,8 @@ function getSortIcon($column, $currentSort, $currentOrder) {
                   echo '<td class="py-2 px-4 border">' . $row['p_id'] . '</td>';
                   echo '<td class="py-2 px-4 border"><img src="" alt="Product Image" class="w-20 h-auto"></td>';
                   echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['p_name']) . '</td>';
-                  echo '<td class="py-2 px-4 border">$' . htmlspecialchars($row['p_old_price']) . '</td>';
-                  echo '<td class="py-2 px-4 border">$' . htmlspecialchars($row['p_current_price']) . '</td>';
+                  echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['p_old_price']) . '</td>';
+                  echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['p_current_price']) . '</td>';
                   echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['p_qty']) . '</td>';
                 //   echo '<td class="py-2 px-4 border text-center">';
                 //   echo ($row['p_is_featured'] == 1) ? '<span class="text-white bg-green-500 px-2 py-1 rounded">Yes</span>' : '<span class="text-white bg-red-500 px-2 py-1 rounded">No</span>';

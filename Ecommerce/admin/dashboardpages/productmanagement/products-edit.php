@@ -464,35 +464,13 @@ try {
 <!-- JavaScript for dynamic display of selected items -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize rich text editors if available
-    if(typeof tinymce !== 'undefined') {
-        tinymce.init({
-            selector: '#p_description',
-            height: 300,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media table paste code help wordcount'
-            ],
-            toolbar: 'undo redo | formatselect | bold italic backcolor | \
-                alignleft aligncenter alignright alignjustify | \
-                bullist numlist outdent indent | removeformat | help'
-        });
-        
-        tinymce.init({
-            selector: '#p_short_description',
-            height: 150,
-            menubar: false,
-            plugins: [
-                'advlist autolink lists link charmap print preview anchor',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media table paste code help wordcount'
-            ],
-            toolbar: 'undo redo | formatselect | bold italic | \
-                alignleft aligncenter alignright alignjustify | \
-                bullist numlist | removeformat'
-        });
-    }
+    
+   // Add rich text editor for product description if you have one integrated
+// Example: if you have CKEditor included in your project
+if (typeof CKEDITOR !== 'undefined') {
+    CKEDITOR.replace('p_description');
+}
+
     
     // Size selection handling
     const sizeSelector = document.getElementById('size-selector');
@@ -527,106 +505,180 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedOption.disabled = true;
         
         // Reset dropdown
-        this.value = '';
-        
-        // Add event listener to the remove button
-        const removeBtn = sizeTag.querySelector('.remove-size');
-        removeBtn.addEventListener('click', function() {
-            const sizeId = this.getAttribute('data-size-id');
-            sizeTag.remove();
-            
-            // Re-enable the option in the dropdown
-            for (let i = 0; i < sizeSelector.options.length; i++) {
-                if (sizeSelector.options[i].value === sizeId) {
-                    sizeSelector.options[i].disabled = false;
-                    break;
-                }
-            }
-        });
+        this.selectedIndex = 0;
     });
-    
-    // Add event listeners to existing remove buttons for sizes
-    document.querySelectorAll('.remove-size').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const sizeId = this.getAttribute('data-size-id');
-            this.closest('div').remove();
-            
-            // Re-enable the option in the dropdown
-            for (let i = 0; i < sizeSelector.options.length; i++) {
-                if (sizeSelector.options[i].value === sizeId) {
-                    sizeSelector.options[i].disabled = false;
-                    break;
-                }
-            }
-        });
-    });
-    
-    // Color selection handling
-    const colorSelector = document.getElementById('color-selector');
-    const selectedColorsContainer = document.getElementById('selected-colors');
-    
-    // Add color when option is clicked
-    colorSelector.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const colorId = this.value;
+
+// Remove size when X button is clicked
+selectedSizesContainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-size') || e.target.closest('.remove-size')) {
+        const removeButton = e.target.classList.contains('remove-size') ? e.target : e.target.closest('.remove-size');
+        const sizeId = removeButton.getAttribute('data-size-id');
+        const sizeTag = removeButton.closest('div');
         
-        if (colorId === '') {
-            return; // Nothing selected
+        // Remove the tag
+        sizeTag.remove();
+        
+        // Enable the option in the dropdown again
+        const option = sizeSelector.querySelector(`option[value="${sizeId}"]`);
+        if (option) {
+            option.disabled = false;
         }
-        
-        const colorName = selectedOption.getAttribute('data-color-name');
-        
-        // Create new color tag with remove button
-        const colorTag = document.createElement('div');
-        colorTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
-        colorTag.innerHTML = `
-            <span>${colorName}</span>
-            <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="${colorId}">
-                <i class="fas fa-times"></i>
-            </button>
-            <input type="hidden" name="p_color[]" value="${colorId}">
-        `;
-        
-        // Add to container
-        selectedColorsContainer.appendChild(colorTag);
-        
-        // Disable the option in the dropdown
-        selectedOption.disabled = true;
-        
-        // Reset dropdown
-        this.value = '';
-        
-        // Add event listener to the remove button
-        const removeBtn = colorTag.querySelector('.remove-color');
-        removeBtn.addEventListener('click', function() {
-            const colorId = this.getAttribute('data-color-id');
-            colorTag.remove();
-            
-            // Re-enable the option in the dropdown
-            for (let i = 0; i < colorSelector.options.length; i++) {
-                if (colorSelector.options[i].value === colorId) {
-                    colorSelector.options[i].disabled = false;
-                    break;
-                }
-            }
-        });
-    });
+    }
+});
+
+// Color selection handling
+const colorSelector = document.getElementById('color-selector');
+const selectedColorsContainer = document.getElementById('selected-colors');
+
+// Add color when option is clicked
+colorSelector.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const colorId = this.value;
     
-    // Add event listeners to existing remove buttons for colors
-    document.querySelectorAll('.remove-color').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const colorId = this.getAttribute('data-color-id');
-            this.closest('div').remove();
+    if (colorId === '') {
+        return; // Nothing selected
+    }
+    
+    const colorName = selectedOption.getAttribute('data-color-name');
+    
+    // Create new color tag with remove button
+    const colorTag = document.createElement('div');
+    colorTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
+    colorTag.innerHTML = `
+        <span>${colorName}</span>
+        <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="${colorId}">
+            <i class="fas fa-times"></i>
+        </button>
+        <input type="hidden" name="p_color[]" value="${colorId}">
+    `;
+    
+    // Add to container
+    selectedColorsContainer.appendChild(colorTag);
+    
+    // Disable the option in the dropdown
+    selectedOption.disabled = true;
+    
+    // Reset the dropdown
+    this.selectedIndex = 0;
+});
+
+// Remove color when X button is clicked
+selectedColorsContainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-color') || e.target.closest('.remove-color')) {
+        const removeButton = e.target.classList.contains('remove-color') ? e.target : e.target.closest('.remove-color');
+        const colorId = removeButton.getAttribute('data-color-id');
+        const colorTag = removeButton.closest('div');
+        
+        // Remove the tag
+        colorTag.remove();
+        
+        // Enable the option in the dropdown again
+        const option = colorSelector.querySelector(`option[value="${colorId}"]`);
+        if (option) {
+            option.disabled = false;
+        }
+    }
+});
+
+        
+    //     // Add event listener to the remove button
+    //     const removeBtn = sizeTag.querySelector('.remove-size');
+    //     removeBtn.addEventListener('click', function() {
+    //         const sizeId = this.getAttribute('data-size-id');
+    //         sizeTag.remove();
             
-            // Re-enable the option in the dropdown
-            for (let i = 0; i < colorSelector.options.length; i++) {
-                if (colorSelector.options[i].value === colorId) {
-                    colorSelector.options[i].disabled = false;
-                    break;
-                }
-            }
-        });
-    });
+    //         // Re-enable the option in the dropdown
+    //         for (let i = 0; i < sizeSelector.options.length; i++) {
+    //             if (sizeSelector.options[i].value === sizeId) {
+    //                 sizeSelector.options[i].disabled = false;
+    //                 break;
+    //             }
+    //         }
+    //     });
+    // });
+    
+    // // Add event listeners to existing remove buttons for sizes
+    // document.querySelectorAll('.remove-size').forEach(function(button) {
+    //     button.addEventListener('click', function() {
+    //         const sizeId = this.getAttribute('data-size-id');
+    //         this.closest('div').remove();
+            
+    //         // Re-enable the option in the dropdown
+    //         for (let i = 0; i < sizeSelector.options.length; i++) {
+    //             if (sizeSelector.options[i].value === sizeId) {
+    //                 sizeSelector.options[i].disabled = false;
+    //                 break;
+    //             }
+    //         }
+    //     });
+    // });
+    
+    // // Color selection handling
+    // const colorSelector = document.getElementById('color-selector');
+    // const selectedColorsContainer = document.getElementById('selected-colors');
+    
+    // // Add color when option is clicked
+    // colorSelector.addEventListener('change', function() {
+    //     const selectedOption = this.options[this.selectedIndex];
+    //     const colorId = this.value;
+        
+    //     if (colorId === '') {
+    //         return; // Nothing selected
+    //     }
+        
+    //     const colorName = selectedOption.getAttribute('data-color-name');
+        
+    //     // Create new color tag with remove button
+    //     const colorTag = document.createElement('div');
+    //     colorTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
+    //     colorTag.innerHTML = `
+    //         <span>${colorName}</span>
+    //         <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="${colorId}">
+    //             <i class="fas fa-times"></i>
+    //         </button>
+    //         <input type="hidden" name="p_color[]" value="${colorId}">
+    //     `;
+        
+    //     // Add to container
+    //     selectedColorsContainer.appendChild(colorTag);
+        
+    //     // Disable the option in the dropdown
+    //     selectedOption.disabled = true;
+        
+    //     // Reset dropdown
+    //     this.value = '';
+        
+    //     // Add event listener to the remove button
+    //     const removeBtn = colorTag.querySelector('.remove-color');
+    //     removeBtn.addEventListener('click', function() {
+    //         const colorId = this.getAttribute('data-color-id');
+    //         colorTag.remove();
+            
+    //         // Re-enable the option in the dropdown
+    //         for (let i = 0; i < colorSelector.options.length; i++) {
+    //             if (colorSelector.options[i].value === colorId) {
+    //                 colorSelector.options[i].disabled = false;
+    //                 break;
+    //             }
+    //         }
+    //     });
+    // });
+    
+    // // Add event listeners to existing remove buttons for colors
+    // document.querySelectorAll('.remove-color').forEach(function(button) {
+    //     button.addEventListener('click', function() {
+    //         const colorId = this.getAttribute('data-color-id');
+    //         this.closest('div').remove();
+            
+    //         // Re-enable the option in the dropdown
+    //         for (let i = 0; i < colorSelector.options.length; i++) {
+    //             if (colorSelector.options[i].value === colorId) {
+    //                 colorSelector.options[i].disabled = false;
+    //                 break;
+    //             }
+    //         }
+    //     });
+    // });
 });
 </script>
 

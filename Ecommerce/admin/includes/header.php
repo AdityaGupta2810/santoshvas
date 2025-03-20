@@ -92,24 +92,24 @@ if(!isset($_SESSION['user'])) {
                     <span class="text ml-3 sidebar-text ">Product Management</span>
                 </a>
             </li>
-            <li>
+            <!-- <li>
                 <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-doughnut-chart text-xl'></i>
                     <span class="text ml-3 sidebar-text ">Analytics</span>
                 </a>
-            </li>
+            </li> -->
             <li>
                 <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-message-dots text-xl'></i>
                     <span class="text ml-3 sidebar-text">Messages</span>
                 </a>
             </li>
-            <li>
+            <!-- <li>
                 <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-group text-xl'></i>
                     <span class="text ml-3 sidebar-text">Team</span>
                 </a>
-            </li>
+            </li> -->
         </ul>
         <ul class="side-menu mt-6">
             <li>

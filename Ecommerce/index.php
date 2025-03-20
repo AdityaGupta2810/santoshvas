@@ -3,11 +3,11 @@ require_once './user/includes/header.php';
 ?>
 
 
-    <!-- Welcome Section -->
-    <section class="text-center  text-black bg-rose-300 py-4">
-        <h2 class="text-3xl font-semibold ">Welcome to Santosh Vastralay</h2>
+    <!-- Welcome Section
+    <section class="text-center  text-white bg-blue-900 py-4 rounded-2xl">
+        <h2 class="text-2xl font-semibold ">Welcome to Santosh Vastralay</h2>
         <p class=" font-semibold mt-2">Your one-stop shop for all fabric needs!</p>
-    </section>
+    </section> -->
     <!-- Offer Banner Section -->
     <!-- <section class="pt-1.5 text-center">
         <div class="bg-pink-900 text-white p-4 rounded-lg shadow-lg text-lg font-semibold">
@@ -58,7 +58,7 @@ require_once './user/includes/header.php';
     <!-- Hero Banner Section -->
     <section class="relative w-full max-w-8xl mx-auto py-1.5  mt-6">
         <img src="Home/images/bridal.jpg" alt="Bridal Collection" class="w-full h-auto rounded-lg shadow-lg">
-        <img src="Home/images/mid_coruoser.jpg" alt="Mid Carousel" class="w-full max-h-[410px] object-cover rounded-lg shadow-lg mt-4">
+        <img src="Home/images/mid_coruoser.jpg" alt="Mid Carousel" class="w-full max-h-[450px] object-cover rounded-lg shadow-lg mt-4">
     </section>
 
     <!-- Product Categories Section -->
@@ -66,35 +66,35 @@ require_once './user/includes/header.php';
     <h1 class="text-4xl font-semibold text-blue-900 text-center m-3 underline" >Shop by Categories</h1>
     <section class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/saree.jpg" alt="Sarees" class="w-full h-40 object-cover rounded">
+            <img src="Home/images/saree.jpg" alt="Sarees" class="w-full h-50 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Sarees</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/suit.jpg" alt="Suits" class="w-full h-40 object-cover rounded">
+            <img src="Home/images/suit.jpg" alt="Suits" class="w-full h-50 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Suits</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/suit.jpg" alt="Shirt Fabric" class="w-full h-40 object-cover rounded">
+            <img src="Home/images/suit.jpg" alt="Shirt Fabric" class="w-full h-50 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Shirt Fabric</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/bedsheet.jpg" alt="Bedsheets" class="w-full h-40 object-cover rounded">
+            <img src="Home/images/bedsheet.jpg" alt="Bedsheets" class="w-full h-50 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Bedsheets</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="./Home/images/mens.gif" alt="Men's Collection" class="w-full h-70 object-cover rounded">
+            <img src="./Home/images/mens.gif" alt="Men's Collection" class="w-full h-80 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Men's Collection</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/saree.gif" alt="Saree Collection" class="w-full h-70 object-cover rounded">
+            <img src="Home/images/saree.gif" alt="Saree Collection" class="w-full h-80 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Saree Collection</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/curtain.gif" alt="Curtains" class="w-full h-70 object-cover rounded">
+            <img src="Home/images/curtain.gif" alt="Curtains" class="w-full h-80 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Curtains</h3>
         </div>
         <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/lahenga.gif" alt="Lehengas" class="w-full h-70 object-cover rounded">
+            <img src="Home/images/lahenga.gif" alt="Lehengas" class="w-full h-80 object-cover rounded">
             <h3 class="text-lg font-semibold mt-2">Lehengas</h3>
         </div>
     </section>
@@ -235,36 +235,7 @@ require_once './user/includes/header.php';
         </div>
     </footer>
 
-    <!-- <script>
-        // Toggle sidebar for small screens
-        const sidebar = document.getElementById("sidebar");
-        const sidebarToggle = document.getElementById("sidebarToggle");
-
-        sidebarToggle.addEventListener("click", () => {
-            sidebar.classList.toggle("-translate-x-full");
-        });
-
-        // Toggle user dropdown on hover for larger screens
-        const userMenuButton = document.getElementById("userMenuButton");
-        const userMenuDropdown = document.getElementById("userMenuDropdown");
-
-        userMenuButton.addEventListener("mouseenter", () => {
-            userMenuDropdown.classList.remove("hidden");
-        });
-
-        userMenuButton.addEventListener("mouseleave", () => {
-            userMenuDropdown.classList.add("hidden");
-        });
-
-
-        // Toggle user dropdown on click for mobile
-        const userMenuButtonMobile = document.getElementById("userMenuButtonMobile");
-        const userMenuDropdownMobile = document.getElementById("userMenuDropdownMobile");
-
-        userMenuButtonMobile.addEventListener("click", () => {
-            userMenuDropdownMobile.classList.toggle("hidden");
-        });
-    </script> -->
+    
 
   
 

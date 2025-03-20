@@ -11,10 +11,10 @@
                         <li><a href="#" class="text-blue-500">Home</a></li>
                     </ul>
                 </div>
-                <a href="#" class="btn-download h-10 px-4 bg-blue-500 text-white rounded-full flex items-center mt-4 md:mt-0 w-max">
+                <!-- <a href="#" class="btn-download h-10 px-4 bg-blue-500 text-white rounded-full flex items-center mt-4 md:mt-0 w-max">
                     <i class='bx bxs-cloud-download mr-2'></i>
                     <span>Download PDF</span>
-                </a>
+                </a> -->
             </div>
 
              <ul class="box-info grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -61,9 +61,9 @@
                                 <tr class="hover:bg-gray-100">
                                     <td class="py-3 flex items-center">
                                         <img src="https://via.placeholder.com/36" class="w-9 h-9 rounded-full object-cover">
-                                        <p class="ml-2">John Doe</p>
+                                        <p class="ml-2">Aditya</p>
                                     </td>
-                                    <td class="py-3">01-10-2024</td>
+                                    <td class="py-3">01-02-2025</td>
                                     <td class="py-3">
                                         <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Completed</span>
                                     </td>
@@ -71,9 +71,9 @@
                                 <tr class="hover:bg-gray-100">
                                     <td class="py-3 flex items-center">
                                         <img src="https://via.placeholder.com/36" class="w-9 h-9 rounded-full object-cover">
-                                        <p class="ml-2">Jane Smith</p>
+                                        <p class="ml-2">Aman</p>
                                     </td>
-                                    <td class="py-3">01-15-2024</td>
+                                    <td class="py-3">09-02-2025</td>
                                     <td class="py-3">
                                         <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Pending</span>
                                     </td>
@@ -81,9 +81,9 @@
                                 <tr class="hover:bg-gray-100">
                                     <td class="py-3 flex items-center">
                                         <img src="https://via.placeholder.com/36" class="w-9 h-9 rounded-full object-cover">
-                                        <p class="ml-2">Robert Johnson</p>
+                                        <p class="ml-2">Rohan</p>
                                     </td>
-                                    <td class="py-3">01-18-2024</td>
+                                    <td class="py-3">11-02-2025</td>
                                     <td class="py-3">
                                         <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Processing</span>
                                     </td>
