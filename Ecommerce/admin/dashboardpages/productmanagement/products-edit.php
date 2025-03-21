@@ -11,9 +11,95 @@ $p_colors = []; // Changed to array
 $p_description = '';
 $p_short_description = '';
 $p_is_active = 1; // Default to active
+$featured_photo = '';
+
+// Check if product ID is provided
+if(!isset($_REQUEST['p_id'])) {
+    header('location: products.php');
+    exit;
+}
+
+$product_id = intval($_REQUEST['p_id']);
+
+// Fetch existing product data
+try {
+    // Get product basic info
+    $stmt_product = $db->prepare("SELECT * FROM tbl_product WHERE p_id = ?");
+    if (!$stmt_product) {
+        throw new Exception("Prepare failed: " . $db->error);
+    }
+    
+    $stmt_product->bind_param("i", $product_id);
+    $stmt_product->execute();
+    $result_product = $stmt_product->get_result();
+    
+    if($result_product->num_rows == 0) {
+        header('location: products.php');
+        exit;
+    }
+    
+    $product_data = $result_product->fetch_assoc();
+    
+    // Populate form data from database
+    $p_name = $product_data['p_name'];
+    $p_old_price = $product_data['p_old_price'];
+    $p_current_price = $product_data['p_current_price'];
+    $p_qty = $product_data['p_qty'];
+    $p_description = $product_data['p_description'];
+    $p_short_description = $product_data['p_short_description'];
+    $p_is_active = $product_data['p_is_active'];
+    $ecat_id = $product_data['ecat_id'];
+    $featured_photo = $product_data['p_featured_photo'];
+    
+    // Get existing sizes
+    $stmt_sizes = $db->prepare("SELECT size_id FROM tbl_product_size WHERE p_id = ?");
+    if (!$stmt_sizes) {
+        throw new Exception("Prepare failed: " . $db->error);
+    }
+    
+    $stmt_sizes->bind_param("i", $product_id);
+    $stmt_sizes->execute();
+    $result_sizes = $stmt_sizes->get_result();
+    
+    while($row = $result_sizes->fetch_assoc()) {
+        $p_sizes[] = $row['size_id'];
+    }
+    
+    // Get existing colors
+    $stmt_colors = $db->prepare("SELECT color_id FROM tbl_product_color WHERE p_id = ?");
+    if (!$stmt_colors) {
+        throw new Exception("Prepare failed: " . $db->error);
+    }
+    
+    $stmt_colors->bind_param("i", $product_id);
+    $stmt_colors->execute();
+    $result_colors = $stmt_colors->get_result();
+    
+    while($row = $result_colors->fetch_assoc()) {
+        $p_colors[] = $row['color_id'];
+    }
+    
+    // Get existing photos
+    $stmt_photos = $db->prepare("SELECT * FROM tbl_product_photo WHERE p_id = ?");
+    if (!$stmt_photos) {
+        throw new Exception("Prepare failed: " . $db->error);
+    }
+    
+    $stmt_photos->bind_param("i", $product_id);
+    $stmt_photos->execute();
+    $result_photos = $stmt_photos->get_result();
+    
+    $product_photos = [];
+    while($row = $result_photos->fetch_assoc()) {
+        $product_photos[] = $row;
+    }
+    
+} catch (Exception $e) {
+    $error_message = 'Database error: ' . $e->getMessage();
+}
 
 // Check if form is submitted
-if (isset($_POST['form1'])) {
+if(isset($_POST['form1'])) {
     // Collect and sanitize form data
     $p_name = mysqli_real_escape_string($db, $_POST['p_name']);
     $p_old_price = isset($_POST['p_old_price']) && !empty($_POST['p_old_price']) ? (float)$_POST['p_old_price'] : null;
@@ -50,68 +136,72 @@ if (isset($_POST['form1'])) {
         $error_message .= 'Please select a category<br>';
     }
     
-    // Check if featured photo is uploaded
-    if(!isset($_FILES['p_featured_photo']['name']) || empty($_FILES['p_featured_photo']['name'])) {
-        $valid = false;
-        $error_message .= 'Featured photo is required<br>';
-    }
-    
-    // Handle featured photo upload
-    $featured_photo = '';
-    if($valid) {
-        if(isset($_FILES['p_featured_photo']['name']) && !empty($_FILES['p_featured_photo']['name'])) {
-            $file_name = $_FILES['p_featured_photo']['name'];
-            $file_temp = $_FILES['p_featured_photo']['tmp_name'];
-            $ext = pathinfo($file_name, PATHINFO_EXTENSION);
-            $allowed_exts = array('jpg', 'jpeg', 'png', 'gif');
-            
-            if(in_array(strtolower($ext), $allowed_exts)) {
-                $featured_photo = 'product_'.time().'.'.$ext;
-                move_uploaded_file($file_temp, '../../assets/uploads/products/'.$featured_photo);
-            } else {
-                $valid = false;
-                $error_message .= 'Featured photo must be jpg, jpeg, png or gif file<br>';
+    // Handle featured photo upload if a new one is provided
+    if(isset($_FILES['p_featured_photo']['name']) && !empty($_FILES['p_featured_photo']['name'])) {
+        $file_name = $_FILES['p_featured_photo']['name'];
+        $file_temp = $_FILES['p_featured_photo']['tmp_name'];
+        $ext = pathinfo($file_name, PATHINFO_EXTENSION);
+        $allowed_exts = array('jpg', 'jpeg', 'png', 'gif');
+        
+        if(in_array(strtolower($ext), $allowed_exts)) {
+            // Remove old featured photo if exists
+            if(!empty($featured_photo) && file_exists('../../assets/uploads/products/'.$featured_photo)) {
+                unlink('../../assets/uploads/products/'.$featured_photo);
             }
+            
+            $featured_photo = 'product_'.time().'.'.$ext;
+            move_uploaded_file($file_temp, '../../assets/uploads/products/'.$featured_photo);
+        } else {
+            $valid = false;
+            $error_message .= 'Featured photo must be jpg, jpeg, png or gif file<br>';
         }
     }
     
     // Process multiple photos if needed
     $photos = array();
-    if($valid) {
-        // Process additional photos
-        if(isset($_FILES['p_photos']['name']) && !empty($_FILES['p_photos']['name'][0])) {
-            $total_files = count($_FILES['p_photos']['name']);
+    if($valid && isset($_FILES['p_photos']['name']) && !empty($_FILES['p_photos']['name'][0])) {
+        $total_files = count($_FILES['p_photos']['name']);
+        
+        for($i=0; $i<$total_files; $i++) {
+            $file_name = $_FILES['p_photos']['name'][$i];
+            $file_temp = $_FILES['p_photos']['tmp_name'][$i];
+            $ext = pathinfo($file_name, PATHINFO_EXTENSION);
             
-            for($i=0; $i<$total_files; $i++) {
-                $file_name = $_FILES['p_photos']['name'][$i];
-                $file_temp = $_FILES['p_photos']['tmp_name'][$i];
-                $ext = pathinfo($file_name, PATHINFO_EXTENSION);
-                
-                if(in_array(strtolower($ext), $allowed_exts)) {
-                    $photo_name = 'product_'.time().'_'.$i.'.'.$ext;
-                    move_uploaded_file($file_temp, '../../assets/uploads/products/'.$photo_name);
-                    $photos[] = $photo_name;
-                } else {
-                    $valid = false;
-                    $error_message .= 'Photo '.$i.' must be jpg, jpeg, png or gif file<br>';
-                    break;
-                }
+            if(in_array(strtolower($ext), $allowed_exts)) {
+                $photo_name = 'product_'.time().'_'.$i.'.'.$ext;
+                move_uploaded_file($file_temp, '../../assets/uploads/products/'.$photo_name);
+                $photos[] = $photo_name;
+            } else {
+                $valid = false;
+                $error_message .= 'Photo '.$i.' must be jpg, jpeg, png or gif file<br>';
+                break;
             }
         }
     }
     
-    // Insert data if valid
+    // Update data if valid
     if($valid) {
         try {
             // Start transaction
             $db->begin_transaction();
             
-            // Insert product
-            $sql = "INSERT INTO tbl_product (
-                p_name, p_old_price, p_current_price, p_qty, 
-                p_featured_photo, p_description, p_short_description, 
-                p_is_active, ecat_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            // Update product
+            $sql = "UPDATE tbl_product SET 
+                    p_name = ?, 
+                    p_old_price = ?, 
+                    p_current_price = ?, 
+                    p_qty = ?, 
+                    p_description = ?, 
+                    p_short_description = ?, 
+                    p_is_active = ?, 
+                    ecat_id = ?";
+            
+            // Only update featured photo if a new one is provided
+            if(!empty($_FILES['p_featured_photo']['name'])) {
+                $sql .= ", p_featured_photo = ?";
+            }
+            
+            $sql .= " WHERE p_id = ?";
             
             $statement = $db->prepare($sql);
             
@@ -119,21 +209,31 @@ if (isset($_POST['form1'])) {
                 throw new Exception("Prepare failed: " . $db->error);
             }
             
-            // Updated bind_param with correct types
-            $statement->bind_param(
-                "sddiissii", 
-                $p_name, $p_old_price, $p_current_price, $p_qty,
-                $featured_photo, $p_description, $p_short_description, 
-                $p_is_active, $ecat_id
-            );
+            if(!empty($_FILES['p_featured_photo']['name'])) {
+                // With featured photo update
+                $statement->bind_param(
+                    "sddiissisi", 
+                    $p_name, $p_old_price, $p_current_price, $p_qty,
+                    $p_description, $p_short_description, 
+                    $p_is_active, $ecat_id, $featured_photo, $product_id
+                );
+            } else {
+                // Without featured photo update
+                $statement->bind_param(
+                    "sddiisiii", 
+                    $p_name, $p_old_price, $p_current_price, $p_qty,
+                    $p_description, $p_short_description, 
+                    $p_is_active, $ecat_id, $product_id
+                );
+            }
             
             if (!$statement->execute()) {
                 throw new Exception("Execute failed: " . $statement->error);
             }
             
-            $product_id = $db->insert_id;
+            // Handle sizes - delete existing and insert new
+            $db->query("DELETE FROM tbl_product_size WHERE p_id = $product_id");
             
-            // Handle multiple sizes
             if(!empty($p_sizes)) {
                 $stmt_size = $db->prepare("INSERT INTO tbl_product_size (p_id, size_id) VALUES (?, ?)");
                 if (!$stmt_size) {
@@ -149,7 +249,9 @@ if (isset($_POST['form1'])) {
                 }
             }
             
-            // Handle multiple colors
+            // Handle colors - delete existing and insert new
+            $db->query("DELETE FROM tbl_product_color WHERE p_id = $product_id");
+            
             if(!empty($p_colors)) {
                 $stmt_color = $db->prepare("INSERT INTO tbl_product_color (p_id, color_id) VALUES (?, ?)");
                 if (!$stmt_color) {
@@ -185,24 +287,75 @@ if (isset($_POST['form1'])) {
             // Commit transaction
             $db->commit();
             
-            $success_message = 'Product has been added successfully!';
+            $success_message = 'Product has been updated successfully!';
             
-            // Clear form data
-            $p_name = '';
-            $p_old_price = '';
-            $p_current_price = '';
-            $p_qty = '';
-            $p_sizes = [];
-            $p_colors = [];
-            $p_description = '';
-            $p_short_description = '';
-            $p_is_active = 1;
+            // Refresh product data after update
+            $stmt_product = $db->prepare("SELECT * FROM tbl_product WHERE p_id = ?");
+            $stmt_product->bind_param("i", $product_id);
+            $stmt_product->execute();
+            $result_product = $stmt_product->get_result();
+            $product_data = $result_product->fetch_assoc();
+            
+            // Refresh photos
+            $stmt_photos = $db->prepare("SELECT * FROM tbl_product_photo WHERE p_id = ?");
+            $stmt_photos->bind_param("i", $product_id);
+            $stmt_photos->execute();
+            $result_photos = $stmt_photos->get_result();
+            
+            $product_photos = [];
+            while($row = $result_photos->fetch_assoc()) {
+                $product_photos[] = $row;
+            }
             
         } catch (Exception $e) {
             // Rollback transaction on error
             $db->rollback();
             $error_message = 'Database error: ' . $e->getMessage();
         }
+    }
+}
+
+// Handle photo deletion
+if(isset($_REQUEST['delete_photo']) && isset($_REQUEST['photo_id'])) {
+    $photo_id = intval($_REQUEST['photo_id']);
+    
+    try {
+        // Get the photo name first
+        $stmt = $db->prepare("SELECT photo FROM tbl_product_photo WHERE pp_id = ?");
+        $stmt->bind_param("i", $photo_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $photo = $row['photo'];
+            
+            // Delete the file
+            if(file_exists('../../assets/uploads/products/'.$photo)) {
+                unlink('../../assets/uploads/products/'.$photo);
+            }
+            
+            // Delete the record
+            $stmt = $db->prepare("DELETE FROM tbl_product_photo WHERE pp_id = ?");
+            $stmt->bind_param("i", $photo_id);
+            $stmt->execute();
+            
+            $success_message = 'Photo has been deleted successfully!';
+            
+            // Refresh photos
+            $stmt_photos = $db->prepare("SELECT * FROM tbl_product_photo WHERE p_id = ?");
+            $stmt_photos->bind_param("i", $product_id);
+            $stmt_photos->execute();
+            $result_photos = $stmt_photos->get_result();
+            
+            $product_photos = [];
+            while($row = $result_photos->fetch_assoc()) {
+                $product_photos[] = $row;
+            }
+        }
+        
+    } catch (Exception $e) {
+        $error_message = 'Database error: ' . $e->getMessage();
     }
 }
 
@@ -270,7 +423,7 @@ try {
     <!-- Header with title and back button -->
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold flex items-center mb-3 sm:mb-0">
-            <i class="fas fa-plus-circle mr-2"></i>Add Product
+            <i class="fas fa-edit mr-2"></i>Edit Product
         </h1>
         <button class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 w-full sm:w-auto">
             <a href="products.php" class="block text-center">
@@ -296,7 +449,7 @@ try {
     </div>
     <?php endif; ?>
     
-    <!-- Product Add Form -->
+    <!-- Product Edit Form -->
     <div class="bg-white rounded shadow p-6">
         <form action="" method="post" enctype="multipart/form-data">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -309,7 +462,7 @@ try {
                             <option value="">Select Category</option>
                             <?php if(isset($result_categories) && $result_categories->num_rows > 0): ?>
                                 <?php while($row = $result_categories->fetch_assoc()): ?>
-                                <option value="<?php echo htmlspecialchars($row['ecat_id']); ?>" <?php echo (isset($_POST['ecat_id']) && $_POST['ecat_id'] == $row['ecat_id']) ? 'selected' : ''; ?>>
+                                <option value="<?php echo htmlspecialchars($row['ecat_id']); ?>" <?php echo (isset($ecat_id) && $ecat_id == $row['ecat_id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($row['tcat_name'] . ' → ' . $row['mcat_name'] . ' → ' . $row['ecat_name']); ?>
                                 </option>
                                 <?php endwhile; ?>
@@ -415,13 +568,41 @@ try {
                 <div>
                     <!-- Images Section -->
                     <div class="mb-6">
-                        <label for="p_featured_photo" class="block mb-2 font-medium">Featured Photo <span class="text-red-500">*</span></label>
-                        <input type="file" name="p_featured_photo" id="p_featured_photo" class="w-full border rounded px-3 py-2" required>
-                        <p class="text-sm text-gray-500 mt-1">Main product image (jpg, jpeg, png, gif only)</p>
+                        <label for="p_featured_photo" class="block mb-2 font-medium">Featured Photo</label>
+                        
+                        <?php if(!empty($featured_photo) && file_exists('../../assets/uploads/products/'.$featured_photo)): ?>
+                            <div class="mb-3">
+                                <img src="../../assets/uploads/products/<?php echo $featured_photo; ?>" alt="Featured Photo" class="w-32 h-32 object-cover border">
+                                <p class="text-sm text-gray-500 mt-1">Current featured photo</p>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <input type="file" name="p_featured_photo" id="p_featured_photo" class="w-full border rounded px-3 py-2">
+                        <p class="text-sm text-gray-500 mt-1">Upload a new image to replace the current one (jpg, jpeg, png, gif only)</p>
                     </div>
                     
+                    <!-- Current Other Photos -->
                     <div class="mb-6">
-                        <label for="p_photos" class="block mb-2 font-medium">Other Photos</label>
+                        <label class="block mb-2 font-medium">Current Other Photos</label>
+                        
+                        <?php if(!empty($product_photos)): ?>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-3">
+                                <?php foreach($product_photos as $photo): ?>
+                                    <div class="border p-2 rounded">
+                                        <img src="../../assets/uploads/products/<?php echo $photo['photo']; ?>" alt="Product Photo" class="w-full h-24 object-cover">
+                                        <a href="product-edit.php?id=<?php echo $product_id; ?>&delete_photo=1&photo_id=<?php echo $photo['pp_id']; ?>" 
+                                           class="block text-center bg-red-500 text-white py-1 px-2 mt-2 rounded text-sm hover:bg-red-600"
+                                           onclick="return confirm('Are you sure you want to delete this photo?');">
+                                            <i class="fas fa-trash-alt mr-1"></i> Delete
+                                        </a>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-sm text-gray-500 mb-3">No additional photos available</p>
+                        <?php endif; ?>
+                        
+                        <label for="p_photos" class="block mb-2 font-medium">Add More Photos</label>
                         <input type="file" name="p_photos[]" id="p_photos" class="w-full border rounded px-3 py-2" multiple>
                         <p class="text-sm text-gray-500 mt-1">You can select multiple photos (jpg, jpeg, png, gif only)</p>
                     </div>
@@ -449,11 +630,12 @@ try {
             </div>
             
             <!-- Submit Buttons -->
-            <div class="border-t border-gray-300 mt-6 pt-6 flex flex-col sm:flex-row justify-end">
-                <button type="submit" name="form1" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mb-2 sm:mb-0 sm:mr-2">
-                    <i class="fas fa-save mr-2"></i>Save Product
+           <!-- Submit Buttons -->
+           <div class="border-t border-gray-300 pt-6 mt-6 flex flex-col sm:flex-row justify-end gap-4">
+                <button type="submit" name="form1" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 w-full sm:w-auto">
+                    <i class="fas fa-save mr-2"></i>Save Changes
                 </button>
-                <a href="products.php" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 text-center">
+                <a href="products.php" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 text-center w-full sm:w-auto">
                     <i class="fas fa-times mr-2"></i>Cancel
                 </a>
             </div>
@@ -461,33 +643,15 @@ try {
     </div>
 </div>
 
-<!-- JavaScript for dynamic display of selected items -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    
-   // Add rich text editor for product description if you have one integrated
-// Example: if you have CKEditor included in your project
-if (typeof CKEDITOR !== 'undefined') {
-    CKEDITOR.replace('p_description');
-}
-
-    
-    // Size selection handling
-    const sizeSelector = document.getElementById('size-selector');
-    const selectedSizesContainer = document.getElementById('selected-sizes');
-    
-    // Add size when option is clicked
-    sizeSelector.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
+    // Size selector handling
+    document.getElementById('size-selector').addEventListener('change', function() {
         const sizeId = this.value;
+        if (!sizeId) return;
         
-        if (sizeId === '') {
-            return; // Nothing selected
-        }
+        const sizeName = this.options[this.selectedIndex].getAttribute('data-size-name');
         
-        const sizeName = selectedOption.getAttribute('data-size-name');
-        
-        // Create new size tag with remove button
+        // Create and add the size tag
         const sizeTag = document.createElement('div');
         sizeTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
         sizeTag.innerHTML = `
@@ -498,90 +662,82 @@ if (typeof CKEDITOR !== 'undefined') {
             <input type="hidden" name="p_size[]" value="${sizeId}">
         `;
         
-        // Add to container
-        selectedSizesContainer.appendChild(sizeTag);
+        document.getElementById('selected-sizes').appendChild(sizeTag);
         
-        // Disable the option in the dropdown
-        selectedOption.disabled = true;
-        
-        // Reset dropdown
+        // Disable the option
+        this.options[this.selectedIndex].disabled = true;
         this.selectedIndex = 0;
     });
 
-// Remove size when X button is clicked
-selectedSizesContainer.addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-size') || e.target.closest('.remove-size')) {
-        const removeButton = e.target.classList.contains('remove-size') ? e.target : e.target.closest('.remove-size');
-        const sizeId = removeButton.getAttribute('data-size-id');
-        const sizeTag = removeButton.closest('div');
-        
-        // Remove the tag
-        sizeTag.remove();
-        
-        // Enable the option in the dropdown again
-        const option = sizeSelector.querySelector(`option[value="${sizeId}"]`);
-        if (option) {
-            option.disabled = false;
+    // Remove size tag handling
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-size')) {
+            const button = e.target.closest('.remove-size');
+            const sizeId = button.getAttribute('data-size-id');
+            
+            // Remove the tag
+            button.closest('div').remove();
+            
+            // Enable the option again
+            const option = document.querySelector(`#size-selector option[value="${sizeId}"]`);
+            if (option) option.disabled = false;
         }
-    }
-});
+    });
 
-// Color selection handling
-const colorSelector = document.getElementById('color-selector');
-const selectedColorsContainer = document.getElementById('selected-colors');
-
-// Add color when option is clicked
-colorSelector.addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    const colorId = this.value;
-    
-    if (colorId === '') {
-        return; // Nothing selected
-    }
-    
-    const colorName = selectedOption.getAttribute('data-color-name');
-    
-    // Create new color tag with remove button
-    const colorTag = document.createElement('div');
-    colorTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
-    colorTag.innerHTML = `
-        <span>${colorName}</span>
-        <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="${colorId}">
-            <i class="fas fa-times"></i>
-        </button>
-        <input type="hidden" name="p_color[]" value="${colorId}">
-    `;
-    
-    // Add to container
-    selectedColorsContainer.appendChild(colorTag);
-    
-    // Disable the option in the dropdown
-    selectedOption.disabled = true;
-    
-    // Reset the dropdown
-    this.selectedIndex = 0;
-});
-
-// Remove color when X button is clicked
-selectedColorsContainer.addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-color') || e.target.closest('.remove-color')) {
-        const removeButton = e.target.classList.contains('remove-color') ? e.target : e.target.closest('.remove-color');
-        const colorId = removeButton.getAttribute('data-color-id');
-        const colorTag = removeButton.closest('div');
+    // Color selector handling
+    document.getElementById('color-selector').addEventListener('change', function() {
+        const colorId = this.value;
+        if (!colorId) return;
         
-        // Remove the tag
-        colorTag.remove();
+        const colorName = this.options[this.selectedIndex].getAttribute('data-color-name');
         
-        // Enable the option in the dropdown again
-        const option = colorSelector.querySelector(`option[value="${colorId}"]`);
-        if (option) {
-            option.disabled = false;
+        // Create and add the color tag
+        const colorTag = document.createElement('div');
+        colorTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
+        colorTag.innerHTML = `
+            <span>${colorName}</span>
+            <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="${colorId}">
+                <i class="fas fa-times"></i>
+            </button>
+            <input type="hidden" name="p_color[]" value="${colorId}">
+        `;
+        
+        document.getElementById('selected-colors').appendChild(colorTag);
+        
+        // Disable the option
+        this.options[this.selectedIndex].disabled = true;
+        this.selectedIndex = 0;
+    });
+
+    // Remove color tag handling
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-color')) {
+            const button = e.target.closest('.remove-color');
+            const colorId = button.getAttribute('data-color-id');
+            
+            // Remove the tag
+            button.closest('div').remove();
+            
+            // Enable the option again
+            const option = document.querySelector(`#color-selector option[value="${colorId}"]`);
+            if (option) option.disabled = false;
         }
+    });
+
+    // Initialize rich text editors if needed
+    if (typeof ClassicEditor !== 'undefined') {
+        ClassicEditor
+            .create(document.querySelector('#p_description'))
+            .catch(error => {
+                console.error(error);
+            });
+            
+        ClassicEditor
+            .create(document.querySelector('#p_short_description'))
+            .catch(error => {
+                console.error(error);
+            });
     }
-});
-        
-   
-});
 </script>
 
 <?php include_once '../../includes/footer.php'; ?>
