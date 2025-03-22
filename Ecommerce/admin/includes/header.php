@@ -92,12 +92,12 @@ if(!isset($_SESSION['user'])) {
                     <span class="text ml-3 sidebar-text ">Product Management</span>
                 </a>
             </li>
-            <!-- <li>
-                <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
+            <li>
+                <a href="/santoshvas/Ecommerce/admin/dashboardpages/order.php" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-doughnut-chart text-xl'></i>
-                    <span class="text ml-3 sidebar-text ">Analytics</span>
+                    <span class="text ml-3 sidebar-text ">Order Management</span>
                 </a>
-            </li> -->
+            </li>
             <li>
                 <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-message-dots text-xl'></i>
@@ -141,7 +141,7 @@ if(!isset($_SESSION['user'])) {
         <!-- 1. First, fix the search toggle icon in the navbar -->
 <nav class="h-16 bg-white px-6 flex items-center justify-evenly  sticky top-0 z-40 shadow-sm">
     <i class='bx bx-menu text-2xl text-gray-700 cursor-pointer' id="menu-btn"></i>
-    <a href="#" class="nav-link ml-4 text-gray-700 hover:text-blue-500">Categories</a>
+    <a href="../../index.php" class="nav-link ml-4 text-gray-700 hover:text-blue-500">Home</a>
     
     <!-- Modified search toggle: hidden on md screens and larger -->
     <!-- <i class='bx bx-search text-2xl text-gray-700 cursor-pointer ml-auto hidden md:hidden lg:hidden xl:hidden' id="search-toggle"></i> -->
@@ -167,7 +167,7 @@ if(!isset($_SESSION['user'])) {
                 <i class='bx bxs-bell text-2xl'></i>
                 <span class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">8</span>
             </a>
-            <a href="#" class="profile ml-4">
+            <a href="/santoshvas/Ecommerce/admin/dashboardpages/profile-edit.php" class="profile ml-4">
                 <img src="https://via.placeholder.com/36" class="w-9 h-9 rounded-full object-cover border-2 border-blue-500">
             </a>
         </nav>
@@ -187,5 +187,5 @@ if(!isset($_SESSION['user'])) {
             </form>
         </div>
 
-         <!-- MAIN -->
+   
     <main class="p-6">
