@@ -723,21 +723,7 @@ try {
             if (option) option.disabled = false;
         }
     });
-
-    // Initialize rich text editors if needed
-    if (typeof ClassicEditor !== 'undefined') {
-        ClassicEditor
-            .create(document.querySelector('#p_description'))
-            .catch(error => {
-                console.error(error);
-            });
-            
-        ClassicEditor
-            .create(document.querySelector('#p_short_description'))
-            .catch(error => {
-                console.error(error);
-            });
-    }
+    
 </script>
 
 <?php include_once '../../includes/footer.php'; ?>

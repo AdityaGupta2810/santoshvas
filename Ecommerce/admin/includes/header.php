@@ -38,7 +38,7 @@ if(!isset($_SESSION['user'])) {
         </a>
         <ul class="side-menu top mt-8">
             <li class="bg-blue-50 border-r-4 border-blue-500">
-                <a href="#" class="flex items-center h-12 px-4 text-blue-500">
+                <a href="/santoshvas/Ecommerce/admin/index.php" class="flex items-center h-12 px-4 text-blue-500">
                     <i class='bx bxs-dashboard text-xl'></i>
                     <span class="text ml-3 sidebar-text">Dashboard</span>
                 </a>

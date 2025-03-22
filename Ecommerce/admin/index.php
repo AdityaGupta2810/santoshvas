@@ -1,6 +1,26 @@
 
 <?php include_once('C:/xampp/htdocs/santoshvas/Ecommerce/admin/includes/header.php');  ?>
 
+<?php
+$statement = $db->prepare("SELECT * FROM tbl_top_category");
+$statement->execute();
+$statement->store_result();
+$total_top_category = $statement->num_rows;
+
+$statement = $db->prepare("SELECT * FROM tbl_mid_category");
+$statement->execute();
+$statement->store_result();
+$total_mid_category = $statement->num_rows;
+
+$statement = $db->prepare("SELECT * FROM tbl_end_category");
+$statement->execute();
+$statement->store_result();
+$total_end_category = $statement->num_rows;
+
+$statement = $db->prepare("SELECT * FROM tbl_product");
+$statement->execute();
+$statement->store_result();
+$total_product = $statement->num_rows; ?>
   
             <div class="head-title flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <div class="left">
@@ -8,7 +28,7 @@
                     <ul class="breadcrumb flex items-center mt-2">
                         <li><a href="#" class="text-gray-500">Dashboard</a></li>
                         <li class="mx-2 text-gray-500"><i class='bx bx-chevron-right'></i></li>
-                        <li><a href="#" class="text-blue-500">Home</a></li>
+                        <li><a href="../index.php" class="text-blue-500">Home</a></li>
                     </ul>
                 </div>
                 <!-- <a href="#" class="btn-download h-10 px-4 bg-blue-500 text-white rounded-full flex items-center mt-4 md:mt-0 w-max">
@@ -21,14 +41,22 @@
                 <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
                     <i class='bx bxs-calendar-check text-4xl text-blue-500'></i>
                     <div class="ml-4">
-                        <h3 class="text-2xl font-semibold text-gray-700">1,020</h3>
+                        <h3 class="text-2xl font-semibold text-gray-700">0</h3>
                         <p class="text-gray-500">New Orders</p>
+                    </div>
+                </li>
+
+                <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
+                <i class='bx bxs-package text-4xl text-blue-500' ></i>
+                    <div class="ml-4">
+                        <h3 class="text-2xl font-semibold text-gray-700"><?php echo $total_product; ?></h3>
+                        <p class="text-gray-500">Total Products</p>
                     </div>
                 </li>
                 <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
                     <i class='bx bxs-group text-4xl text-yellow-500'></i>
                     <div class="ml-4">
-                        <h3 class="text-2xl font-semibold text-gray-700">2,834</h3>
+                        <h3 class="text-2xl font-semibold text-gray-700">4</h3>
                         <p class="text-gray-500">Visitors</p>
                     </div>
                 </li>
@@ -37,6 +65,28 @@
                     <div class="ml-4">
                         <h3 class="text-2xl font-semibold text-gray-700">$2,543</h3>
                         <p class="text-gray-500">Total Sales</p>
+                    </div>
+                </li>
+                <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
+                    <i class='bx bxs-category text-4xl text-green-500'></i>
+                    <div class="ml-4">
+                        <h3 class="text-2xl font-semibold text-gray-700"><?php echo $total_top_category; ?></h3>
+                        <p class="text-gray-500">Total Top Level Categories</p>
+                    </div>
+                </li>
+                <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
+                    <i class='bx bxs-category text-4xl text-red-500'></i>
+                    <div class="ml-4">
+                        <h3 class="text-2xl font-semibold text-gray-700"><?php echo $total_mid_category; ?></h3>
+                        <p class="text-gray-500">Total Mid Level Categories</p>
+                    </div>
+                </li>
+
+                <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
+                    <i class='bx bxs-category text-4xl text-red-500'></i>
+                    <div class="ml-4">
+                        <h3 class="text-2xl font-semibold text-gray-700"><?php echo $total_end_category; ?></h3>
+                        <p class="text-gray-500">Total End Level Categories</p>
                     </div>
                 </li>
             </ul>
@@ -119,9 +169,9 @@
                 </div>
             </div>
         </main>
-        <!-- MAIN -->
+    
     </section>
-    <!-- CONTENT -->
+
 
     <?php include_once('C:/xampp/htdocs/santoshvas/Ecommerce/admin/includes/footer.php'); ?>
   
