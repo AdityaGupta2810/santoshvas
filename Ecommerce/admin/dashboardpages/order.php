@@ -107,27 +107,35 @@ Unit Price: '.$row['unit_price'].'<br>
         }
     }
     
-    // Handle payment status updates
-    if(isset($_GET['payment_id']) && isset($_GET['payment_task']) && $_GET['payment_task'] == 'Completed') {
+    // Handle payment status toggle
+    if(isset($_GET['payment_id']) && isset($_GET['payment_task'])) {
         $payment_id = $_GET['payment_id'];
+        $new_status = $_GET['payment_task']; // Will be either 'Completed' or 'Pending'
         
-        // Update the payment status to Completed
-        $query = "UPDATE tbl_payment SET payment_status = 'Completed' WHERE id = " . $payment_id;
+        // Update the payment status
+        $query = "UPDATE tbl_payment SET payment_status = '{$new_status}' WHERE id = " . $payment_id;
         if(mysqli_query($db, $query)) {
-            $success_message = 'Payment status has been updated to Completed';
+            $success_message = "Payment status has been updated to {$new_status}";
+            // Redirect to remove GET parameters after processing
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         } else {
             $error_message = 'Failed to update payment status: ' . mysqli_error($db);
         }
     }
     
-    // Handle shipping status updates
-    if(isset($_GET['shipping_id']) && isset($_GET['shipping_task']) && $_GET['shipping_task'] == 'Completed') {
+    // Handle shipping status toggle
+    if(isset($_GET['shipping_id']) && isset($_GET['shipping_task'])) {
         $shipping_id = $_GET['shipping_id'];
+        $new_status = $_GET['shipping_task']; // Will be either 'Completed' or 'Pending'
         
-        // Update the shipping status to Completed
-        $query = "UPDATE tbl_payment SET shipping_status = 'Completed' WHERE id = " . $shipping_id;
+        // Update the shipping status
+        $query = "UPDATE tbl_payment SET shipping_status = '{$new_status}' WHERE id = " . $shipping_id;
         if(mysqli_query($db, $query)) {
-            $success_message = 'Shipping status has been updated to Completed';
+            $success_message = "Shipping status has been updated to {$new_status}";
+            // Redirect to remove GET parameters after processing
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         } else {
             $error_message = 'Failed to update shipping status: ' . mysqli_error($db);
         }
@@ -151,16 +159,33 @@ Unit Price: '.$row['unit_price'].'<br>
         $query = "DELETE FROM tbl_payment WHERE id = " . $id;
         if(mysqli_query($db, $query)) {
             $success_message = 'Order has been deleted successfully';
+            // Redirect to remove GET parameters after processing
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         } else {
             $error_message = 'Failed to delete order: ' . mysqli_error($db);
         }
     }
     
+    // Use sessions to store messages instead of displaying them on every refresh
+    // session_start();
+    
+    // Display messages only once if they exist in session
+    if(isset($_SESSION['error_message'])) {
+        echo "<script>alert('".$_SESSION['error_message']."')</script>";
+        unset($_SESSION['error_message']);
+    }
+    if(isset($_SESSION['success_message'])) {
+        echo "<script>alert('".$_SESSION['success_message']."')</script>";
+        unset($_SESSION['success_message']);
+    }
+    
+    // Store current messages in session
     if($error_message != '') {
-        echo "<script>alert('".$error_message."')</script>";
+        $_SESSION['error_message'] = $error_message;
     }
     if($success_message != '') {
-        echo "<script>alert('".$success_message."')</script>";
+        $_SESSION['success_message'] = $success_message;
     }
     ?>
 
@@ -278,24 +303,34 @@ Unit Price: '.$row['unit_price'].'<br>
                             </td>
                             <td class="px-4 py-2 border-r-4"><?php echo $row['paid_amount']; ?></td>
                             <td class="px-4 py-2 border-r-4">
-                                <p class="mb-4"><?php echo $row['payment_status']; ?></p>
+                                <p class="mb-4 font-bold"><?php echo $row['payment_status']; ?></p>
                                 <?php
-                                    if($row['payment_status']=='Pending'){
-                                        ?>
-                                        <a href="?payment_id=<?php echo $row['id']; ?>&payment_task=Completed" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-sm block text-center mb-1">Mark Complete</a>
-                                        <?php
-                                    }
+                                if($row['payment_status'] == 'Pending') {
+                                    // If status is Pending, show button to mark as Completed
+                                    ?>
+                                    <a href="?payment_id=<?php echo $row['id']; ?>&payment_task=Completed" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-sm block text-center mb-1 font-medium">Mark Complete</a>
+                                    <?php
+                                } else {
+                                    // If status is Completed, show button to mark as Pending with better contrast
+                                    ?>
+                                    <a href="?payment_id=<?php echo $row['id']; ?>&payment_task=Pending" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm block text-center mb-1 font-medium">Mark Pending</a>
+                                    <?php
+                                }
                                 ?>
                             </td>
                             <td class="px-4 py-2 border-r-4">
-                                <p class="mb-4"><?php echo $row['shipping_status']; ?></p>
+                                <p class="mb-4 font-bold"><?php echo $row['shipping_status']; ?></p>
                                 <?php
-                                if($row['payment_status']=='Completed') {
-                                    if($row['shipping_status']=='Pending'){
-                                        ?>
-                                        <a href="?shipping_id=<?php echo $row['id']; ?>&shipping_task=Completed" class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded text-sm block text-center mb-1">Mark Complete</a>
-                                        <?php
-                                    }
+                                if($row['shipping_status'] == 'Pending') {
+                                    // If status is Pending, show button to mark as Completed
+                                    ?>
+                                    <a href="?shipping_id=<?php echo $row['id']; ?>&shipping_task=Completed" class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded text-sm block text-center mb-1 font-medium">Mark Complete</a>
+                                    <?php
+                                } else {
+                                    // If status is Completed, show button to mark as Pending with better contrast
+                                    ?>
+                                    <a href="?shipping_id=<?php echo $row['id']; ?>&shipping_task=Pending" class="bg-purple-500 hover:bg-purple-600 text-white py-1 px-2 rounded text-sm block text-center mb-1 font-medium border border-purple-600">Mark Pending</a>
+                                    <?php
                                 }
                                 ?>
                             </td>
@@ -342,35 +377,35 @@ Unit Price: '.$row['unit_price'].'<br>
         const modalCloses = document.querySelectorAll('.modal-close');
         
         modalButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent default button behavior
-            const modalId = this.getAttribute('data-modal-target');
-            document.getElementById(modalId).classList.remove('hidden');
-        });
-    });
-    
-    modalCloses.forEach(close => {
-        close.addEventListener('click', function() {
-            const modal = this.closest('[id^="model-"]');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-        });
-    });
-    
-    // Close modals when clicking outside the modal content
-    window.addEventListener('click', function(event) {
-        document.querySelectorAll('[id^="model-"]').forEach(modal => {
-            if (event.target === modal) {
-                modal.classList.add('hidden');
-            }
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default button behavior
+                const modalId = this.getAttribute('data-modal-target');
+                document.getElementById(modalId).classList.remove('hidden');
+            });
         });
         
-        if (event.target === document.getElementById('delete-modal')) {
-            document.getElementById('delete-modal').classList.add('hidden');
-        }
-    });
+        modalCloses.forEach(close => {
+            close.addEventListener('click', function() {
+                const modal = this.closest('[id^="model-"]');
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
         
+        // Close modals when clicking outside the modal content
+        window.addEventListener('click', function(event) {
+            document.querySelectorAll('[id^="model-"]').forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+            
+            if (event.target === document.getElementById('delete-modal')) {
+                document.getElementById('delete-modal').classList.add('hidden');
+            }
+        });
+            
         // Delete confirmation modal
         const deleteButtons = document.querySelectorAll('.delete-btn');
         const deleteModal = document.getElementById('delete-modal');
@@ -388,8 +423,6 @@ Unit Price: '.$row['unit_price'].'<br>
         deleteCancel.addEventListener('click', function() {
             deleteModal.classList.add('hidden');
         });
-        
-       
     });
     </script>
 <?php include_once "../includes/footer.php" ?>
