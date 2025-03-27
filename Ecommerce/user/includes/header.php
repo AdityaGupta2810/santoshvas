@@ -1,6 +1,8 @@
 <?php
 require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +26,7 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
             <a href="#" class="block py-2 px-4 hover:bg-gray-700">Women</a>
             <a href="#" class="block py-2 px-4 hover:bg-gray-700">Men</a>
             <a href="#" class="block py-2 px-4 hover:bg-gray-700">Others</a>
-            <a href="#" class="block py-2 px-4 hover:bg-gray-700">Cart</a>
+            <a href="/santoshvas/Ecommerce/Home/cart.php" class="block py-2 px-4 hover:bg-gray-700">Cart</a>
             <a href="/santoshvas/Ecommerce/admin/index.php" class="block py-2 px-4 hover:bg-gray-700">Admin</a>
             <div class="relative">
                 <button id="userMenuButtonMobile" class="w-full text-left py-2 px-4 hover:bg-gray-700 focus:outline-none">
@@ -78,7 +80,7 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
     
         <!-- User Dropdown and Cart Icon for Larger Screens -->
         <div class="hidden sm:flex items-center space-x-4">
-            <a href="#" class="hover:text-blue-600 font-bold" aria-label="Cart">
+            <a href="/santoshvas/Ecommerce/Home/cart.php" class="hover:text-blue-600 font-bold" aria-label="Cart">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>

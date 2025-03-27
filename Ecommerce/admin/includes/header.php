@@ -1,20 +1,38 @@
+
 <?php
+// Start output buffering and session
 ob_start();
 session_start();
-// include("config.php");
+
+
 include('C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.php');
-// include("functions.php");
-// include("CSRF_Protect.php");
-// $csrf = new CSRF_Protect();
+
+// Error handling
 $error_message = '';
 $success_message = '';
-$error_message1 = '';
-$success_message1 = '';
 
-// Check if the user is logged in or not
-if(!isset($_SESSION['user'])) {
-	header('location: login.php');
-	exit;
+// Authentication check
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit;
+}
+
+// Logout functionality
+if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
+    // Use a more secure session destruction method
+    $_SESSION = array();
+    
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+    
+    session_destroy();
+    header('Location: login.php');
+    exit;
 }
 ?>
 
@@ -29,7 +47,8 @@ if(!isset($_SESSION['user'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-gray-100">
-    <!-- SIDEBAR -->
+    <!-- Existing HTML structure remains the same -->
+      <!-- SIDEBAR -->
 
     <section id="sidebar" class="fixed top-0 left-0 h-full bg-white shadow-md z-50 transition-all duration-300 w-72 ">
         <a href="#" class="brand flex items-center h-16 px-4 text-blue-500 text-2xl font-bold">
@@ -163,13 +182,32 @@ if(!isset($_SESSION['user'])) {
                     <i class='bx bx-moon text-blue-800 light-icon text-sm ml-auto'></i>
                 </label>
             </div> -->
-            <a href="#" class="notification ml-4 text-gray-700 relative">
+            <a href="#" class="notification mx-4 text-gray-700 relative">
                 <i class='bx bxs-bell text-2xl'></i>
                 <span class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">8</span>
             </a>
-            <a href="/santoshvas/Ecommerce/admin/dashboardpages/profile-edit.php" class="profile ml-4">
-                <img src="https://via.placeholder.com/36" class="w-9 h-9 rounded-full object-cover border-2 border-blue-500">
+           <div class="relative">
+            <a href="#" id="profile-toggle" class="profile relative">
+                <img src="https://via.placeholder.com/36" class="w-9 h-9 rounded-full object-cover border-2 border-blue-500 cursor-pointer">
             </a>
+            
+            <!-- Profile Dropdown -->
+            <div id="profile-dropdown" class="profile-dropdown absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg hidden">
+                <ul class="py-1">
+                    <li>
+                        <a href="/santoshvas/Ecommerce/admin/dashboardpages/profile-edit.php" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center">
+                            <i class='bx bxs-user mr-2'></i> Edit Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a href="?logout=true" class="block px-4 py-2 text-red-600 hover:bg-gray-100 flex items-center">
+                            <i class='bx bxs-log-out-circle mr-2'></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
         </nav>
         <!-- NAVBAR -->
 
@@ -186,6 +224,51 @@ if(!isset($_SESSION['user'])) {
                 </div>
             </form>
         </div>
+    
+    <script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const profileToggle = document.getElementById('profile-toggle');
+    const profileDropdown = document.getElementById('profile-dropdown');
 
-   
-    <main class="p-6">
+    // Toggle dropdown function
+    function toggleDropdown(event) {
+        event.stopPropagation();
+        profileDropdown.classList.toggle('hidden');
+    }
+
+    // Close dropdown when clicking outside
+    function closeDropdown() {
+        profileDropdown.classList.add('hidden');
+    }
+
+    // Initial state: hide dropdown
+    profileDropdown.classList.add('hidden');
+
+    // Add click event listener to profile toggle
+    profileToggle.addEventListener('click', toggleDropdown);
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!profileToggle.contains(event.target) && !profileDropdown.contains(event.target)) {
+            closeDropdown();
+        }
+    });
+
+    // Close dropdown on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+});
+    </script>
+ <main class="p-6">
+
+
+
+
+
+
+
+
+
