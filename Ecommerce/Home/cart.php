@@ -13,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
     ]);
 }
 
-// require_once('header.php');
+
 
 // Database connection
 $conn = new mysqli('localhost', 'root', '', 'santoshvastralay');
@@ -91,13 +91,13 @@ if(isset($_POST['update_cart'])) {
                 <?php echo htmlspecialchars($success_message); ?>
             </div>
         <?php endif; ?>
-
+ 
         <?php if(!isset($_SESSION['cart_p_id']) || empty($_SESSION['cart_p_id'])): ?>
             <div class="bg-white rounded-lg shadow-md p-8 text-center">
                 <i class="fas fa-shopping-cart fa-4x text-gray-400 mb-4"></i>
                 <h2 class="text-2xl font-bold text-gray-700 mb-2">Your cart is empty</h2>
                 <p class="text-gray-600 mb-6">Add products to your cart to view them here.</p>
-                <a href="index.php" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg">
+                <a href="../index.php" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg">
                     Continue Shopping
                 </a>
             </div>

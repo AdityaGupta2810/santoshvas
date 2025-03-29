@@ -9,6 +9,8 @@ session_start();
 // $_SESSION['logout_message'] = 'Logged out Successfully';
 $fn->setAlert('Logged out Successfully');
 // Destroy the session
+
+unset($_SESSION['customer']);
 session_destroy();
 
 // Redirect to the login page
