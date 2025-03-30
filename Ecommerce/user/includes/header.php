@@ -1,5 +1,6 @@
 <?php
 require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
+include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.php";
 ?>
 
 
@@ -67,8 +68,8 @@ require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
         <!-- Navigation Menu for Larger Screens -->
         <nav class="hidden sm:flex gap-5 text-xl p-4">
             <a href="#" class="hover:text-blue-600 font-semibold">Home</a>
-            <a href="#" class="hover:text-blue-600 font-semibold">Women</a>
-            <a href="#" class="hover:text-blue-600 font-semibold">Men</a>
+            <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="hover:text-blue-600 font-semibold">Women</a>
+            <a href="/santoshvas/Ecommerce/Home/categorypage.php" class="hover:text-blue-600 font-semibold">Men</a>
             <a href="#" class="hover:text-blue-600 font-semibold">Others</a>
         </nav>
     
