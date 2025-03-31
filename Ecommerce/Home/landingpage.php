@@ -1,9 +1,17 @@
 <?php
+// Start session if needed (for cart or user data)
+session_start();
+
 // Set the page title
 $title = "Products - Santosh Vastralay";
 
-// Include the header
+// Include the header (assumes $db is defined here)
 include_once "../user/includes/header.php";
+
+// Check database connection
+if (!isset($db) || !$db) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
 
 // Get category IDs if provided
 $ecat_id = isset($_GET['ecat_id']) ? (int)$_GET['ecat_id'] : 0;
@@ -20,61 +28,72 @@ $category_info = null;
 $category_name = "All Products";
 $breadcrumb = [];
 
-// Handle both end category and mid category filtering
+// Prepare statements to prevent SQL injection
 if ($ecat_id > 0) {
-    // Get end category info
     $ecat_query = "SELECT e.*, m.mcat_name, m.mcat_id, t.tcat_name, t.tcat_id 
                    FROM tbl_end_category e
                    LEFT JOIN tbl_mid_category m ON e.mcat_id = m.mcat_id
                    LEFT JOIN tbl_top_category t ON m.tcat_id = t.tcat_id
-                   WHERE e.ecat_id = $ecat_id AND e.ecat_is_active = 1";
-    $ecat_result = mysqli_query($db, $ecat_query);
+                   WHERE e.ecat_id = ? AND e.ecat_is_active = 1";
+    $stmt = mysqli_prepare($db, $ecat_query);
+    mysqli_stmt_bind_param($stmt, "i", $ecat_id);
+    mysqli_stmt_execute($stmt);
+    $ecat_result = mysqli_stmt_get_result($stmt);
     
     if (mysqli_num_rows($ecat_result) > 0) {
         $category_info = mysqli_fetch_assoc($ecat_result);
         $category_name = $category_info['ecat_name'];
-        
-        // Build breadcrumb
         $breadcrumb = [
             ['name' => $category_info['tcat_name'], 'id' => $category_info['tcat_id'], 'type' => 'tcat'],
             ['name' => $category_info['mcat_name'], 'id' => $category_info['mcat_id'], 'type' => 'mcat'],
             ['name' => $category_info['ecat_name'], 'id' => $category_info['ecat_id'], 'type' => 'ecat']
         ];
     }
+    mysqli_stmt_close($stmt);
 } elseif ($mcat_id > 0) {
-    // Get mid category info
     $mcat_query = "SELECT m.*, t.tcat_name, t.tcat_id 
-                  FROM tbl_mid_category m
-                  LEFT JOIN tbl_top_category t ON m.tcat_id = t.tcat_id
-                  WHERE m.mcat_id = $mcat_id";
-    $mcat_result = mysqli_query($db, $mcat_query);
+                   FROM tbl_mid_category m
+                   LEFT JOIN tbl_top_category t ON m.tcat_id = t.tcat_id
+                   WHERE m.mcat_id = ?";
+    $stmt = mysqli_prepare($db, $mcat_query);
+    mysqli_stmt_bind_param($stmt, "i", $mcat_id);
+    mysqli_stmt_execute($stmt);
+    $mcat_result = mysqli_stmt_get_result($stmt);
     
     if (mysqli_num_rows($mcat_result) > 0) {
         $category_info = mysqli_fetch_assoc($mcat_result);
         $category_name = $category_info['mcat_name'];
-        
-        // Build breadcrumb
         $breadcrumb = [
             ['name' => $category_info['tcat_name'], 'id' => $category_info['tcat_id'], 'type' => 'tcat'],
             ['name' => $category_info['mcat_name'], 'id' => $category_info['mcat_id'], 'type' => 'mcat']
         ];
     }
+    mysqli_stmt_close($stmt);
 }
 
 // Build query conditions based on category
 if ($ecat_id > 0) {
-    $count_condition = "WHERE p.ecat_id = $ecat_id AND p.p_is_active = 1";
+    $count_condition = "WHERE p.ecat_id = ? AND p.p_is_active = 1";
+    $product_condition = $count_condition;
 } elseif ($mcat_id > 0) {
-    $count_condition = "WHERE p.ecat_id IN (SELECT ecat_id FROM tbl_end_category WHERE mcat_id = $mcat_id) AND p.p_is_active = 1";
+    $count_condition = "WHERE p.ecat_id IN (SELECT ecat_id FROM tbl_end_category WHERE mcat_id = ?) AND p.p_is_active = 1";
+    $product_condition = $count_condition;
 } else {
     $count_condition = "WHERE p.p_is_active = 1";
+    $product_condition = "WHERE p.p_is_active = 1";
 }
 
 // Count total products for pagination
 $count_query = "SELECT COUNT(*) as total FROM tbl_product p $count_condition";
-$count_result = mysqli_query($db, $count_query);
+$stmt = mysqli_prepare($db, $count_query);
+if ($ecat_id > 0 || $mcat_id > 0) {
+    mysqli_stmt_bind_param($stmt, "i", $ecat_id > 0 ? $ecat_id : $mcat_id);
+}
+mysqli_stmt_execute($stmt);
+$count_result = mysqli_stmt_get_result($stmt);
 $total_products = mysqli_fetch_assoc($count_result)['total'];
 $total_pages = ceil($total_products / $itemsPerPage);
+mysqli_stmt_close($stmt);
 
 // Determine sort order
 $order_by = "p.p_id DESC"; // Default: latest
@@ -89,14 +108,20 @@ if ($sort === 'price-low') {
 }
 
 // Get products
-$product_condition = $count_condition;
 $product_query = "SELECT p.*, e.ecat_name 
                   FROM tbl_product p 
                   LEFT JOIN tbl_end_category e ON p.ecat_id = e.ecat_id 
                   $product_condition 
                   ORDER BY $order_by 
-                  LIMIT $offset, $itemsPerPage";
-$product_result = mysqli_query($db, $product_query);
+                  LIMIT ?, ?";
+$stmt = mysqli_prepare($db, $product_query);
+if ($ecat_id > 0 || $mcat_id > 0) {
+    mysqli_stmt_bind_param($stmt, "iii", $ecat_id > 0 ? $ecat_id : $mcat_id, $offset, $itemsPerPage);
+} else {
+    mysqli_stmt_bind_param($stmt, "ii", $offset, $itemsPerPage);
+}
+mysqli_stmt_execute($stmt);
+$product_result = mysqli_stmt_get_result($stmt);
 
 // Fetch top categories for navigation
 $tcat_query = "SELECT * FROM tbl_top_category WHERE show_on_menu = 1 ORDER BY tcat_name";
@@ -105,10 +130,11 @@ $top_categories = [];
 
 while ($tcat = mysqli_fetch_assoc($tcat_result)) {
     $tcat_id = $tcat['tcat_id'];
-    
-    // Fetch mid categories for each top category
-    $mcat_query = "SELECT * FROM tbl_mid_category WHERE tcat_id = $tcat_id ORDER BY mcat_name";
-    $mcat_result = mysqli_query($db, $mcat_query);
+    $mcat_query = "SELECT * FROM tbl_mid_category WHERE tcat_id = ? ORDER BY mcat_name";
+    $stmt = mysqli_prepare($db, $mcat_query);
+    mysqli_stmt_bind_param($stmt, "i", $tcat_id);
+    mysqli_stmt_execute($stmt);
+    $mcat_result = mysqli_stmt_get_result($stmt);
     
     $mid_categories = [];
     while ($mcat = mysqli_fetch_assoc($mcat_result)) {
@@ -119,6 +145,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
         'tcat' => $tcat,
         'mcats' => $mid_categories
     ];
+    mysqli_stmt_close($stmt);
 }
 ?>
 
@@ -127,7 +154,6 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
     <div class="container mx-auto px-4">
         <div class="flex justify-between">
             <div class="flex">
-                <!-- Main Navigation Items -->
                 <div class="flex items-center space-x-4">
                     <?php foreach($top_categories as $category): ?>
                         <div class="relative dropdown-container">
@@ -137,11 +163,10 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <!-- Dropdown Menu -->
                             <div class="absolute left-0 mt-0 w-48 bg-white rounded-b-md shadow-lg hidden dropdown-menu z-10">
                                 <div class="py-2">
                                     <?php foreach($category['mcats'] as $mcat): ?>
-                                        <a href="/santoshvas/Ecommerce/admin/dashboardpages/productmanagement/products.php?mcat_id=<?= $mcat['mcat_id'] ?>" 
+                                        <a href="/santoshvas/Ecommerce/Home/landingpage.php?mcat_id=<?= $mcat['mcat_id'] ?>" 
                                            class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
                                             <?= htmlspecialchars($mcat['mcat_name']) ?>
                                         </a>
@@ -155,8 +180,6 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                     <?php endforeach; ?>
                 </div>
             </div>
-            
-            <!-- Search Form -->
             <div class="hidden md:flex items-center">
                 <form action="/santoshvas/Ecommerce/Home/search.php" method="GET" class="flex">
                     <input type="text" name="q" placeholder="Search products..." 
@@ -172,8 +195,6 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
 
 <!-- Main Content -->
 <div class="container mx-auto p-4">
- 
-    <!-- Page Header -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <h1 class="text-3xl font-bold text-gray-800 mb-2"><?= htmlspecialchars($category_name) ?></h1>
         <?php if($category_info && !empty($category_info['ecat_description'] ?? $category_info['mcat_description'] ?? '')): ?>
@@ -183,13 +204,11 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
         <?php endif; ?>
     </div>
     
-    <!-- Filters and Sort Options -->
     <div class="bg-white rounded-lg shadow-md p-4 mb-6">
         <div class="flex flex-col md:flex-row justify-between items-center">
             <div class="mb-4 md:mb-0">
                 <span class="text-gray-700">Showing <?= min($total_products, 1 + $offset) ?>-<?= min($offset + $itemsPerPage, $total_products) ?> of <?= $total_products ?> products</span>
             </div>
-            
             <div class="flex flex-col sm:flex-row gap-4">
                 <div class="flex items-center">
                     <label for="sort" class="mr-2 text-gray-700">Sort by:</label>
@@ -201,7 +220,6 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                         <option value="name-za" <?= $sort == 'name-za' ? 'selected' : '' ?>>Name: Z to A</option>
                     </select>
                 </div>
-                
                 <div class="flex items-center">
                     <label for="perPage" class="mr-2 text-gray-700">Show:</label>
                     <select id="perPage" class="border rounded px-2 py-1" onchange="changeLimit(this.value)">
@@ -215,7 +233,6 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
         </div>
     </div>
     
-    <!-- Products Grid -->
     <?php if(mysqli_num_rows($product_result) > 0): ?>
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
             <?php while($product = mysqli_fetch_assoc($product_result)): ?>
@@ -253,14 +270,13 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
         </div>
     <?php endif; ?>
 
-    <!-- Pagination -->
     <?php if($total_pages > 1): ?>
         <div class="flex justify-center my-8">
             <nav aria-label="Page navigation">
                 <ul class="flex space-x-2">
                     <?php if($currentPage > 1): ?>
                         <li>
-                            <a href="?<?= $ecat_id > 0 ? 'ecat_id='.$ecat_id : ($mcat_id > 0 ? 'mcat_id='.$mcat_id : '') ?>&page=<?= $currentPage - 1 ?>&limit=<?= $itemsPerPage ?>&sort=<?= $sort ?>" 
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage - 1])) ?>" 
                                class="px-4 py-2 bg-white border rounded hover:bg-gray-100">
                                 <i class="fas fa-chevron-left"></i>
                             </a>
@@ -272,9 +288,8 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                     $endPage = min($total_pages, $startPage + 4);
                     
                     if ($startPage > 1) {
-                        echo '<li><a href="?'.($ecat_id > 0 ? 'ecat_id='.$ecat_id : ($mcat_id > 0 ? 'mcat_id='.$mcat_id : '')).'&page=1&limit='.$itemsPerPage.'&sort='.$sort.'" 
+                        echo '<li><a href="?'.http_build_query(array_merge($_GET, ['page' => 1])).'" 
                               class="px-4 py-2 bg-white border rounded hover:bg-gray-100">1</a></li>';
-                        
                         if ($startPage > 2) {
                             echo '<li><span class="px-4 py-2 text-gray-500">...</span></li>';
                         }
@@ -283,7 +298,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                     for ($i = $startPage; $i <= $endPage; $i++) {
                         $activeClass = $i == $currentPage ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100';
                         echo '<li>
-                                <a href="?'.($ecat_id > 0 ? 'ecat_id='.$ecat_id : ($mcat_id > 0 ? 'mcat_id='.$mcat_id : '')).'&page='.$i.'&limit='.$itemsPerPage.'&sort='.$sort.'" 
+                                <a href="?'.http_build_query(array_merge($_GET, ['page' => $i])).'" 
                                    class="px-4 py-2 border rounded '.$activeClass.'">'.$i.'</a>
                               </li>';
                     }
@@ -292,9 +307,8 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                         if ($endPage < $total_pages - 1) {
                             echo '<li><span class="px-4 py-2 text-gray-500">...</span></li>';
                         }
-                        
                         echo '<li>
-                                <a href="?'.($ecat_id > 0 ? 'ecat_id='.$ecat_id : ($mcat_id > 0 ? 'mcat_id='.$mcat_id : '')).'&page='.$total_pages.'&limit='.$itemsPerPage.'&sort='.$sort.'" 
+                                <a href="?'.http_build_query(array_merge($_GET, ['page' => $total_pages])).'" 
                                    class="px-4 py-2 bg-white border rounded hover:bg-gray-100">'.$total_pages.'</a>
                               </li>';
                     }
@@ -302,7 +316,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                     
                     <?php if($currentPage < $total_pages): ?>
                         <li>
-                            <a href="?<?= $ecat_id > 0 ? 'ecat_id='.$ecat_id : ($mcat_id > 0 ? 'mcat_id='.$mcat_id : '') ?>&page=<?= $currentPage + 1 ?>&limit=<?= $itemsPerPage ?>&sort=<?= $sort ?>" 
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage + 1])) ?>" 
                                class="px-4 py-2 bg-white border rounded hover:bg-gray-100">
                                 <i class="fas fa-chevron-right"></i>
                             </a>
@@ -314,65 +328,51 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
     <?php endif; ?>
 </div>
 
-<!-- JavaScript for item limits and dropdown functionality -->
+<!-- JavaScript -->
 <script>
 function changeLimit(limit) {
     let url = new URL(window.location.href);
     url.searchParams.set('limit', limit);
-    url.searchParams.set('page', 1); // Reset to page 1 when changing items per page
+    url.searchParams.set('page', 1);
     window.location.href = url.toString();
 }
 
-// Sort functionality
 document.getElementById('sort').addEventListener('change', function() {
     let url = new URL(window.location.href);
     url.searchParams.set('sort', this.value);
-    url.searchParams.set('page', 1); // Reset to page 1 when changing sort
+    url.searchParams.set('page', 1);
     window.location.href = url.toString();
 });
 
-// Dropdown functionality
 document.addEventListener('DOMContentLoaded', function() {
     const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    
-    // Handle desktop hover
     const dropdownContainers = document.querySelectorAll('.dropdown-container');
     
     if (!('ontouchstart' in window)) {
-        // For desktop devices
         dropdownContainers.forEach(container => {
             container.addEventListener('mouseenter', function() {
                 this.querySelector('.dropdown-menu').classList.remove('hidden');
                 this.querySelector('.dropdown-menu').classList.add('block');
             });
-            
             container.addEventListener('mouseleave', function() {
                 this.querySelector('.dropdown-menu').classList.remove('block');
                 this.querySelector('.dropdown-menu').classList.add('hidden');
             });
         });
     } else {
-        // For touch devices
         dropdownToggles.forEach(toggle => {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
                 const menu = this.nextElementSibling;
                 const isVisible = menu.classList.contains('block');
-                
-                // Close all other dropdowns
                 document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
                     dropdown.classList.remove('block');
                     dropdown.classList.add('hidden');
                 });
-                
-                // Toggle current dropdown
                 if (!isVisible) {
                     menu.classList.remove('hidden');
                     menu.classList.add('block');
-                    
-                    // Close dropdown when clicking outside
                     document.addEventListener('click', function closeDropdown(event) {
                         if (!menu.contains(event.target) && !toggle.contains(event.target)) {
                             menu.classList.remove('block');
@@ -384,16 +384,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
-    // Close dropdowns when clicking elsewhere on the page
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.dropdown-container')) {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.classList.remove('block');
-                menu.classList.add('hidden');
-            });
-        }
-    });
 });
 </script>
 

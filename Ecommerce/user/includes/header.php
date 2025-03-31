@@ -24,9 +24,9 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.p
         </div>
         <nav class=" mt-4">
             <a href="/santoshvas/Ecommerce/index.php" class="block py-2 px-4 hover:bg-gray-700">Home</a>
-            <a href="#" class="block py-2 px-4 hover:bg-gray-700">Women</a>
-            <a href="#" class="block py-2 px-4 hover:bg-gray-700">Men</a>
-            <a href="#" class="block py-2 px-4 hover:bg-gray-700">Others</a>
+            <a href="#" class="block py-2 px-4 hover:bg-gray-700">Products</a>
+            <a href="#" class="block py-2 px-4 hover:bg-gray-700">About us</a>
+            <a href="#" class="block py-2 px-4 hover:bg-gray-700">Contact us</a>
             <a href="/santoshvas/Ecommerce/Home/cart.php" class="block py-2 px-4 hover:bg-gray-700">Cart</a>
             <a href="/santoshvas/Ecommerce/admin/index.php" class="block py-2 px-4 hover:bg-gray-700">Admin</a>
             <div class="relative">
@@ -68,9 +68,9 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.p
         <!-- Navigation Menu for Larger Screens -->
         <nav class="hidden sm:flex gap-5 text-xl p-4">
             <a href="#" class="hover:text-blue-600 font-semibold">Home</a>
-            <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="hover:text-blue-600 font-semibold">Women</a>
-            <a href="/santoshvas/Ecommerce/Home/categorypage.php" class="hover:text-blue-600 font-semibold">Men</a>
-            <a href="#" class="hover:text-blue-600 font-semibold">Others</a>
+            <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="hover:text-blue-600 font-semibold">Products</a>
+            <a href="/santoshvas/Ecommerce/Home/categorypage.php" class="hover:text-blue-600 font-semibold">About us</a>
+            <a href="#" class="hover:text-blue-600 font-semibold">Contact us</a>
         </nav>
     
         <!-- Search Bar for Larger Screens -->
