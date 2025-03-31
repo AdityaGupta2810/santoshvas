@@ -172,41 +172,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
 
 <!-- Main Content -->
 <div class="container mx-auto p-4">
-    <!-- Breadcrumbs -->
-    <nav class="flex py-3 px-5 text-gray-700 bg-white rounded-lg shadow mb-5" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-                <a href="/santoshvas/Ecommerce/index.php" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-                    <i class="fas fa-home mr-2"></i>
-                    Home
-                </a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                    <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="text-sm font-medium text-gray-700 hover:text-blue-600">
-                        Categories
-                    </a>
-                </div>
-            </li>
-            
-            <?php foreach($breadcrumb as $index => $crumb): ?>
-            <li>
-                <div class="flex items-center">
-                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                    <?php if($index < count($breadcrumb) - 1): ?>
-                        <a href="products.php?<?= $crumb['type'] ?>_id=<?= $crumb['id'] ?>" class="text-sm font-medium text-gray-700 hover:text-blue-600">
-                            <?= htmlspecialchars($crumb['name']) ?>
-                        </a>
-                    <?php else: ?>
-                        <span class="text-sm font-medium text-gray-500"><?= htmlspecialchars($crumb['name']) ?></span>
-                    <?php endif; ?>
-                </div>
-            </li>
-            <?php endforeach; ?>
-        </ol>
-    </nav>
-    
+ 
     <!-- Page Header -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <h1 class="text-3xl font-bold text-gray-800 mb-2"><?= htmlspecialchars($category_name) ?></h1>
@@ -251,7 +217,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
     
     <!-- Products Grid -->
     <?php if(mysqli_num_rows($product_result) > 0): ?>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
             <?php while($product = mysqli_fetch_assoc($product_result)): ?>
                 <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1">
                     <a href="/santoshvas/Ecommerce/Home/product.php?p_id=<?= $product['p_id'] ?>">
@@ -264,27 +230,13 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                             <h3 class="text-lg font-semibold text-gray-800 hover:text-blue-600 truncate"><?= htmlspecialchars($product['p_name']) ?></h3>
                         </a>
                         <p class="text-sm text-gray-600 mt-1"><?= htmlspecialchars($product['ecat_name']) ?></p>
-                        <div class="mt-2 flex justify-between items-center">
-                            <div>
-                                <?php if($product['p_old_price'] > 0): ?>
-                                    <span class="text-lg font-bold text-blue-600">₹<?= number_format($product['p_current_price']) ?></span>
-                                    <span class="text-sm text-gray-500 line-through ml-2">₹<?= number_format($product['p_old_price']) ?></span>
-                                <?php else: ?>
-                                    <span class="text-lg font-bold text-blue-600">₹<?= number_format($product['p_current_price']) ?></span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button class="text-red-500 hover:text-red-600 add-to-wishlist" 
-                                        data-product-id="<?= $product['p_id'] ?>"
-                                        title="Add to Wishlist">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                                <button class="text-blue-500 hover:text-blue-600 add-to-cart" 
-                                        data-product-id="<?= $product['p_id'] ?>" 
-                                        title="Add to Cart">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </button>
-                            </div>
+                        <div class="mt-2">
+                            <?php if($product['p_old_price'] > 0): ?>
+                                <span class="text-lg font-bold text-blue-600">₹<?= number_format($product['p_current_price']) ?></span>
+                                <span class="text-sm text-gray-500 line-through ml-2">₹<?= number_format($product['p_old_price']) ?></span>
+                            <?php else: ?>
+                                <span class="text-lg font-bold text-blue-600">₹<?= number_format($product['p_current_price']) ?></span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -370,72 +322,6 @@ function changeLimit(limit) {
     url.searchParams.set('page', 1); // Reset to page 1 when changing items per page
     window.location.href = url.toString();
 }
-
-// Add to cart functionality
-document.querySelectorAll('.add-to-cart').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const productId = this.getAttribute('data-product-id');
-        
-        // AJAX request to add item to cart
-        fetch('/santoshvas/Ecommerce/ajax/add_to_cart.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'product_id=' + productId + '&quantity=1'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Show success message
-                alert('Product added to cart!');
-                // Update cart count if needed
-                if (document.querySelector('.cart-count')) {
-                    document.querySelector('.cart-count').textContent = data.cart_count;
-                }
-            } else {
-                alert(data.message || 'Failed to add product to cart.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while adding to cart.');
-        });
-    });
-});
-
-// Add to wishlist functionality
-document.querySelectorAll('.add-to-wishlist').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const productId = this.getAttribute('data-product-id');
-        
-        // AJAX request to add item to wishlist
-        fetch('/santoshvas/Ecommerce/ajax/add_to_wishlist.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'product_id=' + productId
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Show success message
-                alert('Product added to wishlist!');
-                // Change the icon to filled heart
-                this.innerHTML = '<i class="fas fa-heart"></i>';
-            } else {
-                alert(data.message || 'Failed to add product to wishlist.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while adding to wishlist.');
-        });
-    });
-});
 
 // Sort functionality
 document.getElementById('sort').addEventListener('change', function() {
