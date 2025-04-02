@@ -104,7 +104,7 @@ if (isset($_POST['add_to_cart'])) {
         ];
     }
     
-    $success_message = "Product added to cart successfully!";
+    $success_message = "Product added to cart successfully! <a href='cart.php' class='ml-2 text-blue-600 hover:underline'>View Cart</a>";
 }
 
 // Handle Buy Now action
@@ -172,7 +172,6 @@ if (isset($_POST['buy_now'])) {
         <span class="block sm:inline"><?= $success_message ?></span>
         <button class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
             <svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <title>Close</title>
                 <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
             </svg>
         </button>
@@ -181,7 +180,7 @@ if (isset($_POST['buy_now'])) {
 
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
         <div class="md:flex">
-            <!-- Updated image section with centered content -->
+            <!-- Image Gallery -->
             <div class="md:w-1/2 lg:w-2/5">
                 <div class="product-gallery">
                     <div class="main-image-container relative h-96 md:h-[32rem] lg:h-[40rem] overflow-hidden bg-gray-100 flex items-center justify-center">
@@ -221,7 +220,7 @@ if (isset($_POST['buy_now'])) {
                 </div>
             </div>
             
-            <!-- Product info section -->
+            <!-- Product Info -->
             <div class="md:w-1/2 lg:w-3/5 p-6">
                 <div class="mb-4">
                     <h1 class="text-3xl font-bold text-gray-800 mb-2"><?= htmlspecialchars($product['p_name']) ?></h1>
@@ -285,7 +284,6 @@ if (isset($_POST['buy_now'])) {
                                 </div>
                             </div>
                         </div>
-                        <!-- Updated buttons section - both buttons always visible -->
                         <div class="flex flex-col sm:flex-row gap-4">
                             <button type="submit" name="add_to_cart" 
                                     class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md 
@@ -294,11 +292,11 @@ if (isset($_POST['buy_now'])) {
                                 <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
                             </button>
                             <button type="submit" name="buy_now" 
-        class="!block !visible px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md 
-        focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 
-        transition duration-150 ease-in-out">
-    <i class="fas fa-bolt mr-2"></i> Buy Now
-</button>
+                                    class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md 
+                                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 
+                                    transition duration-150 ease-in-out">
+                                <i class="fas fa-bolt mr-2"></i> Buy Now
+                            </button>
                         </div>
                     </form>
                     <?php endif; ?>
@@ -306,7 +304,7 @@ if (isset($_POST['buy_now'])) {
             </div>
         </div>
         
-        <!-- Product tabs section -->
+        <!-- Product Tabs -->
         <div class="border-t border-gray-200">
             <div class="product-tabs" x-data="{ activeTab: 'description' }">
                 <div class="flex border-b">
@@ -365,6 +363,8 @@ if (isset($_POST['buy_now'])) {
             </div>
         </div>
     </div>
+    
+    <!-- Related Products -->
     <?php if(mysqli_num_rows($related_result) > 0): ?>
     <div class="mt-12">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Related Products</h2>
@@ -448,6 +448,7 @@ function decrementQuantity() {
         input.value = value - 1;
     }
 }
+
 function incrementQuantity(max) {
     const input = document.getElementById('quantity');
     const value = parseInt(input.value, 10);

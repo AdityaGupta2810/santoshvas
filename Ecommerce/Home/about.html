@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Santosh Vastralay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(49, 46, 129, 0.8), rgba(49, 46, 129, 0.8)), 
+                        url('https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.03);
+        }
+        .text-shadow {
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header Section -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://images.unsplash.com/photo-1595341595379-cf1cd0fb7fb3?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80" alt="Santosh Vastralay Logo" class="h-12 w-12 rounded-full object-cover mr-3">
+                <h1 class="text-2xl font-bold text-indigo-800">Santosh Vastralay</h1>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition">Home</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition">Shop</a>
+                <a href="#" class="text-indigo-600 font-semibold border-b-2 border-indigo-600">About Us</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition">Contact</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition"><i class="fas fa-search"></i></a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition"><i class="fas fa-user"></i></a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600 transition relative">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                </a>
+            </nav>
+            <button class="md:hidden text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section relative text-white py-32">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 text-shadow">About Santosh Vastralay</h1>
+            <p class="text-xl md:text-2xl max-w-2xl mx-auto text-shadow">Your Trusted Destination for Traditional & Modern Fashion</p>
+            <div class="mt-8">
+                <a href="#our-story" class="inline-block bg-white text-indigo-800 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition hover-scale shadow-lg">
+                    Explore Our Story <i class="fas fa-arrow-down ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="our-story" class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2 relative">
+                    <img src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Santosh Vastralay Store" class="rounded-lg shadow-2xl w-full hover-scale">
+                    <div class="absolute -bottom-6 -right-6 bg-indigo-100 p-4 rounded-lg shadow-lg hidden md:block">
+                        <div class="text-indigo-800 text-3xl font-bold">25+</div>
+                        <div class="text-gray-700">Years of Experience</div>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl font-bold text-indigo-800 mb-6 relative inline-block">
+                        Our Story
+                        <span class="absolute bottom-0 left-0 w-1/3 h-1 bg-indigo-600"></span>
+                    </h2>
+                    <p class="text-gray-700 mb-6 text-lg leading-relaxed">
+                        Founded with a passion for authentic Indian textiles and craftsmanship, Santosh Vastralay began as a small family-run store and has grown into a beloved fashion hub. Our journey has been driven by dedication, customer trust, and a commitment to offering the finest clothing collections.
+                    </p>
+                    <p class="text-gray-700 mb-6 text-lg leading-relaxed">
+                        We believe that clothing is more than just fabric—it's an expression of personality, culture, and tradition. For years, we have been serving our valued customers with a wide range of ethnic and contemporary fashion.
+                    </p>
+                    <div class="flex space-x-4">
+                        <div class="bg-indigo-100 p-4 rounded-lg text-center">
+                            <div class="text-indigo-800 text-2xl font-bold">5000+</div>
+                            <div class="text-gray-700">Happy Customers</div>
+                        </div>
+                        <div class="bg-indigo-100 p-4 rounded-lg text-center">
+                            <div class="text-indigo-800 text-2xl font-bold">100+</div>
+                            <div class="text-gray-700">Designers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Offer Section -->
+    <section class="py-20 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-indigo-800 mb-4">What We Offer</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Discover our exquisite collection that blends tradition with contemporary style</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition hover-scale text-center">
+                    <div class="bg-indigo-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-tshirt text-indigo-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Traditional Wear</h3>
+                    <p class="text-gray-600 mb-4">Sarees, salwar suits, lehengas, and kurta-pajamas.</p>
+                    <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">Explore <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition hover-scale text-center">
+                    <div class="bg-indigo-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-vest text-indigo-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Western Fashion</h3>
+                    <p class="text-gray-600 mb-4">Trendy shirts, jeans, dresses, and fusion wear.</p>
+                    <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">Explore <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition hover-scale text-center">
+                    <div class="bg-indigo-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-gem text-indigo-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Festive Collections</h3>
+                    <p class="text-gray-600 mb-4">Elegant bridal and party wear for special occasions.</p>
+                    <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">Explore <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition hover-scale text-center">
+                    <div class="bg-indigo-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-tags text-indigo-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Affordable Pricing</h3>
+                    <p class="text-gray-600 mb-4">Quality fashion that fits every budget.</p>
+                    <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">Explore <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parallax Section -->
+    <section class="parallax-bg py-32" style="background-image: url('https://images.unsplash.com/photo-1523359346063-d879354c0ea5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
+        <div class="container mx-auto px-4 text-center text-white">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 text-shadow">Crafting Fashion Since 1995</h2>
+            <p class="text-xl max-w-3xl mx-auto mb-8 text-shadow">A legacy of quality, tradition, and impeccable style</p>
+            <a href="#" class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition hover-scale shadow-lg">
+                Our Collections <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-indigo-800 mb-4">Why Choose Us?</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">We go beyond just selling clothes - we create experiences</p>
+            </div>
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="md:w-1/2">
+                    <div class="space-y-8">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-5 flex-shrink-0">
+                                <i class="fas fa-check text-indigo-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Quality Assurance</h3>
+                                <p class="text-gray-600">Every garment is handpicked for durability and style, with rigorous quality checks to ensure perfection.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-5 flex-shrink-0">
+                                <i class="fas fa-smile-beam text-indigo-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Customer Satisfaction</h3>
+                                <p class="text-gray-600">Friendly service and personalized shopping experiences with our expert fashion consultants.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-5 flex-shrink-0">
+                                <i class="fas fa-clipboard-list text-indigo-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Wide Selection</h3>
+                                <p class="text-gray-600">From daily wear to festive outfits, we have the largest collection in the region with 500+ new arrivals monthly.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-5 flex-shrink-0">
+                                <i class="fas fa-award text-indigo-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Trusted Legacy</h3>
+                                <p class="text-gray-600">A name synonymous with reliability in fashion, serving generations of customers since 1995.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 relative">
+                    <img src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Happy Customers" class="rounded-lg shadow-xl w-full hover-scale">
+                    <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-lg shadow-lg hidden md:block">
+                        <div class="text-indigo-800 text-2xl font-bold mb-2">"Best in Town!"</div>
+                        <div class="text-gray-700 mb-2">- Priya Sharma</div>
+                        <div class="flex text-yellow-400">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-indigo-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-indigo-800 mb-4">What Our Customers Say</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Hear from our satisfied customers about their shopping experience</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition hover-scale">
+                    <div class="flex items-center mb-4">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80" alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h4 class="font-semibold">Ananya Patel</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"The lehenga I bought for my sister's wedding was absolutely stunning! The craftsmanship and attention to detail was exceptional. Will definitely shop here again!"</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition hover-scale">
+                    <div class="flex items-center mb-4">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80" alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h4 class="font-semibold">Rahul Verma</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"As someone who values both traditional and modern fashion, Santosh Vastralay offers the perfect blend. Their kurta collection is my go-to for all festive occasions."</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition hover-scale">
+                    <div class="flex items-center mb-4">
+                        <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80" alt="Customer" class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h4 class="font-semibold">Meera Desai</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"The staff's knowledge about fabrics and designs helped me choose the perfect saree for my daughter's graduation. Their personal touch makes all the difference!"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-indigo-800 to-purple-800 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Visit Us Today!</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">Experience the perfect blend of tradition and trend at <strong class="font-semibold">Santosh Vastralay</strong>. We look forward to dressing you in style!</p>
+            <div class="flex flex-col md:flex-row justify-center gap-6">
+                <a href="#" class="bg-white text-indigo-800 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition hover-scale shadow-lg flex items-center justify-center">
+                    <i class="fas fa-shopping-bag mr-2"></i> Shop Now
+                </a>
+                <a href="#" class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:bg-opacity-10 transition hover-scale shadow-lg flex items-center justify-center">
+                    <i class="fas fa-map-marker-alt mr-2"></i> Find Our Store
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <img src="https://images.unsplash.com/photo-1595341595379-cf1cd0fb7fb3?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80" alt="Santosh Vastralay Logo" class="h-10 w-10 rounded-full object-cover mr-3">
+                        <h3 class="text-xl font-bold">Santosh Vastralay</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Where Fashion Meets Tradition.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Shop</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Categories</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Sarees</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Salwar Suits</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Lehengas</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Kurtas</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i> Western Wear</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start text-gray-400">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-indigo-400"></i>
+                            <div>123 Fashion Street, Textile District, Mumbai, Maharashtra 400001</div>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-phone-alt mr-3 text-indigo-400"></i>
+                            <div>+91 98765 43210</div>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-envelope mr-3 text-indigo-400"></i>
+                            <div>info@santoshvastralay.com</div>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-clock mr-3 text-indigo-400"></i>
+                            <div>Mon-Sat: 10AM - 8PM<br>Sun: 11AM - 6PM</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 Santosh Vastralay. All Rights Reserved. | Designed with <i class="fas fa-heart text-red-500"></i> by FashionWeb</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="fixed bottom-6 right-6 bg-indigo-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-700 transition transform hover:scale-110">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</body>
+</html>

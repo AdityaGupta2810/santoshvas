@@ -92,41 +92,65 @@ if (isset($_POST['form1'])) {
     if (empty($errors)) {
         try {
             // Insert into tbl_product
-            $stmt = $db->prepare("INSERT INTO tbl_product (p_name, p_old_price, p_current_price, p_qty, p_featured_photo, p_description, p_short_description, p_feature, p_is_active, p_is_featured, ecat_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssissssiii", $p_name, $p_old_price, $p_current_price, $p_qty, $p_featured_photo, $p_description, $p_short_description, $p_feature, $p_is_active, $p_is_featured, $ecat_id);
+            $stmt = $db->prepare("INSERT INTO tbl_product 
+                (p_name, p_old_price, p_current_price, p_qty, p_featured_photo, p_description, 
+                p_short_description, p_feature, p_is_active, p_is_featured, ecat_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
-
-
+            // Check if prepare statement failed
+            if ($stmt === false) {
+                throw new Exception("Prepare statement failed: " . $db->error);
+            }
+            
+            $stmt->bind_param("sssissssiii", $p_name, $p_old_price, $p_current_price, $p_qty, 
+                              $p_featured_photo, $p_description, $p_short_description, 
+                              $p_feature, $p_is_active, $p_is_featured, $ecat_id);
 
             if ($stmt->execute()) {
                 $p_id = $stmt->insert_id;
                 
                 // Insert product photos
                 if (!empty($photo_names)) {
-                    $stmt = $db->prepare("INSERT INTO tbl_product_photo (p_id, photo) VALUES (?, ?)");
-                    foreach ($photo_names as $photo) {
-                        $stmt->bind_param("is", $p_id, $photo);
-                        $stmt->execute();
+                    $photo_stmt = $db->prepare("INSERT INTO tbl_product_photo (p_id, photo) VALUES (?, ?)");
+                    if ($photo_stmt === false) {
+                        throw new Exception("Prepare statement for photos failed: " . $db->error);
                     }
+                    
+                    foreach ($photo_names as $photo) {
+                        $photo_stmt->bind_param("is", $p_id, $photo);
+                        $photo_stmt->execute();
+                    }
+                    $photo_stmt->close();
                 }
                 
-                // Insert sizes and colors
+                // Insert sizes
                 if (!empty($p_sizes)) {
-                    $stmt_size = $db->prepare("INSERT INTO tbl_product_size (p_id, size_id) VALUES (?, ?)");
+                    $size_stmt = $db->prepare("INSERT INTO tbl_product_size (p_id, size_id) VALUES (?, ?)");
+                    if ($size_stmt === false) {
+                        throw new Exception("Prepare statement for sizes failed: " . $db->error);
+                    }
+                    
                     foreach($p_sizes as $size_id) {
                         $size_id = (int)$size_id;
-                        $stmt_size->bind_param("ii", $p_id, $size_id);
-                        $stmt_size->execute();
+                        $size_stmt->bind_param("ii", $p_id, $size_id);
+                        $size_stmt->execute();
                     }
+                    $size_stmt->close();
                 }
                 
+                // Insert colors
                 if (!empty($p_colors)) {
-                    $stmt_color = $db->prepare("INSERT INTO tbl_product_color (p_id, color_id) VALUES (?, ?)");
+                    $color_stmt = $db->prepare("INSERT INTO tbl_product_color (p_id, color_id) VALUES (?, ?)");
+                    if ($color_stmt === false) {
+                        throw new Exception("Prepare statement for colors failed: " . $db->error);
+                    }
+                    
                     foreach($p_colors as $color_id) {
                         $color_id = (int)$color_id;
-                        $stmt_color->bind_param("ii", $p_id, $color_id);
-                        $stmt_color->execute();
+                        $color_stmt->bind_param("ii", $p_id, $color_id);
+                        $color_stmt->execute();
                     }
+                    $color_stmt->close();
                 }
                 
                 $success = "Product added successfully!";
@@ -140,6 +164,8 @@ if (isset($_POST['form1'])) {
             } else {
                 $errors[] = "Error adding product: " . $stmt->error;
             }
+            
+            $stmt->close();
         } catch (Exception $e) {
             $errors[] = "Database error: " . $e->getMessage();
         }
@@ -147,7 +173,14 @@ if (isset($_POST['form1'])) {
 }
 
 // Get categories, sizes, and colors for dropdowns
+$result_categories = $result_sizes = $result_colors = null;
+$sizes_map = [];
+$colors_map = [];
+$size_options = [];
+$color_options = [];
+
 try {
+    // Get categories
     $stmt_categories = $db->prepare("
         SELECT e.ecat_id, e.ecat_name, m.mcat_name, t.tcat_name 
         FROM tbl_end_category e
@@ -155,31 +188,45 @@ try {
         JOIN tbl_top_category t ON m.tcat_id = t.tcat_id
         ORDER BY t.tcat_name, m.mcat_name, e.ecat_name
     ");
+    
+    if ($stmt_categories === false) {
+        throw new Exception("Prepare statement for categories failed: " . $db->error);
+    }
+    
     $stmt_categories->execute();
     $result_categories = $stmt_categories->get_result();
+    $stmt_categories->close();
     
+    // Get sizes
     $stmt_sizes = $db->prepare("SELECT id, size_name FROM tbl_size ORDER BY size_name");
+    if ($stmt_sizes === false) {
+        throw new Exception("Prepare statement for sizes failed: " . $db->error);
+    }
+    
     $stmt_sizes->execute();
     $result_sizes = $stmt_sizes->get_result();
-    
-    $stmt_colors = $db->prepare("SELECT id, color_name FROM tbl_color ORDER BY color_name");
-    $stmt_colors->execute();
-    $result_colors = $stmt_colors->get_result();
-    
-    $sizes_map = [];
-    $colors_map = [];
-    $size_options = [];
-    $color_options = [];
     
     while($row = $result_sizes->fetch_assoc()) {
         $sizes_map[$row['id']] = $row['size_name'];
         $size_options[] = $row;
     }
+    $stmt_sizes->close();
+    
+    // Get colors
+    $stmt_colors = $db->prepare("SELECT id, color_name FROM tbl_color ORDER BY color_name");
+    if ($stmt_colors === false) {
+        throw new Exception("Prepare statement for colors failed: " . $db->error);
+    }
+    
+    $stmt_colors->execute();
+    $result_colors = $stmt_colors->get_result();
     
     while($row = $result_colors->fetch_assoc()) {
         $colors_map[$row['id']] = $row['color_name'];
         $color_options[] = $row;
     }
+    $stmt_colors->close();
+    
 } catch (Exception $e) {
     $errors[] = 'Database error: ' . $e->getMessage();
 }
@@ -235,11 +282,11 @@ try {
                         <label for="ecat_id" class="block mb-2 font-medium">Category *</label>
                         <select name="ecat_id" id="ecat_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">Select a category</option>
-                            <?php while ($row = $result_categories->fetch_assoc()): ?>
+                            <?php if ($result_categories): while ($row = $result_categories->fetch_assoc()): ?>
                                 <option value="<?php echo $row['ecat_id']; ?>" <?php echo ($ecat_id == $row['ecat_id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($row['tcat_name'] . ' → ' . $row['mcat_name'] . ' → ' . $row['ecat_name']); ?>
                                 </option>
-                            <?php endwhile; ?>
+                            <?php endwhile; endif; ?>
                         </select>
                     </div>
                 </div>
@@ -399,102 +446,116 @@ try {
 
 <script>
 // Size selection handling
-const sizeSelector = document.getElementById('size-selector');
-const selectedSizesContainer = document.getElementById('selected-sizes');
+document.addEventListener('DOMContentLoaded', function() {
+    // Size selection handling
+    const sizeSelector = document.getElementById('size-selector');
+    const selectedSizesContainer = document.getElementById('selected-sizes');
 
-sizeSelector.addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    const sizeId = this.value;
-    
-    if (sizeId === '') return;
-    
-    const sizeName = selectedOption.getAttribute('data-size-name');
-    const sizeTag = document.createElement('div');
-    sizeTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
-    sizeTag.innerHTML = `
-        <span>${sizeName}</span>
-        <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-size" data-size-id="${sizeId}">
-            <i class="fas fa-times"></i>
-        </button>
-        <input type="hidden" name="p_size[]" value="${sizeId}">
-    `;
-    
-    selectedSizesContainer.appendChild(sizeTag);
-    selectedOption.disabled = true;
-    this.selectedIndex = 0;
-});
-
-selectedSizesContainer.addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-size') || e.target.closest('.remove-size')) {
-        const removeButton = e.target.classList.contains('remove-size') ? e.target : e.target.closest('.remove-size');
-        const sizeId = removeButton.getAttribute('data-size-id');
-        removeButton.closest('div').remove();
-        
-        const option = sizeSelector.querySelector(`option[value="${sizeId}"]`);
-        if (option) option.disabled = false;
-    }
-});
-
-// Color selection handling
-const colorSelector = document.getElementById('color-selector');
-const selectedColorsContainer = document.getElementById('selected-colors');
-
-colorSelector.addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    const colorId = this.value;
-    
-    if (colorId === '') return;
-    
-    const colorName = selectedOption.getAttribute('data-color-name');
-    const colorTag = document.createElement('div');
-    colorTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
-    colorTag.innerHTML = `
-        <span>${colorName}</span>
-        <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="${colorId}">
-            <i class="fas fa-times"></i>
-        </button>
-        <input type="hidden" name="p_color[]" value="${colorId}">
-    `;
-    
-    selectedColorsContainer.appendChild(colorTag);
-    selectedOption.disabled = true;
-    this.selectedIndex = 0;
-});
-
-selectedColorsContainer.addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-color') || e.target.closest('.remove-color')) {
-        const removeButton = e.target.classList.contains('remove-color') ? e.target : e.target.closest('.remove-color');
-        const colorId = removeButton.getAttribute('data-color-id');
-        removeButton.closest('div').remove();
-        
-        const option = colorSelector.querySelector(`option[value="${colorId}"]`);
-        if (option) option.disabled = false;
-    }
-});
-
-// Preview image on file select
-document.getElementById('p_featured_photo').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.createElement('div');
-            preview.innerHTML = `<div class="mt-2 flex items-center"><img src="${e.target.result}" alt="Preview" class="w-24 h-24 object-cover rounded border"><span class="ml-2 text-sm text-gray-500">Preview</span></div>`;
+    if (sizeSelector) {
+        sizeSelector.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const sizeId = this.value;
             
-            const oldPreview = document.querySelector('.preview-container');
-            if (oldPreview) oldPreview.remove();
+            if (sizeId === '') return;
             
-            preview.classList.add('preview-container');
-            e.target.parentNode.appendChild(preview);
-        }
-        reader.readAsDataURL(file);
+            const sizeName = selectedOption.getAttribute('data-size-name');
+            const sizeTag = document.createElement('div');
+            sizeTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
+            sizeTag.innerHTML = `
+                <span>${sizeName}</span>
+                <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-size" data-size-id="${sizeId}">
+                    <i class="fas fa-times"></i>
+                </button>
+                <input type="hidden" name="p_size[]" value="${sizeId}">
+            `;
+            
+            selectedSizesContainer.appendChild(sizeTag);
+            selectedOption.disabled = true;
+            this.selectedIndex = 0;
+        });
+    }
+
+    if (selectedSizesContainer) {
+        selectedSizesContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-size') || e.target.closest('.remove-size')) {
+                const removeButton = e.target.classList.contains('remove-size') ? e.target : e.target.closest('.remove-size');
+                const sizeId = removeButton.getAttribute('data-size-id');
+                removeButton.closest('div').remove();
+                
+                const option = sizeSelector.querySelector(`option[value="${sizeId}"]`);
+                if (option) option.disabled = false;
+            }
+        });
+    }
+
+    // Color selection handling
+    const colorSelector = document.getElementById('color-selector');
+    const selectedColorsContainer = document.getElementById('selected-colors');
+
+    if (colorSelector) {
+        colorSelector.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const colorId = this.value;
+            
+            if (colorId === '') return;
+            
+            const colorName = selectedOption.getAttribute('data-color-name');
+            const colorTag = document.createElement('div');
+            colorTag.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center';
+            colorTag.innerHTML = `
+                <span>${colorName}</span>
+                <button type="button" class="ml-2 text-blue-500 hover:text-blue-700 remove-color" data-color-id="${colorId}">
+                    <i class="fas fa-times"></i>
+                </button>
+                <input type="hidden" name="p_color[]" value="${colorId}">
+            `;
+            
+            selectedColorsContainer.appendChild(colorTag);
+            selectedOption.disabled = true;
+            this.selectedIndex = 0;
+        });
+    }
+
+    if (selectedColorsContainer) {
+        selectedColorsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-color') || e.target.closest('.remove-color')) {
+                const removeButton = e.target.classList.contains('remove-color') ? e.target : e.target.closest('.remove-color');
+                const colorId = removeButton.getAttribute('data-color-id');
+                removeButton.closest('div').remove();
+                
+                const option = colorSelector.querySelector(`option[value="${colorId}"]`);
+                if (option) option.disabled = false;
+            }
+        });
+    }
+
+    // Preview image on file select
+    const featuredPhotoInput = document.getElementById('p_featured_photo');
+    if (featuredPhotoInput) {
+        featuredPhotoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.createElement('div');
+                    preview.innerHTML = `<div class="mt-2 flex items-center"><img src="${e.target.result}" alt="Preview" class="w-24 h-24 object-cover rounded border"><span class="ml-2 text-sm text-gray-500">Preview</span></div>`;
+                    
+                    const oldPreview = document.querySelector('.preview-container');
+                    if (oldPreview) oldPreview.remove();
+                    
+                    preview.classList.add('preview-container');
+                    featuredPhotoInput.parentNode.appendChild(preview);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Add rich text editor if available
+    if (typeof CKEDITOR !== 'undefined') {
+        CKEDITOR.replace('p_description');
     }
 });
-
-// Add rich text editor if available
-if (typeof CKEDITOR !== 'undefined') {
-    CKEDITOR.replace('p_description');
-}
 </script>
 
 <?php include_once '../../includes/footer.php'; ?>
