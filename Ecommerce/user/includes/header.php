@@ -49,7 +49,7 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.p
             <a href="/santoshvas/Ecommerce/index.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Home</a>
             <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Shop</a>
             <a href="/santoshvas/Ecommerce/Home/about.html" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">About us</a>
-            <a href="/santoshvas/Ecommerce/Home/contact.html" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Contact</a>
+            <a href="/santoshvas/Ecommerce/Home/contact.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Contact</a>
             <a href="/santoshvas/Ecommerce/Home/cart.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Cart</a>
             <a href="/santoshvas/Ecommerce/admin/index.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Admin</a>
             <div class="relative">
@@ -86,7 +86,7 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.p
             <a href="/santoshvas/Ecommerce/index.php" class="nav-item font-semibold">Home</a>
             <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="nav-item font-semibold">Shop</a>
             <a href="/santoshvas/Ecommerce/Home/about.html" class="nav-item font-semibold">About us</a>
-            <a href="/santoshvas/Ecommerce/Home/contact.html" class="nav-item font-semibold">Contact</a>
+            <a href="/santoshvas/Ecommerce/Home/contact.php" class="nav-item font-semibold">Contact</a>
         </nav>
     
         <!-- Mobile Menu Button (Hamburger Icon) -->
@@ -101,7 +101,7 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.p
             <a href="/santoshvas/Ecommerce/index.php" class="nav-item  font-semibold  ">Home</a>
             <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="nav-item font-semibold">Shop</a>
             <a href="/santoshvas/Ecommerce/Home/about.html" class="nav-item font-semibold">About us</a>
-            <a href="/santoshvas/Ecommerce/Home/contact.html" class="nav-item font-semibold">Contact</a>
+            <a href="/santoshvas/Ecommerce/Home/contact.php" class="nav-item font-semibold">Contact</a>
         </nav>
     
         <!-- Search Bar for Larger Screens -->
