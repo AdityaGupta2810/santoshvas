@@ -150,7 +150,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
 ?>
 
 <!-- Navigation Bar -->
-<nav class="bg-blue-700 text-white shadow-md mb-6">
+<nav class="bg-gray-300 text-black shadow-md mb-6">
     <div class="container mx-auto px-4">
         <div class="flex justify-between">
             <div class="flex">

@@ -166,9 +166,9 @@ require_once './user/includes/header.php';
                 <div class="mb-6 md:mb-0">
                     <h2 class="text-xl font-bold mb-4">Contact Us</h2>
                     <ul class="space-y-2 text-black">
-                        <li><i class="fas fa-map-marker-alt mr-2"></i>123 Fabric Street, Textile City, India</li>
-                        <li><i class="fas fa-phone-alt mr-2"></i>+91 123 456 7890</li>
-                        <li><i class="fas fa-envelope mr-2"></i>info@santoshvastralay.com</li>
+                        <li><i class="fas fa-map-marker-alt mr-2"></i>Bishunpura, Gopalganj, Bihar 841407, India</li>
+                        <li><i class="fas fa-phone-alt mr-2"></i>+91 9006645817</li>
+                        <li><i class="fas fa-envelope mr-2"></i>santoshvastraly@gmail.com</li>
                     </ul>
                 </div>
     
@@ -218,7 +218,7 @@ require_once './user/includes/header.php';
                 <div class="flex flex-wrap justify-center items-center gap-8">
                     
                     <!-- Copyright Text -->
-                    <p>&copy; 2024 Santosh Vastralay. All rights reserved.</p>
+                    <p>&copy; 2025 Santosh Vastralay. All rights reserved.</p>
                     <!-- Designed By -->
                     <p>Designed by <a href="#" class="text-blue-600 hover:text-blue-500">Aditya Gupta   </a>    </p>
                     <!-- Payment Icons -->
