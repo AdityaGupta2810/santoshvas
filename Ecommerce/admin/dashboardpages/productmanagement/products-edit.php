@@ -145,12 +145,12 @@ if(isset($_POST['form1'])) {
         
         if(in_array(strtolower($ext), $allowed_exts)) {
             // Remove old featured photo if exists
-            if(!empty($featured_photo) && file_exists('../../assets/uploads/products/'.$featured_photo)) {
-                unlink('../../assets/uploads/products/'.$featured_photo);
+            if(!empty($featured_photo) && file_exists('../../uploadimgs/'.$featured_photo)) {
+                unlink('../../uploadimgs/'.$featured_photo);
             }
             
             $featured_photo = 'product_'.time().'.'.$ext;
-            move_uploaded_file($file_temp, '../../assets/uploads/products/'.$featured_photo);
+            move_uploaded_file($file_temp, '../../uploadimgs/'.$featured_photo);
         } else {
             $valid = false;
             $error_message .= 'Featured photo must be jpg, jpeg, png or gif file<br>';
@@ -169,7 +169,7 @@ if(isset($_POST['form1'])) {
             
             if(in_array(strtolower($ext), $allowed_exts)) {
                 $photo_name = 'product_'.time().'_'.$i.'.'.$ext;
-                move_uploaded_file($file_temp, '../../assets/uploads/products/'.$photo_name);
+                move_uploaded_file($file_temp, '../../uploadimgs/'.$photo_name);
                 $photos[] = $photo_name;
             } else {
                 $valid = false;
@@ -331,8 +331,8 @@ if(isset($_REQUEST['delete_photo']) && isset($_REQUEST['photo_id'])) {
             $photo = $row['photo'];
             
             // Delete the file
-            if(file_exists('../../assets/uploads/products/'.$photo)) {
-                unlink('../../assets/uploads/products/'.$photo);
+            if(file_exists('../../uploadimgs/'.$photo)) {
+                unlink('../../uploadimgs/'.$photo);
             }
             
             // Delete the record
@@ -570,9 +570,9 @@ try {
                     <div class="mb-6">
                         <label for="p_featured_photo" class="block mb-2 font-medium">Featured Photo</label>
                         
-                        <?php if(!empty($featured_photo) && file_exists('../../assets/uploads/products/'.$featured_photo)): ?>
+                        <?php if(!empty($featured_photo) && file_exists('../../uploadimgs/'.$featured_photo)): ?>
                             <div class="mb-3">
-                                <img src="../../assets/uploads/products/<?php echo $featured_photo; ?>" alt="Featured Photo" class="w-32 h-32 object-cover border">
+                                <img src="../../uploadimgs/<?php echo $featured_photo; ?>" alt="Featured Photo" class="w-32 h-32 object-cover border">
                                 <p class="text-sm text-gray-500 mt-1">Current featured photo</p>
                             </div>
                         <?php endif; ?>
@@ -589,7 +589,7 @@ try {
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-3">
                                 <?php foreach($product_photos as $photo): ?>
                                     <div class="border p-2 rounded">
-                                        <img src="../../assets/uploads/products/<?php echo $photo['photo']; ?>" alt="Product Photo" class="w-full h-24 object-cover">
+                                        <img src="../../uploadimgs/<?php echo $photo['photo']; ?>" alt="Product Photo" class="w-full h-24 object-cover">
                                         <a href="product-edit.php?id=<?php echo $product_id; ?>&delete_photo=1&photo_id=<?php echo $photo['pp_id']; ?>" 
                                            class="block text-center bg-red-500 text-white py-1 px-2 mt-2 rounded text-sm hover:bg-red-600"
                                            onclick="return confirm('Are you sure you want to delete this photo?');">

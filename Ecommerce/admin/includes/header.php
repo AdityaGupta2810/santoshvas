@@ -5,8 +5,8 @@ ob_start();
 session_start();
 
 // Use absolute path for includes
-require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.php';
-require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php';
+require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/actions/function.class.php';
+require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/db.php';
 
 // Initialize database and function classes if needed
 if (!isset($db)) {

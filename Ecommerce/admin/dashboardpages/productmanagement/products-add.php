@@ -36,7 +36,7 @@ if (isset($_POST['form1'])) {
     if (empty($ecat_id)) $errors[] = "You must select a category";
 
     // Handle featured photo upload
-    $target_dir = "../../assets/uploads/products/";
+    $target_dir = "../../uploadimgs/";
     $p_featured_photo = '';
     
     if (isset($_FILES['p_featured_photo']) && $_FILES['p_featured_photo']['error'] == 0) {

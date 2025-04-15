@@ -1,6 +1,6 @@
 <?php
-require "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php";
-include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.php";
+require "C:/xampp/htdocs/santoshvas/Ecommerce/actions/function.class.php";
+include_once "C:/xampp/htdocs/santoshvas/Ecommerce/db.php";
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +13,8 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.p
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/santoshvas/Ecommerce/output.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
     <style>
         .fancy-header {
             background: linear-gradient(45deg, #1a202c, #2d3748);

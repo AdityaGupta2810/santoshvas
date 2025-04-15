@@ -5,9 +5,12 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Correct path to include files
-$base_path = 'C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/';
-require_once $base_path . 'database.class.php';
-require_once $base_path . 'function.class.php';
+// $base_path = 'C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/';
+// require_once $base_path . 'database.class.php';
+// require_once $base_path . 'function.class.php';
+
+require_once './function.class.php';
+require_once '../db.php';
 
 // Initialize database if not already done
 if (!isset($db)) {

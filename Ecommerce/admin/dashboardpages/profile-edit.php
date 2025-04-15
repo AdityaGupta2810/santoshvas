@@ -93,6 +93,7 @@ if(isset($_POST['form2'])) {
 
         // In a real application, update the database here
         // For example: UPDATE users SET photo = ? WHERE id = ?
+        
 
         $success_message = 'User Photo is updated successfully.';
     }
@@ -201,7 +202,7 @@ $role = $_SESSION['user']['role'] ?? 'User';
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Existing Photo</label>
                             <div class="mt-1">
-                                <img src="<?php echo isset($photo) ? 'assets/uploads/'.$photo : 'assets/uploads/default.jpg'; ?>" 
+                                <img src="<?php echo isset($photo) ? 'uploadimgs/'.$photo : './uploadimgs/default.jpg'; ?>" 
                                      class="w-32 h-32 object-cover rounded-md" alt="Profile Photo">
                             </div>
                         </div>

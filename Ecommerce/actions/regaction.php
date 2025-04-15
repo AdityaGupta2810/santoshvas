@@ -2,8 +2,8 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-require '../assets/class/database.class.php';
-require_once '../assets/class/function.class.php';
+require_once './function.class.php';
+require_once '../db.php';
 
 if($_POST){
  $post =$_POST;

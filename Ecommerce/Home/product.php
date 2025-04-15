@@ -187,7 +187,7 @@ if (isset($_POST['buy_now'])) {
                         <?php foreach($product_images as $index => $image): ?>
                         <div class="main-image absolute inset-0 transition-opacity duration-500 ease-in-out <?= $index === 0 ? 'opacity-100' : 'opacity-0' ?> flex items-center justify-center"
                              data-index="<?= $index ?>">
-                            <img src="/santoshvas/Ecommerce/admin/assets/uploads/products/<?= htmlspecialchars($image['photo']) ?>" 
+                            <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?= htmlspecialchars($image['photo']) ?>" 
                                  alt="<?= htmlspecialchars($product['p_name']) ?>" 
                                  class="max-w-full max-h-full object-contain">
                         </div>
@@ -210,7 +210,7 @@ if (isset($_POST['buy_now'])) {
                         <?php foreach($product_images as $index => $image): ?>
                         <div class="thumbnail cursor-pointer flex-shrink-0 border-2 <?= $index === 0 ? 'border-blue-500' : 'border-transparent' ?> hover:border-blue-300"
                              onclick="selectImage(<?= $index ?>)">
-                            <img src="/santoshvas/Ecommerce/admin/assets/uploads/products/<?= htmlspecialchars($image['photo']) ?>" 
+                            <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?= htmlspecialchars($image['photo']) ?>" 
                                  alt="Thumbnail" 
                                  class="h-20 w-20 object-cover">
                         </div>
@@ -372,7 +372,7 @@ if (isset($_POST['buy_now'])) {
             <?php while($related = mysqli_fetch_assoc($related_result)): ?>
             <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1">
                 <a href="/santoshvas/Ecommerce/Home/product.php?p_id=<?= $related['p_id'] ?>">
-                    <img src="/santoshvas/Ecommerce/admin/assets/uploads/products/<?= htmlspecialchars($related['p_featured_photo']) ?>" 
+                    <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?= htmlspecialchars($related['p_featured_photo']) ?>" 
                          alt="<?= htmlspecialchars($related['p_name']) ?>" 
                          class="w-full h-48 object-cover">
                 </a>

@@ -238,7 +238,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
             <?php while($product = mysqli_fetch_assoc($product_result)): ?>
                 <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1">
                     <a href="/santoshvas/Ecommerce/Home/product.php?p_id=<?= $product['p_id'] ?>">
-                        <img src="/santoshvas/Ecommerce/admin/assets/uploads/products/<?= htmlspecialchars($product['p_featured_photo']) ?>" 
+                        <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?= htmlspecialchars($product['p_featured_photo']) ?>" 
                              alt="<?= htmlspecialchars($product['p_name']) ?>" 
                              class="w-full h-48 object-cover">
                     </a>

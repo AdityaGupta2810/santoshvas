@@ -191,7 +191,7 @@ function getSortIcon($column, $currentSort, $currentOrder) {
               while ($row = mysqli_fetch_assoc($result)) {
                   echo '<tr class="hover:bg-gray-50">';
                   echo '<td class="py-2 px-4 border">' . $row['p_id'] . '</td>';
-                  echo '<td class="py-2 px-4 border"><img src="../../assets/uploads/products/' . htmlspecialchars($row['p_featured_photo']) . '" alt="Product" class="w-20 h-auto"></td>';
+                  echo '<td class="py-2 px-4 border"><img src="../../uploadimgs/' . htmlspecialchars($row['p_featured_photo']) . '" alt="Product" class="w-20 h-auto"></td>';
 
                   echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['p_name']) . '</td>';
                   echo '<td class="py-2 px-4 border">' . htmlspecialchars($row['p_old_price']) . '</td>';

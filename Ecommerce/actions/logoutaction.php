@@ -1,7 +1,6 @@
 <?php
-require '../assets/class/database.class.php';
-require '../assets/class/function.class.php';
-
+require_once './function.class.php';
+require_once '../db.php';
 // session_start();
 
 // Set the logged-out message in the session
