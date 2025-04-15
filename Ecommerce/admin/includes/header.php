@@ -144,12 +144,12 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
             </li> -->
         </ul>
         <ul class="side-menu mt-6">
-            <li>
+            <!-- <li>
                 <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-cog text-xl'></i>
                     <span class="text ml-3 sidebar-text">Settings</span>
                 </a>
-            </li>
+            </li> -->
             <li>
                 <a href="?logout=true" class="logout flex items-center h-12 px-4 text-red-500 hover:text-red-700">
                     <i class='bx bxs-log-out-circle text-xl'></i>

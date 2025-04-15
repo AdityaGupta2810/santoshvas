@@ -53,7 +53,7 @@ $total_product = $statement->num_rows; ?>
                         <p class="text-gray-500">Total Products</p>
                     </div>
                 </li>
-                <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
+                <!-- <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
                     <i class='bx bxs-group text-4xl text-yellow-500'></i>
                     <div class="ml-4">
                         <h3 class="text-2xl font-semibold text-gray-700">4</h3>
@@ -66,7 +66,7 @@ $total_product = $statement->num_rows; ?>
                         <h3 class="text-2xl font-semibold text-gray-700">$2,543</h3>
                         <p class="text-gray-500">Total Sales</p>
                     </div>
-                </li>
+                </li> -->
                 <li class="p-6 bg-white rounded-xl flex items-center shadow-sm">
                     <i class='bx bxs-category text-4xl text-green-500'></i>
                     <div class="ml-4">
