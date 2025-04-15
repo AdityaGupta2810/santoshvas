@@ -51,7 +51,7 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.p
             <a href="/santoshvas/Ecommerce/Home/about.html" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">About us</a>
             <a href="/santoshvas/Ecommerce/Home/contact.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Contact</a>
             <a href="/santoshvas/Ecommerce/Home/cart.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Cart</a>
-            <a href="/santoshvas/Ecommerce/admin/index.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Admin</a>
+            <a href="/santoshvas/Ecommerce/user/adminlogin.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Admin</a>
             <div class="relative">
                 <button id="userMenuButtonMobile" class="w-full text-left py-3 px-6 hover:bg-gray-800 focus:outline-none">
                     <span class="flex items-center"><i class='bx bx-user mr-2'></i> User</span>
@@ -131,7 +131,7 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.p
                     <li><a href="/santoshvas/Ecommerce/actions/logoutaction.php" class="block px-6 py-2 hover:bg-gray-100 flex items-center"><i class='bx bx-log-out mr-2'></i> Logout</a></li>
                 </ul>
             </div>
-            <a href="/santoshvas/Ecommerce/admin/index.php" class="nav-item font-semibold">Admin</a>
+            <a href="/santoshvas/Ecommerce/user/adminlogin.php" class="nav-item font-semibold">Admin</a>
         </div>
     </header>
 

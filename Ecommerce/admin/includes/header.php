@@ -4,16 +4,29 @@
 ob_start();
 session_start();
 
+// Use absolute path for includes
+require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.php';
+require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/function.class.php';
 
-include('C:/xampp/htdocs/santoshvas/Ecommerce/assets/class/database.class.php');
+// Initialize database and function classes if needed
+if (!isset($db)) {
+    $db = new Database();
+}
+if (!isset($fn)) {
+    $fn = new Functions();
+}
 
 // Error handling
-$error_message = '';
-$success_message = '';
+$error_message = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+$success_message = isset($_SESSION['success']) ? $_SESSION['success'] : '';
+
+// Clear flash messages
+unset($_SESSION['error']);
+unset($_SESSION['success']);
 
 // Authentication check
 if (!isset($_SESSION['user'])) {
-    header('Location: login.php');
+    header('Location: /santoshvas/Ecommerce/user/adminlogin.php');
     exit;
 }
 
@@ -31,7 +44,7 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
     }
     
     session_destroy();
-    header('Location: login.php');
+    header('Location: /santoshvas/Ecommerce/user/adminlogin.php');
     exit;
 }
 ?>
@@ -138,7 +151,7 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
                 </a>
             </li>
             <li>
-                <a href="#" class="logout flex items-center h-12 px-4 text-red-500 hover:text-red-700">
+                <a href="?logout=true" class="logout flex items-center h-12 px-4 text-red-500 hover:text-red-700">
                     <i class='bx bxs-log-out-circle text-xl'></i>
                     <span class="text ml-3 sidebar-text">Logout</span>
                 </a>

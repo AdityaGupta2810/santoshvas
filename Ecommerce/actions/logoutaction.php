@@ -2,7 +2,7 @@
 require '../assets/class/database.class.php';
 require '../assets/class/function.class.php';
 
-session_start();
+// session_start();
 
 // Set the logged-out message in the session
 
