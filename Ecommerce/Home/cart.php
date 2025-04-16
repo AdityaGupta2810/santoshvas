@@ -8,6 +8,9 @@ $title = "Shopping Cart - Santosh Vastralay";
 // Include header (assumes $db is defined here)
 include_once "../user/includes/header.php";
 
+// Include cart functions
+include_once "cart-functions.php";
+
 // Check database connection
 if (!isset($db) || !$db) {
     die("Database connection failed: " . mysqli_connect_error());
@@ -20,27 +23,36 @@ $banner_cart = $banner_row['banner_cart'] ?? 'default-banner.jpg';
 
 // Handle form submission
 $error_message = '';
+$success_message = '';
+
 if (isset($_POST['update_cart'])) {
     $all_valid = true;
+    $error_messages = [];
     
-    foreach ($_POST['product_id'] as $key => $product_id) {
+    foreach ($_SESSION['cart'] as $key => $item) {
         $quantity = (int)$_POST['quantity'][$key];
-        $product_name = $db->real_escape_string($_POST['product_name'][$key]);
+        $result = updateCartQuantity($db, $item['p_id'], $quantity);
         
-        $stock_result = $db->query("SELECT p_qty FROM tbl_product WHERE p_id = " . (int)$product_id);
-        if ($stock_result->num_rows > 0) {
-            $stock_row = $stock_result->fetch_assoc();
-            if ($quantity > $stock_row['p_qty']) {
-                $error_message .= "Only {$stock_row['p_qty']} items available for $product_name. ";
-                $all_valid = false;
-            } else {
-                $_SESSION['cart_p_qty'][$key] = $quantity;
-            }
+        if (!$result['success']) {
+            $all_valid = false;
+            $error_messages[] = $result['message'];
         }
     }
     
     if ($all_valid) {
         $success_message = "Cart updated successfully!";
+    } else {
+        $error_message = implode("<br>", $error_messages);
+    }
+}
+
+// Handle remove item
+if (isset($_GET['remove']) && is_numeric($_GET['remove'])) {
+    $result = removeFromCart((int)$_GET['remove']);
+    if ($result['success']) {
+        $success_message = $result['message'];
+    } else {
+        $error_message = $result['message'];
     }
 }
 ?>
@@ -57,17 +69,17 @@ if (isset($_POST['update_cart'])) {
 <div class="container mx-auto px-4 py-8">
     <?php if(isset($error_message) && $error_message): ?>
         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
-            <?php echo htmlspecialchars($error_message); ?>
+            <?php echo $error_message; ?>
         </div>
     <?php endif; ?>
     
-    <?php if(isset($success_message)): ?>
+    <?php if(isset($success_message) && $success_message): ?>
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
-            <?php echo htmlspecialchars($success_message); ?>
+            <?php echo $success_message; ?>
         </div>
     <?php endif; ?>
 
-    <?php if(!isset($_SESSION['cart_p_id']) || empty($_SESSION['cart_p_id'])): ?>
+    <?php if(!isset($_SESSION['cart']) || empty($_SESSION['cart'])): ?>
         <div class="bg-white rounded-lg shadow-md p-8 text-center">
             <i class="fas fa-shopping-cart fa-4x text-gray-400 mb-4"></i>
             <h2 class="text-2xl font-bold text-gray-700 mb-2">Your cart is empty</h2>
@@ -92,22 +104,21 @@ if (isset($_POST['update_cart'])) {
                     </thead>
                     <tbody>
                         <?php 
-                        $table_total_price = 0;
-                        for($i = 0; $i < count($_SESSION['cart_p_id']); $i++): 
-                            $product_id = $_SESSION['cart_p_id'][$i];
-                            $quantity = $_SESSION['cart_p_qty'][$i];
-                            $price = $_SESSION['cart_p_current_price'][$i];
-                            $product_name = $_SESSION['cart_p_name'][$i];
-                            $photo = $_SESSION['cart_p_featured_photo'][$i];
+                        $table_total_price = getCartTotal();
+                        foreach ($_SESSION['cart'] as $key => $item): 
+                            $product_id = $item['p_id'];
+                            $quantity = $item['quantity'];
+                            $price = $item['price'];
+                            $product_name = $item['name'];
+                            $photo = $item['photo'];
                             
                             $row_total = $price * $quantity;
-                            $table_total_price += $row_total;
                         ?>
                             <tr class="border-t border-gray-200">
-                                <td class="py-4 px-4"><?php echo $i+1; ?></td>
+                                <td class="py-4 px-4"><?php echo $key+1; ?></td>
                                 <td class="py-4 px-4">
                                     <div class="flex items-center">
-                                        <img src="/santoshvas/Ecommerce/admin/assets/uploads/products/<?php echo htmlspecialchars($photo); ?>" 
+                                        <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?php echo htmlspecialchars($photo); ?>" 
                                              alt="<?php echo htmlspecialchars($product_name); ?>" 
                                              class="w-16 h-16 object-cover rounded mr-4">
                                         <?php echo htmlspecialchars($product_name); ?>
@@ -115,8 +126,6 @@ if (isset($_POST['update_cart'])) {
                                 </td>
                                 <td class="py-4 px-4">₹<?php echo number_format($price, 2); ?></td>
                                 <td class="py-4 px-4">
-                                    <input type="hidden" name="product_id[]" value="<?php echo $product_id; ?>">
-                                    <input type="hidden" name="product_name[]" value="<?php echo htmlspecialchars($product_name); ?>">
                                     <input type="number" 
                                            class="w-20 p-2 border rounded" 
                                            min="1" 
@@ -125,14 +134,14 @@ if (isset($_POST['update_cart'])) {
                                 </td>
                                 <td class="py-4 px-4 text-right">₹<?php echo number_format($row_total, 2); ?></td>
                                 <td class="py-4 px-4 text-center">
-                                    <a href="cart-item-delete.php?id=<?php echo $product_id; ?>" 
+                                    <a href="cart.php?remove=<?php echo $product_id; ?>" 
                                        class="text-red-500 hover:text-red-700"
                                        onclick="return confirm('Are you sure you want to remove this item?');">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
                             </tr>
-                        <?php endfor; ?>
+                        <?php endforeach; ?>
                         <tr class="bg-gray-50 font-bold">
                             <td colspan="4" class="py-4 px-4">Total</td>
                             <td class="py-4 px-4 text-right">₹<?php echo number_format($table_total_price, 2); ?></td>

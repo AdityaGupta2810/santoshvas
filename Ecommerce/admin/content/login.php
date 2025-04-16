@@ -1,4 +1,5 @@
 <?php 
+$title= "Login page";
 include('../../user/includes/header.php');
 ?>
 <main class=" transition-all duration-300 ease-in-out">

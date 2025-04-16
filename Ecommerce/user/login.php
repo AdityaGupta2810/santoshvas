@@ -1,36 +1,74 @@
-<?php
-$title= "Login page";
-require(__DIR__."/includes/header.php");
-?>
-<!-- <div class="container flex justify-center items-center bg-[url('./Home/images/logiback.webp')] bg-cover bg-center " >  for bg - image --> 
-<div class=" w-full flex justify-center items-center bg-gradient-to-r from-blue-500 to-purple-600 h-screen " >
-    
-    <div class="bg-gray-100 shadow-lg shadow-white box-content py-4 sm:w-1/2 xl:w-1/3  w-full  border-0 border-solid rounded-xl border-black mt-12 m-7">
+<?php $title= "Login page"; require(__DIR__."/includes/header.php"); ?>
+
+<div class="w-full min-h-screen flex justify-center items-center bg-gradient-to-r from-blue-600 to-purple-700 py-8">
+    <div class="bg-white shadow-xl rounded-2xl max-w-md w-full mx-4 overflow-hidden">
+        <!-- Header section -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
+            <h1 class="font-bold text-3xl text-center">Welcome Back</h1>
+            <p class="text-center text-blue-100 mt-2">Sign in to continue to your account</p>
+        </div>
         
-       
-            <h1 class=" font-semibold text-5xl my-10 text-center rounded font-sans">Login</h1>
-            <div>
-                <p class="text-2xl text-center font-semibold text-gray-600 p-4">Don't have an account? Register Now!!! <a href="reg.php" class="text-blue-700 text-xl ">Create Your Account</a></p>
-            </div>
-    <div class=" text-xl font-semibold m-8  ">
-         <form method="post" action="../actions/logaction.php">
-         <input class="  border-b-2  w-full px-2 py-1 outline-none my-2 border-gray-500" type="email" name="uemail" placeholder="Enter your Email" required> <br>
-         <input class=" border-b-2 w-full px-2 py-1  outline-none my-4 border-gray-500" type="password" name="upass" placeholder="Password" > <br>
-         <div class="flex items-center space-x-2 my-3">
-            <input class="w-5 h-5 border-2 border-green-500 rounded accent-green-500 focus:ring focus:ring-green-300" 
-                   type="checkbox" 
-                   name="rem" 
-                   id="check">
-            <label for="check" class="font-semibold">Remember me</label>
-         </div>
-       
-         <button class="border-0 py-2 px-6 text-white rounded-2xl bg-green-500 shadow-lg hover:bg-green-700 transition-all duration-300"> Login </button>
+        <!-- Form section -->
+        <div class="p-8">
+            <form method="post" action="../actions/logaction.php" class="space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input 
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 outline-none"
+                            type="email" 
+                            id="email"
+                            name="uemail" 
+                            placeholder="Enter your email" 
+                            required
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input 
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 outline-none"
+                            type="password" 
+                            id="password"
+                            name="upass" 
+                            placeholder="Enter your password"
+                        >
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input 
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            type="checkbox"
+                            id="check"
+                            name="rem"
+                        >
+                        <label for="check" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                    </div>
+                    
+                    <!-- <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">Forgot password?</a> -->
+                </div>
+                
+                <div>
+                    <button 
+                        type="submit"
+                        class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium py-3 px-4 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
+                    >
+                        Sign In
+                    </button>
+                </div>
+            </form>
+        </div>
         
-        </form>
-     </div>
-  
+        <!-- Footer section -->
+        <div class="bg-gray-50 px-8 py-6 border-t border-gray-200">
+            <p class="text-center text-gray-600">
+                Don't have an account? 
+                <a href="reg.php" class="font-medium text-blue-600 hover:text-blue-800">Create one now</a>
+            </p>
+        </div>
+    </div>
 </div>
-</div>
-<?php
-require "C:/xampp/htdocs/santoshvas/Ecommerce/user/includes/footer.php";
-?>
+
+<?php require "./includes/footer.php"; ?>

@@ -1,6 +1,7 @@
 <?php
 require "C:/xampp/htdocs/santoshvas/Ecommerce/actions/function.class.php";
 include_once "C:/xampp/htdocs/santoshvas/Ecommerce/db.php";
+include_once "C:/xampp/htdocs/santoshvas/Ecommerce/Home/cart-functions.php";
 ?>
 
 <!DOCTYPE html>
@@ -118,7 +119,7 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/db.php";
           
         <a href="/santoshvas/Ecommerce/Home/cart.php" class="text-white transition relative">
                     <i class="fas fa-shopping-cart nav-item"></i>
-                    <span class="absolute -top-2 -right-2 bg-indigo-600  text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    <span class="absolute -top-2 -right-2 bg-indigo-600  text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo getCartItemCount(); ?></span>
                 </a> 
             <div class="relative">
                 <button id="userMenuButton" class=" font-semibold focus:outline-none flex items-center">

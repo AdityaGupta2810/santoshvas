@@ -76,53 +76,32 @@ mysqli_stmt_bind_param($stmt, "ii", $product['ecat_id'], $p_id);
 mysqli_stmt_execute($stmt);
 $related_result = mysqli_stmt_get_result($stmt);
 
+// Include cart functions
+include_once "cart-functions.php";
+
 // Handle Add to Cart action
 if (isset($_POST['add_to_cart'])) {
     $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-    $quantity = max(1, min($quantity, $product['p_qty']));
+    $result = addToCart($db, $p_id, $quantity);
     
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
+    if ($result['success']) {
+        $success_message = $result['message'] . " <a href='cart.php' class='ml-2 text-blue-600 hover:underline'>View Cart</a>";
+    } else {
+        $error_message = $result['message'];
     }
-    
-    $product_exists = false;
-    foreach ($_SESSION['cart'] as $key => $item) {
-        if ($item['p_id'] == $p_id) {
-            $_SESSION['cart'][$key]['quantity'] = min($_SESSION['cart'][$key]['quantity'] + $quantity, $product['p_qty']);
-            $product_exists = true;
-            break;
-        }
-    }
-    
-    if (!$product_exists) {
-        $_SESSION['cart'][] = [
-            'p_id' => $p_id,
-            'name' => $product['p_name'],
-            'price' => $product['p_current_price'],
-            'photo' => $product['p_featured_photo'],
-            'quantity' => $quantity
-        ];
-    }
-    
-    $success_message = "Product added to cart successfully! <a href='cart.php' class='ml-2 text-blue-600 hover:underline'>View Cart</a>";
 }
 
 // Handle Buy Now action
 if (isset($_POST['buy_now'])) {
     $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-    $quantity = max(1, min($quantity, $product['p_qty']));
+    $result = addToCart($db, $p_id, $quantity);
     
-    $_SESSION['cart'] = [];
-    $_SESSION['cart'][] = [
-        'p_id' => $p_id,
-        'name' => $product['p_name'],
-        'price' => $product['p_current_price'],
-        'photo' => $product['p_featured_photo'],
-        'quantity' => $quantity
-    ];
-    
-    header('Location: checkout.php');
-    exit;
+    if ($result['success']) {
+        header('Location: checkout.php');
+        exit;
+    } else {
+        $error_message = $result['message'];
+    }
 }
 ?>
 
