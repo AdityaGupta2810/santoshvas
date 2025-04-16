@@ -105,6 +105,35 @@ if (isset($_POST['buy_now'])) {
 }
 ?>
 
+<!-- Add this at the very top of the file, right after the opening <body> tag -->
+<div id="imageModal" class="fixed inset-0 hidden bg-black bg-opacity-90 z-50 p-4">
+    <div class="absolute top-4 right-4">
+        <button onclick="closeModal()" class="text-white hover:text-gray-300">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Previous button -->
+    <button onclick="modalChangeImage('prev')" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full focus:outline-none transition-all duration-300">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+    </button>
+    
+    <!-- Next button -->
+    <button onclick="modalChangeImage('next')" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full focus:outline-none transition-all duration-300">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+    </button>
+    
+    <div class="flex items-center justify-center h-full">
+        <img id="modalImage" src="" alt="" class="max-h-[90vh] max-w-[90vw] object-contain">
+    </div>
+</div>
+
 <!-- Breadcrumb -->
 <div class="container mx-auto px-4 py-4">
     <nav class="text-sm mb-4">
@@ -164,22 +193,23 @@ if (isset($_POST['buy_now'])) {
                 <div class="product-gallery">
                     <div class="main-image-container relative h-96 md:h-[32rem] lg:h-[40rem] overflow-hidden bg-gray-100 flex items-center justify-center">
                         <?php foreach($product_images as $index => $image): ?>
-                        <div class="main-image absolute inset-0 transition-opacity duration-500 ease-in-out <?= $index === 0 ? 'opacity-100' : 'opacity-0' ?> flex items-center justify-center"
-                             data-index="<?= $index ?>">
+                        <div class="main-image absolute inset-0 transition-opacity duration-500 ease-in-out <?= $index === 0 ? 'opacity-100' : 'opacity-0' ?> flex items-center justify-center cursor-pointer"
+                             data-index="<?= $index ?>"
+                             onclick="openModal('/santoshvas/Ecommerce/admin/uploadimgs/<?= htmlspecialchars($image['photo']) ?>')">
                             <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?= htmlspecialchars($image['photo']) ?>" 
                                  alt="<?= htmlspecialchars($product['p_name']) ?>" 
-                                 class="max-w-full max-h-full object-contain">
+                                 class="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300">
                         </div>
                         <?php endforeach; ?>
                         <button class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-30 text-white p-2 rounded-r focus:outline-none hover:bg-opacity-50"
                                 onclick="changeImage('prev')">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                             </svg>
                         </button>
                         <button class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-30 text-white p-2 rounded-l focus:outline-none hover:bg-opacity-50"
                                 onclick="changeImage('next')">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </button>
@@ -381,40 +411,144 @@ if (isset($_POST['buy_now'])) {
 <script>
 let currentIndex = 0;
 const totalImages = <?= count($product_images) ?>;
+const productImages = [
+    <?php foreach($product_images as $image): ?>
+    "/santoshvas/Ecommerce/admin/uploadimgs/<?= htmlspecialchars($image['photo']) ?>",
+    <?php endforeach; ?>
+];
 
+// Modal functions
+function openModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = imageSrc;
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    
+    // Find the index of the current image
+    currentIndex = productImages.indexOf(imageSrc);
+}
+
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+function modalChangeImage(direction) {
+    let newIndex;
+    if (direction === 'next') {
+        newIndex = (currentIndex + 1) % totalImages;
+    } else {
+        newIndex = (currentIndex - 1 + totalImages) % totalImages;
+    }
+    
+    // Update modal image
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = productImages[newIndex];
+    
+    // Update main gallery
+    updateMainGallery(newIndex);
+    
+    currentIndex = newIndex;
+}
+
+function updateMainGallery(newIndex) {
+    // Update main image visibility
+    document.querySelectorAll('.main-image').forEach((img, index) => {
+        if (index === newIndex) {
+            img.classList.remove('opacity-0');
+            img.classList.add('opacity-100');
+        } else {
+            img.classList.add('opacity-0');
+            img.classList.remove('opacity-100');
+        }
+    });
+    
+    // Update thumbnails if they exist
+    if (document.querySelectorAll('.thumbnail').length > 0) {
+        document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+            if (index === newIndex) {
+                thumb.classList.add('border-blue-500');
+                thumb.classList.remove('border-transparent');
+            } else {
+                thumb.classList.remove('border-blue-500');
+                thumb.classList.add('border-transparent');
+            }
+        });
+    }
+}
+
+// Click outside to close
+document.getElementById('imageModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+    if (document.getElementById('imageModal').classList.contains('hidden')) {
+        return;
+    }
+    
+    switch(e.key) {
+        case 'ArrowLeft':
+            modalChangeImage('prev');
+            break;
+        case 'ArrowRight':
+            modalChangeImage('next');
+            break;
+        case 'Escape':
+            closeModal();
+            break;
+    }
+});
+
+// Original gallery functions remain the same
 function changeImage(direction) {
-    if (totalImages === 0) return;
+    if (totalImages <= 1) return;
+    
     document.querySelector(`.main-image[data-index="${currentIndex}"]`).classList.add('opacity-0');
     document.querySelector(`.main-image[data-index="${currentIndex}"]`).classList.remove('opacity-100');
-    if (totalImages > 1) {
+    
+    if (document.querySelectorAll('.thumbnail').length > 0) {
         document.querySelectorAll('.thumbnail')[currentIndex].classList.remove('border-blue-500');
         document.querySelectorAll('.thumbnail')[currentIndex].classList.add('border-transparent');
     }
+    
     if (direction === 'next') {
         currentIndex = (currentIndex + 1) % totalImages;
     } else {
         currentIndex = (currentIndex - 1 + totalImages) % totalImages;
     }
+    
     document.querySelector(`.main-image[data-index="${currentIndex}"]`).classList.remove('opacity-0');
     document.querySelector(`.main-image[data-index="${currentIndex}"]`).classList.add('opacity-100');
-    if (totalImages > 1) {
+    
+    if (document.querySelectorAll('.thumbnail').length > 0) {
         document.querySelectorAll('.thumbnail')[currentIndex].classList.add('border-blue-500');
         document.querySelectorAll('.thumbnail')[currentIndex].classList.remove('border-transparent');
     }
 }
 
 function selectImage(index) {
-    if (totalImages === 0 || index >= totalImages) return;
+    if (index === currentIndex || index >= totalImages) return;
+    
     document.querySelector(`.main-image[data-index="${currentIndex}"]`).classList.add('opacity-0');
     document.querySelector(`.main-image[data-index="${currentIndex}"]`).classList.remove('opacity-100');
-    if (totalImages > 1) {
+    
+    if (document.querySelectorAll('.thumbnail').length > 0) {
         document.querySelectorAll('.thumbnail')[currentIndex].classList.remove('border-blue-500');
         document.querySelectorAll('.thumbnail')[currentIndex].classList.add('border-transparent');
     }
+    
     currentIndex = index;
+    
     document.querySelector(`.main-image[data-index="${currentIndex}"]`).classList.remove('opacity-0');
     document.querySelector(`.main-image[data-index="${currentIndex}"]`).classList.add('opacity-100');
-    if (totalImages > 1) {
+    
+    if (document.querySelectorAll('.thumbnail').length > 0) {
         document.querySelectorAll('.thumbnail')[currentIndex].classList.add('border-blue-500');
         document.querySelectorAll('.thumbnail')[currentIndex].classList.remove('border-transparent');
     }
