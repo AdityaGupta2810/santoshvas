@@ -71,54 +71,29 @@ try {
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
-                        <h3 class="font-bold text-gray-700">Order Status</h3>
-                        <span class="px-2 py-1 rounded-full text-sm 
-                            <?php 
-                            switch($order['status']) {
-                                case 'pending':
-                                    echo 'bg-yellow-100 text-yellow-800';
-                                    break;
-                                case 'processing':
-                                    echo 'bg-blue-100 text-blue-800';
-                                    break;
-                                case 'shipped':
-                                    echo 'bg-purple-100 text-purple-800';
-                                    break;
-                                case 'delivered':
-                                    echo 'bg-green-100 text-green-800';
-                                    break;
-                                case 'cancelled':
-                                    echo 'bg-red-100 text-red-800';
-                                    break;
-                                default:
-                                    echo 'bg-gray-100 text-gray-800';
-                            }
-                            ?>">
-                            <?php echo ucfirst($order['status']); ?>
-                        </span>
-                    </div>
-                    
-                    <div>
                         <h3 class="font-bold text-gray-700">Order Date</h3>
                         <p><?php echo date('M d, Y', strtotime($order['created_at'])); ?></p>
                     </div>
                     
                     <div>
-                        <h3 class="font-bold text-gray-700">Payment Status</h3>
+                        <h3 class="font-bold text-gray-700">Order Status</h3>
                         <span class="px-2 py-1 rounded-full text-sm 
                             <?php 
-                            switch($order['payment_status']) {
+                            switch($order['status']) {
                                 case 'completed':
                                     echo 'bg-green-100 text-green-800';
                                     break;
-                                case 'failed':
+                                case 'cancelled':
                                     echo 'bg-red-100 text-red-800';
+                                    break;
+                                case 'processing':
+                                    echo 'bg-blue-100 text-blue-800';
                                     break;
                                 default:
                                     echo 'bg-yellow-100 text-yellow-800';
                             }
                             ?>">
-                            <?php echo ucfirst($order['payment_status']); ?>
+                            <?php echo ucfirst($order['status']); ?>
                         </span>
                     </div>
                     
@@ -134,7 +109,7 @@ try {
             
             <!-- Order Items -->
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-bold mb-4">Order Items</h2>
+                <h2 class="text-xl font-bold mb-4">Ordered Items</h2>
                 <div class="space-y-4">
                     <?php foreach ($items as $item): ?>
                         <div class="flex items-center justify-between border-b pb-4">

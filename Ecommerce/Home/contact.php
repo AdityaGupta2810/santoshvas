@@ -170,11 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
                 <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="text-gray-700 hover:text-indigo-600 transition">Shop</a>
                 <a href="/santoshvas/Ecommerce/Home/about.html" class="text-gray-700 hover:text-indigo-600 transition">About Us</a>
                 <a href="/santoshvas/Ecommerce/Home/contact.php" class="text-indigo-600 font-semibold border-b-2 border-indigo-600">Contact</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 transition"><i class="fas fa-search"></i></a>
-                <a href="/santoshvas/Ecommerce/Home/cart.php" class="text-gray-700 hover:text-indigo-600 transition relative">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-                </a>
+             
+            
             </nav>
             <button class="md:hidden text-gray-700" id="mobile-menu-button">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

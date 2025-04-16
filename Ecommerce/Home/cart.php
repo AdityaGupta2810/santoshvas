@@ -11,7 +11,7 @@ include_once __DIR__ . "/cart-functions.php";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_cart'])) {
         foreach ($_POST['quantity'] as $product_id => $quantity) {
-            $result = updateCartQuantity($product_id, $quantity);
+            $result = updateCartQuantity($db, $product_id, $quantity);
             if (!$result['success']) {
                 $error_message = $result['message'];
                 break;

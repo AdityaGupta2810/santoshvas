@@ -36,10 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 user_id, 
                 total_amount, 
                 shipping_address, 
-                payment_status,
                 status,
-                created_at
-            ) VALUES (?, ?, ?, 'pending', 'pending', NOW())
+                created_at,
+                updated_at
+            ) VALUES (?, ?, ?, 'pending', NOW(), NOW())
         ");
         
         if (!$stmt) {
