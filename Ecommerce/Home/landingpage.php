@@ -1,12 +1,11 @@
 <?php
-// Start session if needed (for cart or user data)
-session_start();
+require_once __DIR__ . "/../config.php";
 
 // Set the page title
 $title = "Products - Santosh Vastralay";
 
 // Include the header (assumes $db is defined here)
-include_once "../user/includes/header.php";
+include_once __DIR__ . "/../user/includes/header.php";
 
 // Check database connection
 if (!isset($db) || !$db) {
@@ -145,7 +144,6 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
         'tcat' => $tcat,
         'mcats' => $mid_categories
     ];
-    mysqli_stmt_close($stmt);
 }
 ?>
 
@@ -210,25 +208,33 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                 <span class="text-gray-700">Showing <?= min($total_products, 1 + $offset) ?>-<?= min($offset + $itemsPerPage, $total_products) ?> of <?= $total_products ?> products</span>
             </div>
             <div class="flex flex-col sm:flex-row gap-4">
-                <div class="flex items-center">
-                    <label for="sort" class="mr-2 text-gray-700">Sort by:</label>
-                    <select id="sort" class="border rounded px-2 py-1">
-                        <option value="latest" <?= $sort == 'latest' ? 'selected' : '' ?>>Latest</option>
-                        <option value="price-low" <?= $sort == 'price-low' ? 'selected' : '' ?>>Price: Low to High</option>
-                        <option value="price-high" <?= $sort == 'price-high' ? 'selected' : '' ?>>Price: High to Low</option>
-                        <option value="name-az" <?= $sort == 'name-az' ? 'selected' : '' ?>>Name: A to Z</option>
-                        <option value="name-za" <?= $sort == 'name-za' ? 'selected' : '' ?>>Name: Z to A</option>
-                    </select>
-                </div>
-                <div class="flex items-center">
-                    <label for="perPage" class="mr-2 text-gray-700">Show:</label>
-                    <select id="perPage" class="border rounded px-2 py-1" onchange="changeLimit(this.value)">
-                        <option value="12" <?= $itemsPerPage == 12 ? 'selected' : '' ?>>12</option>
-                        <option value="24" <?= $itemsPerPage == 24 ? 'selected' : '' ?>>24</option>
-                        <option value="36" <?= $itemsPerPage == 36 ? 'selected' : '' ?>>36</option>
-                        <option value="48" <?= $itemsPerPage == 48 ? 'selected' : '' ?>>48</option>
-                    </select>
-                </div>
+                <form method="GET" class="flex items-center gap-4">
+                    <?php if(isset($_GET['mcat_id'])): ?>
+                        <input type="hidden" name="mcat_id" value="<?= htmlspecialchars($_GET['mcat_id']) ?>">
+                    <?php endif; ?>
+                    <?php if(isset($_GET['ecat_id'])): ?>
+                        <input type="hidden" name="ecat_id" value="<?= htmlspecialchars($_GET['ecat_id']) ?>">
+                    <?php endif; ?>
+                    <div class="flex items-center">
+                        <label for="sort" class="mr-2 text-gray-700">Sort by:</label>
+                        <select id="sort" name="sort" class="border rounded px-2 py-1" onchange="this.form.submit()">
+                            <option value="latest" <?= $sort == 'latest' ? 'selected' : '' ?>>Latest</option>
+                            <option value="price-low" <?= $sort == 'price-low' ? 'selected' : '' ?>>Price: Low to High</option>
+                            <option value="price-high" <?= $sort == 'price-high' ? 'selected' : '' ?>>Price: High to Low</option>
+                            <option value="name-az" <?= $sort == 'name-az' ? 'selected' : '' ?>>Name: A to Z</option>
+                            <option value="name-za" <?= $sort == 'name-za' ? 'selected' : '' ?>>Name: Z to A</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center">
+                        <label for="limit" class="mr-2 text-gray-700">Show:</label>
+                        <select id="limit" name="limit" class="border rounded px-2 py-1" onchange="this.form.submit()">
+                            <option value="12" <?= $itemsPerPage == 12 ? 'selected' : '' ?>>12</option>
+                            <option value="24" <?= $itemsPerPage == 24 ? 'selected' : '' ?>>24</option>
+                            <option value="36" <?= $itemsPerPage == 36 ? 'selected' : '' ?>>36</option>
+                            <option value="48" <?= $itemsPerPage == 48 ? 'selected' : '' ?>>48</option>
+                        </select>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -328,6 +334,85 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
     <?php endif; ?>
 </div>
 
+<!-- Footer -->
+<footer class="bg-gray-800 text-white mt-12">
+    <div class="container mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- About Section -->
+            <div>
+                <h3 class="text-lg font-bold mb-4">About Us</h3>
+                <p class="text-gray-400">Santosh Vastralay - Your one-stop destination for quality clothing and accessories.</p>
+            </div>
+            
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="landingpage.php" class="text-gray-400 hover:text-white">Home</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Best Sellers</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Deals & Offers</a></li>
+                </ul>
+            </div>
+            
+            <!-- Customer Service -->
+            <div>
+                <h3 class="text-lg font-bold mb-4">Customer Service</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Shipping Policy</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Returns & Exchange</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">FAQs</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact Info -->
+            <div>
+                <h3 class="text-lg font-bold mb-4">Contact Info</h3>
+                <ul class="space-y-2 text-gray-400">
+                    <li class="flex items-center">
+                        <i class="fas fa-map-marker-alt w-5"></i>
+                        <span>123 Main Street, City, State, India</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-phone w-5"></i>
+                        <span>+91 1234567890</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-envelope w-5"></i>
+                        <span>info@santoshvastralay.com</span>
+                    </li>
+                </ul>
+                <!-- Social Media Links -->
+                <div class="mt-4 flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Bar -->
+        <div class="border-t border-gray-700 mt-8 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400">© 2024 Santosh Vastralay. All rights reserved.</p>
+                <div class="mt-4 md:mt-0">
+                    <img src="/santoshvas/Ecommerce/assets/images/payment-methods.png" alt="Payment Methods" class="h-8">
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
 <!-- JavaScript -->
 <script>
 function changeLimit(limit) {
@@ -384,10 +469,19 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Add search functionality
+    const searchForm = document.querySelector('form[action="/santoshvas/Ecommerce/Home/search.php"]');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const searchQuery = this.querySelector('input[name="q"]').value.trim();
+            if (searchQuery) {
+                window.location.href = `/santoshvas/Ecommerce/Home/search.php?q=${encodeURIComponent(searchQuery)}`;
+            }
+        });
+    }
 });
 </script>
 
-<?php
-// Include the footer
-include_once "../user/includes/footer.php";
-?>
+<?php include_once __DIR__ . "/../user/includes/footer.php"; ?>

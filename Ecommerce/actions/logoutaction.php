@@ -1,6 +1,6 @@
 <?php
 require_once './function.class.php';
-require_once '../db.php';
+require_once '../config.php';
 // session_start();
 
 // Set the logged-out message in the session

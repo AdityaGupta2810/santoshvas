@@ -10,7 +10,7 @@ if (session_status() == PHP_SESSION_NONE) {
 // require_once $base_path . 'function.class.php';
 
 require_once './function.class.php';
-require_once '../db.php';
+require_once '../config.php';
 
 // Initialize database if not already done
 if (!isset($db)) {

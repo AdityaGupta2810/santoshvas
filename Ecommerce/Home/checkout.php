@@ -17,6 +17,9 @@ if (empty($_SESSION['cart'])) {
 // Get user details
 $user_id = $_SESSION['user_id'];
 $stmt = $db->prepare("SELECT * FROM tbl_users WHERE id = ?");
+if (!$stmt) {
+    die("Error preparing statement: " . $db->error);
+}
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
@@ -29,29 +32,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Create order
         $stmt = $db->prepare("
-            INSERT INTO tbl_orders (user_id, total_amount, shipping_address, payment_status) 
-            VALUES (?, ?, ?, 'pending')
+            INSERT INTO tbl_orders (
+                user_id, 
+                total_amount, 
+                shipping_address, 
+                payment_status,
+                status,
+                created_at
+            ) VALUES (?, ?, ?, 'pending', 'pending', NOW())
         ");
         
+        if (!$stmt) {
+            throw new Exception("Error preparing order statement: " . $db->error);
+        }
+        
         $total_amount = getCartTotal();
-        $stmt->bind_param("ids", $user_id, $total_amount, $user['address']);
-        $stmt->execute();
+        $shipping_address = $_POST['shipping_address'] ?? $user['address'];
+        
+        $stmt->bind_param("ids", $user_id, $total_amount, $shipping_address);
+        if (!$stmt->execute()) {
+            throw new Exception("Error executing order statement: " . $stmt->error);
+        }
         $order_id = $db->insert_id;
         
         // Add order items
         $stmt = $db->prepare("
-            INSERT INTO tbl_order_items (order_id, product_id, quantity, price) 
-            VALUES (?, ?, ?, ?)
+            INSERT INTO tbl_order_items (
+                order_id, 
+                product_id, 
+                quantity, 
+                price,
+                created_at
+            ) VALUES (?, ?, ?, ?, NOW())
         ");
+        
+        if (!$stmt) {
+            throw new Exception("Error preparing order items statement: " . $db->error);
+        }
         
         foreach ($_SESSION['cart'] as $item) {
             $stmt->bind_param("iiid", $order_id, $item['p_id'], $item['quantity'], $item['price']);
-            $stmt->execute();
+            if (!$stmt->execute()) {
+                throw new Exception("Error executing order items statement: " . $stmt->error);
+            }
             
             // Update product stock
-            $update_stmt = $db->prepare("UPDATE tbl_product SET p_qty = p_qty - ? WHERE p_id = ?");
-            $update_stmt->bind_param("ii", $item['quantity'], $item['p_id']);
-            $update_stmt->execute();
+            $update_stmt = $db->prepare("UPDATE tbl_product SET p_qty = p_qty - ? WHERE p_id = ? AND p_qty >= ?");
+            if (!$update_stmt) {
+                throw new Exception("Error preparing stock update statement: " . $db->error);
+            }
+            $update_stmt->bind_param("iii", $item['quantity'], $item['p_id'], $item['quantity']);
+            if (!$update_stmt->execute()) {
+                throw new Exception("Error updating product stock: " . $update_stmt->error);
+            }
+            
+            // Check if stock update was successful
+            if ($update_stmt->affected_rows === 0) {
+                throw new Exception("Product {$item['name']} is out of stock");
+            }
         }
         
         // Commit transaction
@@ -66,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         // Rollback transaction
         $db->rollback();
-        $error_message = "Error placing order: " . $e->getMessage();
+        $error_message = $e->getMessage();
     }
 }
 
@@ -105,27 +143,28 @@ $cart_total = getCartTotal();
                             </div>
                         </div>
                     <?php endforeach; ?>
-                </div>
-                <div class="border-t mt-4 pt-4">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold">Total</span>
-                        <span class="text-xl font-bold">₹<?php echo number_format($cart_total, 2); ?></span>
+                    
+                    <div class="border-t pt-4 mt-4">
+                        <div class="flex justify-between">
+                            <p class="font-bold">Total:</p>
+                            <p class="font-bold">₹<?php echo number_format($cart_total, 2); ?></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Shipping Information -->
+        <!-- Checkout Form -->
         <div class="md:w-1/2">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-bold mb-4">Shipping Information</h2>
                 <form method="post">
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
-                            Full Name
+                            Name
                         </label>
                         <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                               id="name" type="text" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
+                               id="name" type="text" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required readonly>
                     </div>
                     
                     <div class="mb-4">
@@ -133,7 +172,7 @@ $cart_total = getCartTotal();
                             Email
                         </label>
                         <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                               id="email" type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                               id="email" type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required readonly>
                     </div>
                     
                     <div class="mb-4">
@@ -145,11 +184,12 @@ $cart_total = getCartTotal();
                     </div>
                     
                     <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="address">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="shipping_address">
                             Shipping Address
                         </label>
                         <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                  id="address" name="address" required><?php echo htmlspecialchars($user['address']); ?></textarea>
+                                  id="shipping_address" name="shipping_address" rows="4" required><?php echo htmlspecialchars($user['address']); ?></textarea>
+                        <p class="text-sm text-gray-500 mt-1">Please provide your complete address with pin code</p>
                     </div>
                     
                     <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">
@@ -161,4 +201,4 @@ $cart_total = getCartTotal();
     </div>
 </div>
 
-<?php include_once __DIR__ . "/../user/includes/footer.php"; ?> 
+<?php include_once __DIR__ . "/../user/includes/footer.php"; ?>
