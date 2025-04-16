@@ -74,9 +74,11 @@ if ($ecat_id > 0) {
 if ($ecat_id > 0) {
     $count_condition = "WHERE p.ecat_id = ? AND p.p_is_active = 1";
     $product_condition = $count_condition;
+    $category_param = $ecat_id;  // Store parameter in a variable
 } elseif ($mcat_id > 0) {
     $count_condition = "WHERE p.ecat_id IN (SELECT ecat_id FROM tbl_end_category WHERE mcat_id = ?) AND p.p_is_active = 1";
     $product_condition = $count_condition;
+    $category_param = $mcat_id;  // Store parameter in a variable
 } else {
     $count_condition = "WHERE p.p_is_active = 1";
     $product_condition = "WHERE p.p_is_active = 1";
@@ -86,7 +88,7 @@ if ($ecat_id > 0) {
 $count_query = "SELECT COUNT(*) as total FROM tbl_product p $count_condition";
 $stmt = mysqli_prepare($db, $count_query);
 if ($ecat_id > 0 || $mcat_id > 0) {
-    mysqli_stmt_bind_param($stmt, "i", $ecat_id > 0 ? $ecat_id : $mcat_id);
+    mysqli_stmt_bind_param($stmt, "i", $category_param);  // Use the stored parameter
 }
 mysqli_stmt_execute($stmt);
 $count_result = mysqli_stmt_get_result($stmt);
@@ -115,9 +117,13 @@ $product_query = "SELECT p.*, e.ecat_name
                   LIMIT ?, ?";
 $stmt = mysqli_prepare($db, $product_query);
 if ($ecat_id > 0 || $mcat_id > 0) {
-    mysqli_stmt_bind_param($stmt, "iii", $ecat_id > 0 ? $ecat_id : $mcat_id, $offset, $itemsPerPage);
+    $offset_param = $offset;  // Store offset in a variable
+    $limit_param = $itemsPerPage;  // Store limit in a variable
+    mysqli_stmt_bind_param($stmt, "iii", $category_param, $offset_param, $limit_param);
 } else {
-    mysqli_stmt_bind_param($stmt, "ii", $offset, $itemsPerPage);
+    $offset_param = $offset;  // Store offset in a variable
+    $limit_param = $itemsPerPage;  // Store limit in a variable
+    mysqli_stmt_bind_param($stmt, "ii", $offset_param, $limit_param);
 }
 mysqli_stmt_execute($stmt);
 $product_result = mysqli_stmt_get_result($stmt);
@@ -154,14 +160,14 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
             <div class="flex">
                 <div class="flex items-center space-x-4">
                     <?php foreach($top_categories as $category): ?>
-                        <div class="relative dropdown-container">
-                            <button class="py-4 px-3 hover:bg-blue-800 focus:outline-none flex items-center dropdown-toggle">
+                        <div class="relative group dropdown-container">
+                            <button class="py-4 px-3 hover:bg-blue-800 hover:text-white focus:outline-none flex items-center dropdown-toggle">
                                 <?= htmlspecialchars($category['tcat']['tcat_name']) ?>
                                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <div class="absolute left-0 mt-0 w-48 bg-white rounded-b-md shadow-lg hidden dropdown-menu z-10">
+                            <div class="absolute left-0 mt-0 w-48 bg-white rounded-b-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 dropdown-menu z-50">
                                 <div class="py-2">
                                     <?php foreach($category['mcats'] as $mcat): ?>
                                         <a href="/santoshvas/Ecommerce/Home/landingpage.php?mcat_id=<?= $mcat['mcat_id'] ?>" 
@@ -413,74 +419,82 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
     </div>
 </footer>
 
-<!-- JavaScript -->
+<!-- Add this style section in the head of your document or just before the closing </head> tag -->
+<style>
+    .group:hover .dropdown-menu {
+        display: block !important;
+    }
+    
+    .dropdown-menu {
+        display: none;
+        min-width: 200px;
+    }
+    
+    @media (min-width: 768px) {
+        .group:hover .dropdown-menu {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+    }
+</style>
+
+<!-- Update the JavaScript section -->
 <script>
-function changeLimit(limit) {
-    let url = new URL(window.location.href);
-    url.searchParams.set('limit', limit);
-    url.searchParams.set('page', 1);
-    window.location.href = url.toString();
-}
-
-document.getElementById('sort').addEventListener('change', function() {
-    let url = new URL(window.location.href);
-    url.searchParams.set('sort', this.value);
-    url.searchParams.set('page', 1);
-    window.location.href = url.toString();
-});
-
 document.addEventListener('DOMContentLoaded', function() {
     const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
     const dropdownContainers = document.querySelectorAll('.dropdown-container');
     
-    if (!('ontouchstart' in window)) {
-        dropdownContainers.forEach(container => {
-            container.addEventListener('mouseenter', function() {
-                this.querySelector('.dropdown-menu').classList.remove('hidden');
-                this.querySelector('.dropdown-menu').classList.add('block');
-            });
-            container.addEventListener('mouseleave', function() {
-                this.querySelector('.dropdown-menu').classList.remove('block');
-                this.querySelector('.dropdown-menu').classList.add('hidden');
-            });
-        });
-    } else {
+    // For mobile devices only (touch devices)
+    if ('ontouchstart' in window) {
         dropdownToggles.forEach(toggle => {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                const menu = this.nextElementSibling;
-                const isVisible = menu.classList.contains('block');
+                
+                const container = this.closest('.dropdown-container');
+                const menu = container.querySelector('.dropdown-menu');
+                const isVisible = !menu.classList.contains('opacity-0');
+                
+                // Hide all other dropdowns
                 document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
-                    dropdown.classList.remove('block');
-                    dropdown.classList.add('hidden');
+                    dropdown.classList.add('opacity-0', 'invisible');
                 });
+                
+                // Toggle current dropdown
                 if (!isVisible) {
-                    menu.classList.remove('hidden');
-                    menu.classList.add('block');
-                    document.addEventListener('click', function closeDropdown(event) {
-                        if (!menu.contains(event.target) && !toggle.contains(event.target)) {
-                            menu.classList.remove('block');
-                            menu.classList.add('hidden');
+                    menu.classList.remove('opacity-0', 'invisible');
+                    
+                    // Close dropdown when clicking outside
+                    const closeDropdown = function(event) {
+                        if (!container.contains(event.target)) {
+                            menu.classList.add('opacity-0', 'invisible');
                             document.removeEventListener('click', closeDropdown);
                         }
-                    });
+                    };
+                    
+                    setTimeout(() => {
+                        document.addEventListener('click', closeDropdown);
+                    }, 0);
                 }
             });
         });
     }
-
-    // Add search functionality
-    const searchForm = document.querySelector('form[action="/santoshvas/Ecommerce/Home/search.php"]');
-    if (searchForm) {
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const searchQuery = this.querySelector('input[name="q"]').value.trim();
-            if (searchQuery) {
-                window.location.href = `/santoshvas/Ecommerce/Home/search.php?q=${encodeURIComponent(searchQuery)}`;
-            }
-        });
-    }
+    
+    // Ensure dropdowns are properly positioned
+    dropdownContainers.forEach(container => {
+        const menu = container.querySelector('.dropdown-menu');
+        const button = container.querySelector('.dropdown-toggle');
+        
+        // Adjust dropdown position if needed
+        function adjustPosition() {
+            const rect = button.getBoundingClientRect();
+            menu.style.top = `${rect.height}px`;
+            menu.style.minWidth = `${Math.max(200, rect.width)}px`;
+        }
+        
+        adjustPosition();
+        window.addEventListener('resize', adjustPosition);
+    });
 });
 </script>
 
