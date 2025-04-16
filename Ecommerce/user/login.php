@@ -1,74 +1,115 @@
-<?php $title= "Login page"; require(__DIR__."/includes/header.php"); ?>
+<?php
+require_once __DIR__ . "/../config.php";
 
-<div class="w-full min-h-screen flex justify-center items-center bg-gradient-to-r from-blue-600 to-purple-700 py-8">
-    <div class="bg-white shadow-xl rounded-2xl max-w-md w-full mx-4 overflow-hidden">
-        <!-- Header section -->
-        <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
-            <h1 class="font-bold text-3xl text-center">Welcome Back</h1>
-            <p class="text-center text-blue-100 mt-2">Sign in to continue to your account</p>
-        </div>
-        
-        <!-- Form section -->
-        <div class="p-8">
-            <form method="post" action="../actions/logaction.php" class="space-y-6">
-                <div class="space-y-4">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                        <input 
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 outline-none"
-                            type="email" 
-                            id="email"
-                            name="uemail" 
-                            placeholder="Enter your email" 
-                            required
-                        >
-                    </div>
-                    
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input 
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 outline-none"
-                            type="password" 
-                            id="password"
-                            name="upass" 
-                            placeholder="Enter your password"
-                        >
-                    </div>
-                </div>
+// Initialize variables
+$email = $password = '';
+$errors = [];
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get form data
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+
+    // Validate form data
+    if (empty($email)) {
+        $errors['email'] = 'Email is required';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Invalid email format';
+    }
+
+    if (empty($password)) {
+        $errors['password'] = 'Password is required';
+    }
+
+    // If no errors, proceed with login
+    if (empty($errors)) {
+        // Check if user exists
+        $stmt = $db->prepare("SELECT id, name, email, password FROM tbl_users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+            $user = $result->fetch_assoc();
+            
+            // Verify password
+            if (password_verify($password, $user['password'])) {
+                // Set session variables
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['user_email'] = $user['email'];
                 
+                // Redirect to home page
+                header('Location: /santoshvas/Ecommerce/Home/landingpage.php');
+                exit();
+            } else {
+                $errors['general'] = 'Invalid email or password';
+            }
+        } else {
+            $errors['general'] = 'Invalid email or password';
+        }
+    }
+}
+
+// Set page title
+$title = "Login - Santosh Vastralay";
+
+// Include header
+include_once "includes/header.php";
+?>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Login to Your Account</h1>
+
+            <?php if (isset($errors['general'])): ?>
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
+                    <?php echo $errors['general']; ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" class="space-y-4">
+                <div>
+                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>"
+                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <?php echo isset($errors['email']) ? 'border-red-500' : ''; ?>">
+                    <?php if (isset($errors['email'])): ?>
+                        <p class="text-red-500 text-xs mt-1"><?php echo $errors['email']; ?></p>
+                    <?php endif; ?>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="password" name="password"
+                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <?php echo isset($errors['password']) ? 'border-red-500' : ''; ?>">
+                    <?php if (isset($errors['password'])): ?>
+                        <p class="text-red-500 text-xs mt-1"><?php echo $errors['password']; ?></p>
+                    <?php endif; ?>
+                </div>
+
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <input 
-                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            type="checkbox"
-                            id="check"
-                            name="rem"
-                        >
-                        <label for="check" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        <input type="checkbox" id="remember" name="remember" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
                     </div>
-                    
-                    <!-- <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">Forgot password?</a> -->
+                    <a href="forgot-password.php" class="text-sm text-blue-600 hover:text-blue-800">Forgot password?</a>
                 </div>
-                
-                <div>
-                    <button 
-                        type="submit"
-                        class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium py-3 px-4 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
-                    >
-                        Sign In
-                    </button>
-                </div>
+
+                <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Login
+                </button>
             </form>
-        </div>
-        
-        <!-- Footer section -->
-        <div class="bg-gray-50 px-8 py-6 border-t border-gray-200">
-            <p class="text-center text-gray-600">
-                Don't have an account? 
-                <a href="reg.php" class="font-medium text-blue-600 hover:text-blue-800">Create one now</a>
-            </p>
+
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">Don't have an account? 
+                    <a href="reg.php" class="text-blue-600 hover:text-blue-800">Register here</a>
+                </p>
+            </div>
         </div>
     </div>
 </div>
 
-<?php require "./includes/footer.php"; ?>
+<?php include_once "includes/footer.php"; ?>

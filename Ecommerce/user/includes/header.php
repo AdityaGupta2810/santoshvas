@@ -1,15 +1,19 @@
 <?php
-require "C:/xampp/htdocs/santoshvas/Ecommerce/actions/function.class.php";
-include_once "C:/xampp/htdocs/santoshvas/Ecommerce/db.php";
-include_once "C:/xampp/htdocs/santoshvas/Ecommerce/Home/cart-functions.php";
-?>
+require_once __DIR__ . "/../../config.php";
 
+// Only proceed with HTML output if no headers have been sent
+if (!headers_sent()) {
+    // Set default title if not set
+    if (!isset($title)) {
+        $title = "Santosh Vastralay";
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?=@$title?></title>
+    <title><?php echo htmlspecialchars($title); ?></title>
     
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -21,10 +25,12 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/Home/cart-functions.php";
             background: linear-gradient(45deg, #1a202c, #2d3748);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+        .nav-item {
+            transition: all 0.3s ease;
+        }
         .nav-item:hover {
             color: #4a90e2;
-            transform: translateX(5px);
-            transition: all 0.3s ease;
+            transform: translateY(-2px);
         }
         .search-bar {
             background: white;
@@ -39,153 +45,210 @@ include_once "C:/xampp/htdocs/santoshvas/Ecommerce/Home/cart-functions.php";
         .search-button:hover {
             background: linear-gradient(45deg, #357abd, #4a90e2);
         }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #4a90e2;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            min-width: 20px;
+            text-align: center;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1000;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .mobile-menu.show {
+            transform: translateX(0);
+        }
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #4a5568;
+            transition: all 0.2s ease;
+        }
+        .user-menu-item:hover {
+            background-color: #f7fafc;
+            color: #2d3748;
+        }
+        .user-menu-item i {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            text-align: center;
+        }
     </style>
-</head> 
+</head>
 <body class="bg-gray-100 font-sans">
-    <!-- Sidebar for Mobile (Hidden on Larger Screens) -->
-    <div id="sidebar" class="fixed inset-y-0 left-0 bg-gray-900 text-white w-64 transform -translate-x-full sm:hidden transition-transform duration-300 ease-in-out z-50 shadow-lg">
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed inset-y-0 left-0 bg-gray-900 text-white w-64 z-50 shadow-lg">
         <div class="p-6 border-b border-gray-700">
-            <h1 class="text-2xl font-bold text-indigo-400">Santosh Vastralay</h1>
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-indigo-400">Santosh Vastralay</h1>
+                <button id="closeMobileMenu" class="text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
         <nav class="mt-6">
-            <a href="/santoshvas/Ecommerce/index.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Home</a>
-            <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Shop</a>
-            <a href="/santoshvas/Ecommerce/Home/about.html" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">About us</a>
-            <a href="/santoshvas/Ecommerce/Home/contact.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Contact</a>
-            <a href="/santoshvas/Ecommerce/Home/cart.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Cart</a>
-            <a href="/santoshvas/Ecommerce/user/adminlogin.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">Admin</a>
-            <div class="relative">
-                <button id="userMenuButtonMobile" class="w-full text-left py-3 px-6 hover:bg-gray-800 focus:outline-none">
-                    <span class="flex items-center"><i class='bx bx-user mr-2'></i> User</span>
-                </button>
-                <ul id="userMenuDropdownMobile" class="bg-gray-800 text-white rounded-lg shadow-lg hidden mt-1">
-                    <li><a href="/santoshvas/Ecommerce/user/login.php" class="block px-6 py-2 hover:bg-gray-700"><i class='bx bx-log-in mr-2'></i> Login</a></li>
-                    <li><a href="/santoshvas/Ecommerce/user/reg.php" class="block px-6 py-2 hover:bg-gray-700"><i class='bx bx-user-plus mr-2'></i> Register</a></li>
-                    <li><a href="#" class="block px-6 py-2 hover:bg-gray-700"><i class='bx bx-box mr-2'></i> My Orders</a></li>
-                    <li><a href="/santoshvas/Ecommerce/user/userprofile.php" class="block px-6 py-2 hover:bg-gray-700"><i class='bx bx-user-circle mr-2'></i> Profile</a></li>                 
-                    <li><a href="/santoshvas/Ecommerce/actions/logoutaction.php" class="block px-6 py-2 hover:bg-gray-700"><i class='bx bx-log-out mr-2'></i> Logout</a></li>
-                </ul>
-            </div>
-            <!-- Search Bar for Mobile -->
-            <!-- <div class="p-6">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search..." class="w-full p-3 bg-gray-800 text-white border-none focus:outline-none">
-                    <button class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-3 rounded mt-2 hover:from-indigo-600 hover:to-purple-700 transition-all duration-300" aria-label="Search">Search</button>
-                </div>
-            </div> -->
+            <a href="/santoshvas/Ecommerce/index.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                <i class="fas fa-home mr-2"></i> Home
+            </a>
+            <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                <i class="fas fa-store mr-2"></i> Shop
+            </a>
+            <a href="/santoshvas/Ecommerce/Home/about.html" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                <i class="fas fa-info-circle mr-2"></i> About us
+            </a>
+            <a href="/santoshvas/Ecommerce/Home/contact.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                <i class="fas fa-envelope mr-2"></i> Contact
+            </a>
+            <a href="/santoshvas/Ecommerce/Home/cart.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                <i class="fas fa-shopping-cart mr-2"></i> Cart
+                <span class="cart-badge"><?php echo getCartItemCount(); ?></span>
+            </a>
+            <?php if($isLoggedIn): ?>
+                <a href="/santoshvas/Ecommerce/user/userprofile.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                    <i class="fas fa-user mr-2"></i> My Profile
+                </a>
+                <a href="/santoshvas/Ecommerce/user/orders.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                    <i class="fas fa-box mr-2"></i> My Orders
+                </a>
+                <a href="/santoshvas/Ecommerce/actions/logoutaction.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </a>
+            <?php else: ?>
+                <a href="/santoshvas/Ecommerce/user/login.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Login
+                </a>
+                <a href="/santoshvas/Ecommerce/user/reg.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                    <i class="fas fa-user-plus mr-2"></i> Register
+                </a>
+            <?php endif; ?>
+            <a href="/santoshvas/Ecommerce/user/adminlogin.php" class="block py-3 px-6 hover:bg-gray-800 hover:text-indigo-300 transition-colors duration-200">
+                <i class="fas fa-user-shield mr-2"></i> Admin
+            </a>
         </nav>
     </div>
 
     <!-- Header Section -->
-    <header class="fancy-header text-white p-4 flex justify-between items-center shrink-0">
+    <header class="fancy-header text-white p-4 flex justify-between items-center">
         <!-- Logo and Brand Name -->
         <div class="flex items-center">
             <img src="/santoshvas/Ecommerce/Home/images/logo.png" alt="Santosh Vastralay Logo" class="h-12 rounded-full shadow-md">
-          
         </div>
 
-        <nav class="flex sm:hidden items-center gap-6 text-lg">
-            <a href="/santoshvas/Ecommerce/index.php" class="nav-item font-semibold">Home</a>
-            <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="nav-item font-semibold">Shop</a>
-            <a href="/santoshvas/Ecommerce/Home/about.html" class="nav-item font-semibold">About us</a>
-            <a href="/santoshvas/Ecommerce/Home/contact.php" class="nav-item font-semibold">Contact</a>
-        </nav>
-    
-        <!-- Mobile Menu Button (Hamburger Icon) -->
-        <button id="sidebarToggle" class="sm:hidden text-white focus:outline-none p-2 hover:bg-gray-700 rounded">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
-            </svg>
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuButton" class="sm:hidden text-white focus:outline-none p-2 hover:bg-gray-700 rounded">
+            <i class="fas fa-bars text-xl"></i>
         </button>
     
         <!-- Navigation Menu for Larger Screens -->
         <nav class="hidden sm:flex items-center gap-6 text-lg">
-            <a href="/santoshvas/Ecommerce/index.php" class="nav-item  font-semibold  ">Home</a>
-            <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="nav-item font-semibold">Shop</a>
-            <a href="/santoshvas/Ecommerce/Home/about.html" class="nav-item font-semibold">About us</a>
-            <a href="/santoshvas/Ecommerce/Home/contact.php" class="nav-item font-semibold">Contact</a>
+            <a href="/santoshvas/Ecommerce/index.php" class="nav-item font-semibold">
+                <i class="fas fa-home mr-1"></i> Home
+            </a>
+            <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="nav-item font-semibold">
+                <i class="fas fa-store mr-1"></i> Shop
+            </a>
+            <a href="/santoshvas/Ecommerce/Home/about.html" class="nav-item font-semibold">
+                <i class="fas fa-info-circle mr-1"></i> About us
+            </a>
+            <a href="/santoshvas/Ecommerce/Home/contact.php" class="nav-item font-semibold">
+                <i class="fas fa-envelope mr-1"></i> Contact
+            </a>
         </nav>
     
-        <!-- Search Bar for Larger Screens -->
-        <!-- <div class="hidden md:flex items-center">
-            <div class="search-bar flex">
-                <input type="text" placeholder="Search..." class="p-3 rounded-l-full border-none focus:outline-none">
-                <button class="search-button p-3 rounded-r-full" aria-label="Search">Search</button>
-            </div>
-        </div> -->
-    
-        <!-- User Dropdown and Cart Icon for Larger Screens -->
-        <div class="hidden sm:flex items-center space-x-8">
-          
-        <a href="/santoshvas/Ecommerce/Home/cart.php" class="text-white transition relative">
-                    <i class="fas fa-shopping-cart nav-item"></i>
-                    <span class="absolute -top-2 -right-2 bg-indigo-600  text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"><?php echo getCartItemCount(); ?></span>
-                </a> 
+        <!-- User Dropdown and Cart Icon -->
+        <div class="hidden sm:flex items-center space-x-6">
+            <a href="/santoshvas/Ecommerce/Home/cart.php" class="text-white nav-item relative">
+                <i class="fas fa-shopping-cart text-xl"></i>
+                <span class="cart-badge"><?php echo getCartItemCount(); ?></span>
+            </a>
+
             <div class="relative">
-                <button id="userMenuButton" class=" font-semibold focus:outline-none flex items-center">
-                <a href="#" class="text-white nav-item transition"><i class="fas fa-user"></i></a>
+                <button id="userMenuButton" class="nav-item text-white focus:outline-none flex items-center">
+                    <i class="fas fa-user text-xl"></i>
+                    <span class="ml-2"><?php echo htmlspecialchars($userName); ?></span>
                 </button>
-                <ul id="userMenuDropdown" class="absolute right-0 mt-2 bg-white text-gray-800 rounded-lg shadow-lg border border-gray-200 hidden z-10">
-                    <li><a href="/santoshvas/Ecommerce/user/login.php" class="block px-6 py-2 hover:bg-gray-100 flex items-center"><i class='bx bx-log-in mr-2'></i> Login</a></li>
-                    <li><a href="/santoshvas/Ecommerce/user/reg.php" class="block px-6 py-2 hover:bg-gray-100 flex items-center"><i class='bx bx-user-plus mr-2'></i> Register</a></li>
-                    <li><a href="#" class="block px-6 py-2 hover:bg-gray-100 flex items-center"><i class='bx bx-box mr-2'></i> My Orders</a></li>
-                    <li><a href="/santoshvas/Ecommerce/user/userprofile.php" class="block px-6 py-2 hover:bg-gray-100 flex items-center"><i class='bx bx-user-circle mr-2'></i> Profile</a></li>
-                    <li><a href="/santoshvas/Ecommerce/actions/logoutaction.php" class="block px-6 py-2 hover:bg-gray-100 flex items-center"><i class='bx bx-log-out mr-2'></i> Logout</a></li>
-                </ul>
+                <div id="userMenuDropdown" class="dropdown-menu">
+                    <?php if($isLoggedIn): ?>
+                        <a href="/santoshvas/Ecommerce/user/userprofile.php" class="user-menu-item">
+                            <i class="fas fa-user-circle"></i> My Profile
+                        </a>
+                        <a href="/santoshvas/Ecommerce/user/orders.php" class="user-menu-item">
+                            <i class="fas fa-box"></i> My Orders
+                        </a>
+                        <a href="/santoshvas/Ecommerce/actions/logoutaction.php" class="user-menu-item">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    <?php else: ?>
+                        <a href="/santoshvas/Ecommerce/user/login.php" class="user-menu-item">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a href="/santoshvas/Ecommerce/user/reg.php" class="user-menu-item">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    <?php endif; ?>
+                </div>
             </div>
-            <a href="/santoshvas/Ecommerce/user/adminlogin.php" class="nav-item font-semibold">Admin</a>
+
+            <a href="/santoshvas/Ecommerce/user/adminlogin.php" class="nav-item text-white">
+                <i class="fas fa-user-shield text-xl"></i>
+            </a>
         </div>
     </header>
 
-    <!-- <div class="bg-white p-4 shadow-md md:hidden flex justify-center px-6">
-        <form action="#" class="w-full max-w-md">
-            <div class="form-input flex items-center h-12 w-full">
-                <input type="search" placeholder="Search..." class="flex-grow h-full px-4 bg-gray-200 rounded-l-full outline-none">
-                <button type="submit" class="w-12 h-full bg-indigo-500 text-white rounded-r-full flex items-center justify-center hover:bg-indigo-600 transition-colors duration-300">
-                    <i class='bx bx-search'></i>
-                </button>
-            </div>
-        </form>
-    </div> -->
-
     <script>
-        // Toggle sidebar for small screens
-        const sidebar = document.getElementById("sidebar");
-        const sidebarToggle = document.getElementById("sidebarToggle");
+        // Mobile Menu Toggle
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
 
-        sidebarToggle.addEventListener("click", () => {
-            sidebar.classList.toggle("-translate-x-full");
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.add('show');
         });
 
-        // Toggle user dropdown on hover for larger screens
-        const userMenuButton = document.getElementById("userMenuButton");
-        const userMenuDropdown = document.getElementById("userMenuDropdown");
-
-        userMenuButton.addEventListener("mouseenter", () => {
-            userMenuDropdown.classList.remove("hidden");
+        closeMobileMenu.addEventListener('click', () => {
+            mobileMenu.classList.remove('show');
         });
 
-        userMenuDropdown.addEventListener("mouseenter", () => {
-            userMenuDropdown.classList.remove("hidden");
+        // User Dropdown Toggle
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+        userMenuButton.addEventListener('click', () => {
+            userMenuDropdown.classList.toggle('show');
         });
 
-        userMenuButton.addEventListener("mouseleave", () => {
-            setTimeout(() => {
-                if (!userMenuDropdown.matches(":hover")) {
-                    userMenuDropdown.classList.add("hidden");
-                }
-            }, 200);
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenuButton.contains(e.target) && !userMenuDropdown.contains(e.target)) {
+                userMenuDropdown.classList.remove('show');
+            }
         });
 
-        userMenuDropdown.addEventListener("mouseleave", () => {
-            userMenuDropdown.classList.add("hidden");
-        });
-
-        // Toggle user dropdown on click for mobile
-        const userMenuButtonMobile = document.getElementById("userMenuButtonMobile");
-        const userMenuDropdownMobile = document.getElementById("userMenuDropdownMobile");
-
-        userMenuButtonMobile.addEventListener("click", () => {
-            userMenuDropdownMobile.classList.toggle("hidden");
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target) && mobileMenu.classList.contains('show')) {
+                mobileMenu.classList.remove('show');
+            }
         });
     </script>
+<?php } ?>

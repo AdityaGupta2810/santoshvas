@@ -1,85 +1,47 @@
 <?php
-// Start session
-session_start();
+require_once __DIR__ . "/../config.php";
 
-// Set page title
-$title = "Shopping Cart - Santosh Vastralay";
-
-// Include header (assumes $db is defined here)
-include_once "../user/includes/header.php";
+// Include header
+include_once __DIR__ . "/../user/includes/header.php";
 
 // Include cart functions
-include_once "cart-functions.php";
-
-// Check database connection
-if (!isset($db) || !$db) {
-    die("Database connection failed: " . mysqli_connect_error());
-}
-
-// Get banner image
-$banner_result = $db->query("SELECT banner_cart FROM tbl_settings WHERE id=1");
-$banner_row = $banner_result->fetch_assoc();
-$banner_cart = $banner_row['banner_cart'] ?? 'default-banner.jpg';
+include_once __DIR__ . "/cart-functions.php";
 
 // Handle form submission
-$error_message = '';
-$success_message = '';
-
-if (isset($_POST['update_cart'])) {
-    $all_valid = true;
-    $error_messages = [];
-    
-    foreach ($_SESSION['cart'] as $key => $item) {
-        $quantity = (int)$_POST['quantity'][$key];
-        $result = updateCartQuantity($db, $item['p_id'], $quantity);
-        
-        if (!$result['success']) {
-            $all_valid = false;
-            $error_messages[] = $result['message'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['update_cart'])) {
+        foreach ($_POST['quantity'] as $product_id => $quantity) {
+            $result = updateCartQuantity($product_id, $quantity);
+            if (!$result['success']) {
+                $error_message = $result['message'];
+                break;
+            }
         }
-    }
-    
-    if ($all_valid) {
-        $success_message = "Cart updated successfully!";
-    } else {
-        $error_message = implode("<br>", $error_messages);
     }
 }
 
 // Handle remove item
-if (isset($_GET['remove']) && is_numeric($_GET['remove'])) {
-    $result = removeFromCart((int)$_GET['remove']);
-    if ($result['success']) {
-        $success_message = $result['message'];
-    } else {
+if (isset($_GET['remove'])) {
+    $result = removeFromCart($_GET['remove']);
+    if (!$result['success']) {
         $error_message = $result['message'];
     }
 }
+
+// Get cart total
+$cart_total = getCartTotal();
 ?>
 
-<div class="relative h-64 w-full bg-gray-900 overflow-hidden">
-    <img src="/santoshvas/Ecommerce/admin/assets/uploads/<?php echo htmlspecialchars($banner_cart); ?>" 
-         alt="Shopping Cart" 
-         class="w-full h-full object-cover opacity-70">
-    <div class="absolute inset-0 flex items-center justify-center">
-        <h1 class="text-4xl font-bold text-white z-10">Your Shopping Cart</h1>
-    </div>
-</div>
-
 <div class="container mx-auto px-4 py-8">
-    <?php if(isset($error_message) && $error_message): ?>
+    <h1 class="text-2xl font-bold mb-6">Shopping Cart</h1>
+    
+    <?php if (isset($error_message)): ?>
         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
-            <?php echo $error_message; ?>
+            <?php echo htmlspecialchars($error_message); ?>
         </div>
     <?php endif; ?>
     
-    <?php if(isset($success_message) && $success_message): ?>
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
-            <?php echo $success_message; ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if(!isset($_SESSION['cart']) || empty($_SESSION['cart'])): ?>
+    <?php if (empty($_SESSION['cart'])): ?>
         <div class="bg-white rounded-lg shadow-md p-8 text-center">
             <i class="fas fa-shopping-cart fa-4x text-gray-400 mb-4"></i>
             <h2 class="text-2xl font-bold text-gray-700 mb-2">Your cart is empty</h2>
@@ -103,38 +65,28 @@ if (isset($_GET['remove']) && is_numeric($_GET['remove'])) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
-                        $table_total_price = getCartTotal();
-                        foreach ($_SESSION['cart'] as $key => $item): 
-                            $product_id = $item['p_id'];
-                            $quantity = $item['quantity'];
-                            $price = $item['price'];
-                            $product_name = $item['name'];
-                            $photo = $item['photo'];
-                            
-                            $row_total = $price * $quantity;
-                        ?>
+                        <?php foreach ($_SESSION['cart'] as $key => $item): ?>
                             <tr class="border-t border-gray-200">
                                 <td class="py-4 px-4"><?php echo $key+1; ?></td>
                                 <td class="py-4 px-4">
                                     <div class="flex items-center">
-                                        <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?php echo htmlspecialchars($photo); ?>" 
-                                             alt="<?php echo htmlspecialchars($product_name); ?>" 
+                                        <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?php echo htmlspecialchars($item['photo']); ?>" 
+                                             alt="<?php echo htmlspecialchars($item['name']); ?>" 
                                              class="w-16 h-16 object-cover rounded mr-4">
-                                        <?php echo htmlspecialchars($product_name); ?>
+                                        <?php echo htmlspecialchars($item['name']); ?>
                                     </div>
                                 </td>
-                                <td class="py-4 px-4">₹<?php echo number_format($price, 2); ?></td>
+                                <td class="py-4 px-4">₹<?php echo number_format($item['price'], 2); ?></td>
                                 <td class="py-4 px-4">
                                     <input type="number" 
                                            class="w-20 p-2 border rounded" 
                                            min="1" 
-                                           name="quantity[]" 
-                                           value="<?php echo $quantity; ?>">
+                                           name="quantity[<?php echo $item['p_id']; ?>]" 
+                                           value="<?php echo $item['quantity']; ?>">
                                 </td>
-                                <td class="py-4 px-4 text-right">₹<?php echo number_format($row_total, 2); ?></td>
+                                <td class="py-4 px-4 text-right">₹<?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
                                 <td class="py-4 px-4 text-center">
-                                    <a href="cart.php?remove=<?php echo $product_id; ?>" 
+                                    <a href="cart.php?remove=<?php echo $item['p_id']; ?>" 
                                        class="text-red-500 hover:text-red-700"
                                        onclick="return confirm('Are you sure you want to remove this item?');">
                                         <i class="fas fa-trash"></i>
@@ -144,7 +96,7 @@ if (isset($_GET['remove']) && is_numeric($_GET['remove'])) {
                         <?php endforeach; ?>
                         <tr class="bg-gray-50 font-bold">
                             <td colspan="4" class="py-4 px-4">Total</td>
-                            <td class="py-4 px-4 text-right">₹<?php echo number_format($table_total_price, 2); ?></td>
+                            <td class="py-4 px-4 text-right">₹<?php echo number_format($cart_total, 2); ?></td>
                             <td class="py-4 px-4"></td>
                         </tr>
                     </tbody>
@@ -168,10 +120,4 @@ if (isset($_GET['remove']) && is_numeric($_GET['remove'])) {
     <?php endif; ?>
 </div>
 
-<?php include_once "../user/includes/footer.php"; ?>
-
-<script>
-    function confirmDelete() {
-        return confirm("Are you sure you want to remove this item from your cart?");
-    }
-</script>
+<?php include_once __DIR__ . "/../user/includes/footer.php"; ?>
