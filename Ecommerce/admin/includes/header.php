@@ -125,7 +125,7 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
                 </a>
             </li>
             <li>
-                <a href="/santoshvas/Ecommerce/admin/dashboardpages/order.php" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
+                <a href="/santoshvas/Ecommerce/admin/dashboardpages/ordermanagement.php" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-doughnut-chart text-xl'></i>
                     <span class="text ml-3 sidebar-text ">Order Management</span>
                 </a>
