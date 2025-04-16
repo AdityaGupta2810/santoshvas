@@ -1,8 +1,6 @@
-
 <?php
 // Start output buffering and session
 ob_start();
-session_start();
 
 // Use absolute path for includes
 require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/actions/function.class.php';
@@ -47,6 +45,24 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
     header('Location: /santoshvas/Ecommerce/user/adminlogin.php');
     exit;
 }
+
+// Only start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Get admin data if logged in
+$admin_name = '';
+if (isset($_SESSION['admin_id'])) {
+    $stmt = $db->prepare("SELECT full_name FROM admin WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['admin_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $admin_data = $result->fetch_assoc();
+        $admin_name = $admin_data['full_name'];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -54,7 +70,7 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdminHub Dashboard</title>
+    <title>Admin Dashboard - Santosh Vastralay</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -171,37 +187,31 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
         <!-- NAVBAR -->
 
         <!-- 1. First, fix the search toggle icon in the navbar -->
-<nav class="h-16 bg-white px-6 flex items-center justify-evenly  sticky top-0 z-40 shadow-sm">
+<nav class="h-16 bg-white px-6 flex items-center justify-between  sticky top-0 z-40 shadow-sm">
+    <div>
     <i class='bx bx-menu text-2xl text-gray-700 cursor-pointer' id="menu-btn"></i>
     <a href="../../index.php" class="nav-link ml-4 text-gray-700 hover:text-blue-500">Home</a>
-    
+    </div>
     <!-- Modified search toggle: hidden on md screens and larger -->
     <!-- <i class='bx bx-search text-2xl text-gray-700 cursor-pointer ml-auto hidden md:hidden lg:hidden xl:hidden' id="search-toggle"></i> -->
     
     <!-- Search form: visible only on md screens and larger -->
-    <form action="#" class="search-form hidden md:flex ml-auto transition-all duration-300">
+    <!-- <form action="#" class="search-form hidden md:flex ml-auto transition-all duration-300">
         <div class="form-input flex items-center h-9">
             <input type="search" placeholder="Search..." class="w-max-64 h-full px-4 bg-gray-200 rounded-l-full outline-none">
             <button type="submit" class="w-9 h-full bg-blue-500 text-white rounded-r-full flex items-center justify-center">
                 <i class='bx bx-search'></i>
             </button>
            </div>
-               </form>
-            <!-- <div class="ml-4 flex items-center">
-                <input type="checkbox" id="switch-mode" hidden>
-                <label for="switch-mode" class="bg-gray-300 w-12 h-6 rounded-full relative cursor-pointer flex items-center p-1">
-                    <i class='bx bx-sun text-yellow-500 dark-icon hidden text-sm'></i>
-                    <span class="block w-4 h-4 bg-white rounded-full transform transition-transform duration-300" id="toggle-switch"></span>
-                    <i class='bx bx-moon text-blue-800 light-icon text-sm ml-auto'></i>
-                </label>
-            </div> -->
-            <a href="#" class="notification mx-4 text-gray-700 relative">
+               </form> -->
+            
+            <!-- <a href="#" class="notification mx-4 text-gray-700 relative">
                 <i class='bx bxs-bell text-2xl'></i>
                 <span class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">8</span>
-            </a>
+            </a> -->
            <div class="relative">
             <a href="#" id="profile-toggle" class="profile relative">
-                <img src="https://via.placeholder.com/36" class="w-9 h-9 rounded-full object-cover border-2 border-blue-500 cursor-pointer">
+                <img src="https://www.freeiconspng.com/thumbs/profile-icon-png/profile-icon-9.png" class="w-9 h-9 rounded-full object-cover border-2 border-blue-500 cursor-pointer">
             </a>
             
             <!-- Profile Dropdown -->

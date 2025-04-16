@@ -21,6 +21,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+// Load email configuration
+$mail_config = require __DIR__ . '/../config/mail-config.php';
+
 // Process message form submission
 if(isset($_POST['form1'])) {
     $valid = 1;
@@ -310,6 +313,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     exit();
 }
 
+// Handle email sending
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
+    $order_id = $_POST['order_id'];
+    $customer_email = $_POST['customer_email'];
+    $subject = $_POST['email_subject'];
+    $message = $_POST['email_message'];
+    
+    $mail = new PHPMailer(true);
+    
+    try {
+        // Server settings
+        $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
+        $mail->isSMTP();                                            // Send using SMTP
+        $mail->Host       = $mail_config['smtp_host'];              // Set the SMTP server
+        $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+        $mail->Username   = $mail_config['smtp_username'];          // SMTP username
+        $mail->Password   = $mail_config['smtp_password'];          // SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;        // Enable TLS encryption
+        $mail->Port       = $mail_config['smtp_port'];             // TCP port to connect to
+
+        // Recipients
+        $mail->setFrom($mail_config['from_email'], $mail_config['from_name']);
+        $mail->addAddress($customer_email);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        
+        // Create HTML message with better formatting
+        $htmlMessage = "
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+            <div style='background-color: #f8f9fa; padding: 20px; text-align: center;'>
+                <h1 style='color: #333;'>{$mail_config['from_name']}</h1>
+            </div>
+            <div style='padding: 20px; background-color: #ffffff;'>
+                " . nl2br(htmlspecialchars($message)) . "
+            </div>
+            <div style='background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666;'>
+                <p>This is an automated message, please do not reply directly to this email.</p>
+            </div>
+        </div>";
+        
+        $mail->Body = $htmlMessage;
+        $mail->AltBody = strip_tags($message); // Plain text version
+
+        $mail->send();
+        $_SESSION['success_msg'] = "Email sent successfully to customer!";
+    } catch (Exception $e) {
+        $_SESSION['error_msg'] = "Email could not be sent. Error: " . $mail->ErrorInfo;
+    }
+    
+    header("Location: ordermanagement.php");
+    exit();
+}
+
 // Get all orders with customer details and order items
 $query = "
     SELECT 
@@ -344,7 +402,7 @@ $orders = $db->query($query);
             ?>
         </div>
     <?php endif; ?>
-
+    
     <?php if (isset($_SESSION['error_msg'])): ?>
         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
             <?php 
@@ -357,20 +415,21 @@ $orders = $db->query($query);
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full">
-                <thead class="bg-gray-100">
+                <thead class="bg-gray-100 border-2 border-gray-400">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Details</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Items</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-1 py-3 text-left  font-medium text-gray-900 uppercase tracking-wider">Order ID</th>
+                    <th class="px-6 py-3 text-left  font-medium text-gray-900 uppercase tracking-wider">Customer Details</th>
+
+                        <th class="px-6 py-3 text-left  font-medium text-gray-900 uppercase tracking-wider">Order Items</th> 
+                        <th class="px-6 py-3 text-left  font-medium text-gray-900 uppercase tracking-wider">Total Amount</th>
+                        <th class="px-1 py-3 text-left  font-medium text-gray-900 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left  font-medium text-gray-900 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left  font-medium text-gray-900 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <?php while ($order = $orders->fetch_assoc()): ?>
-                        <?php
+                <?php
                         // Get order items for this order
                         $items_query = "
                             SELECT 
@@ -390,7 +449,7 @@ $orders = $db->query($query);
                             <td class="px-6 py-4 whitespace-nowrap">
                                 #<?php echo $order['id']; ?>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-2 py-4">
                                 <div class="text-sm">
                                     <p class="font-medium"><?php echo htmlspecialchars($order['customer_name']); ?></p>
                                     <p class="text-gray-500"><?php echo htmlspecialchars($order['customer_email']); ?></p>
@@ -399,7 +458,7 @@ $orders = $db->query($query);
                                         <summary class="text-blue-600 cursor-pointer">Shipping Address</summary>
                                         <p class="text-gray-500 mt-1"><?php echo nl2br(htmlspecialchars($order['shipping_address'])); ?></p>
                                     </details>
-                                </div>
+                                        </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm">
@@ -412,16 +471,16 @@ $orders = $db->query($query);
                                                 <p class="font-medium"><?php echo htmlspecialchars($item['p_name']); ?></p>
                                                 <p class="text-gray-500">Qty: <?php echo $item['quantity']; ?> × ₹<?php echo number_format($item['price'], 2); ?></p>
                                             </div>
-                                        </div>
+                                            </div>
                                     <?php endwhile; ?>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            </div>
+                        </td>
+                            <td class="pl-8 py-4 whitespace-nowrap">
                                 ₹<?php echo number_format($order['total_amount'], 2); ?>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                        </td>
+                            <td class="px-1 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    <?php 
+                            <?php
                                     switch($order['status']) {
                                         case 'completed':
                                             echo 'bg-green-100 text-green-800';
@@ -438,10 +497,10 @@ $orders = $db->query($query);
                                     ?>">
                                     <?php echo ucfirst($order['status']); ?>
                                 </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <?php echo date('M d, Y H:i', strtotime($order['created_at'])); ?>
-                            </td>
+                        </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <form method="post" class="inline-block">
                                     <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
@@ -455,13 +514,195 @@ $orders = $db->query($query);
                                         Update
                                     </button>
                                 </form>
-                            </td>
-                        </tr>
+                                <button onclick="openEmailModal(<?php echo $order['id']; ?>, '<?php echo htmlspecialchars($order['customer_email']); ?>', '<?php echo $order['status']; ?>', '<?php echo htmlspecialchars($order['customer_name']); ?>')"
+                                        class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm ml-2">
+                                    <i class="fas fa-envelope mr-1"></i> Email
+                                </button>
+                        </td>
+                    </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<!-- Improved Email Modal -->
+<div id="emailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-[600px] shadow-lg rounded-md bg-white">
+        <div class="absolute top-0 right-0 pt-4 pr-4">
+            <button onclick="closeEmailModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="mt-3">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-envelope text-blue-500 text-2xl mr-3"></i>
+                <h3 class="text-xl font-medium leading-6 text-gray-900">Send Email to Customer</h3>
+            </div>
+            
+            <form method="post" id="emailForm" class="space-y-4">
+                <input type="hidden" name="order_id" id="email_order_id">
+                <input type="hidden" name="customer_email" id="email_customer_email">
+                
+                <div class="space-y-2">
+                    <label class="block text-gray-700 text-sm font-bold" for="email_subject">
+                        Subject
+                    </label>
+                    <input type="text" id="email_subject" name="email_subject" 
+                           class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           required>
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-gray-700 text-sm font-bold" for="email_message">
+                        Message
+                    </label>
+                    <textarea id="email_message" name="email_message" rows="8"
+                            class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            required></textarea>
+                </div>
+                
+                <div class="flex items-center justify-between pt-4 border-t">
+                    <button type="button" onclick="insertTemplate()"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center">
+                        <i class="fas fa-file-alt mr-2"></i> Insert Template
+                    </button>
+                    
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeEmailModal()"
+                                class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Cancel
+                </button>
+                        <button type="submit" name="send_email"
+                                class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center">
+                            <i class="fas fa-paper-plane mr-2"></i> Send Email
+                        </button>
+                    </div>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced JavaScript -->
+<script>
+const emailTemplates = {
+    pending: {
+        subject: "Order #{orderId} Received",
+        message: `Dear {customerName},
+
+Thank you for your order #{orderId}. We have received your order and will begin processing it shortly.
+
+Order Details:
+- Order Number: #{orderId}
+- Status: Pending
+- Total Amount: ₹{totalAmount}
+
+We will notify you once your order has been processed.
+
+Best regards,
+{storeName}`
+    },
+    processing: {
+        subject: "Order #{orderId} is Being Processed",
+        message: `Dear {customerName},
+
+Your order #{orderId} is now being processed. We're preparing your items for shipment.
+
+Order Details:
+- Order Number: #{orderId}
+- Status: Processing
+- Total Amount: ₹{totalAmount}
+
+We will send you another notification once your order has been shipped.
+
+Best regards,
+{storeName}`
+    },
+    completed: {
+        subject: "Order #{orderId} Completed",
+        message: `Dear {customerName},
+
+Great news! Your order #{orderId} has been completed and shipped.
+
+Order Details:
+- Order Number: #{orderId}
+- Status: Completed
+- Total Amount: ₹{totalAmount}
+
+Thank you for shopping with us. We hope you enjoy your purchase!
+
+Best regards,
+{storeName}`
+    },
+    cancelled: {
+        subject: "Order #{orderId} Cancelled",
+        message: `Dear {customerName},
+
+Your order #{orderId} has been cancelled as requested.
+
+Order Details:
+- Order Number: #{orderId}
+- Status: Cancelled
+- Total Amount: ₹{totalAmount}
+
+If you have any questions about this cancellation, please don't hesitate to contact us.
+
+Best regards,
+{storeName}`
+    }
+};
+
+let currentOrderData = null;
+
+function openEmailModal(orderId, customerEmail, orderStatus, customerName, totalAmount) {
+    currentOrderData = {
+        orderId,
+        customerEmail,
+        orderStatus,
+        customerName,
+        totalAmount,
+        storeName: '<?php echo $mail_config['from_name']; ?>'
+    };
+    
+    document.getElementById('emailModal').classList.remove('hidden');
+    document.getElementById('email_order_id').value = orderId;
+    document.getElementById('email_customer_email').value = customerEmail;
+    
+    insertTemplate();
+}
+
+function insertTemplate() {
+    if (!currentOrderData) return;
+    
+    const template = emailTemplates[currentOrderData.orderStatus] || emailTemplates.pending;
+    
+    let subject = template.subject.replace('{orderId}', currentOrderData.orderId);
+    let message = template.message
+        .replace(/{orderId}/g, currentOrderData.orderId)
+        .replace(/{customerName}/g, currentOrderData.customerName)
+        .replace(/{totalAmount}/g, currentOrderData.totalAmount)
+        .replace(/{storeName}/g, currentOrderData.storeName);
+    
+    document.getElementById('email_subject').value = subject;
+    document.getElementById('email_message').value = message;
+}
+
+function closeEmailModal() {
+    document.getElementById('emailModal').classList.add('hidden');
+    currentOrderData = null;
+}
+
+// Close modal when clicking outside
+document.getElementById('emailModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEmailModal();
+    }
+});
+</script>
 
 <?php include_once "../includes/footer.php" ?>
