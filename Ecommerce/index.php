@@ -2,6 +2,10 @@
 require_once './user/includes/header.php';
 ?>
 
+<!-- Welcome Banner (Optional) -->
+<div class="bg-blue-900 text-white py-2 px-4 text-center">
+    <p class="text-sm">Welcome to Santosh Vastralay - Your Premium Fabric Destination</p>
+</div>
 
     <!-- Welcome Section
     <section class="text-center  text-white bg-blue-900 py-4 rounded-2xl">
@@ -17,38 +21,54 @@ require_once './user/includes/header.php';
 
    
 
-    <!-- Carousel Section -->
-   
-    <div id="carousel" class="relative w-full overflow-hidden ">
-        <div class="carousel-inner flex transition-transform duration-500 ease-in-out">
-            <div class="carousel-item w-full flex-shrink-0">
-                <img src="Home/images/carosel1.webp" class="w-full" alt="Slide 1">
-                <div class="carousel-caption absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-                    <h5 class="text-xl">First Slide Label</h5>
-                    <p>Some representative placeholder content for the first slide.</p>
+    <!-- Carousel Section with proper spacing -->
+    <div class="mt-1"> 
+        <div id="carousel" class="relative w-full overflow-hidden ">
+            <div class="carousel-inner flex transition-transform duration-500 ease-in-out h-full">
+                <div class="carousel-item w-full flex-shrink-0 relative">
+                    <img src="Home/images/carosel1.webp" class="w-full  object-fit" alt="Premium Saree Collection">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
+                    <div class="carousel-caption absolute bottom-0 left-0 right-0 p-8 text-center">
+                        <h5 class="text-4xl font-bold text-white mb-4 animate-fadeIn">Exclusive Saree Collection</h5>
+                        <p class="text-xl text-white mb-6">Discover our premium range of traditional and designer sarees</p>
+                        
+                    </div>
+                </div>
+                <div class="carousel-item w-full flex-shrink-0 relative">
+                    <img src="Home/images/carousel2.webp" class="w-full h-full object-fit" alt="Designer Suits">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="carousel-caption absolute bottom-0 left-0 right-0 p-8 text-center">
+                        <h5 class="text-4xl font-bold text-white mb-4 animate-fadeIn">Designer Suit Fabrics</h5>
+                        <p class="text-xl text-white mb-6">Premium fabrics for your perfect outfit</p>
+                        
+                    </div>
+                </div>
+                <div class="carousel-item w-full flex-shrink-0 relative">
+                    <img src="Home/images/carousel3.webp" class="w-full h-full object-fit" alt="Home Furnishing">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="carousel-caption absolute bottom-0 left-0 right-0 p-8 text-center">
+                        <h5 class="text-4xl font-bold text-white mb-4 animate-fadeIn">Home Furnishing Collection</h5>
+                        <p class="text-xl text-white mb-6">Transform your home with our exclusive range</p>
+                        
+                    </div>
                 </div>
             </div>
-            <div class="carousel-item w-full flex-shrink-0">
-                <img src="Home/images/carousel2.webp" class="w-full" alt="Slide 2">
-                <div class="carousel-caption absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-                    <h5 class="text-xl">Second Slide Label</h5>
-                    <p>Some representative placeholder content for the second slide.</p>
-                </div>
-            </div>
-            <div class="carousel-item w-full flex-shrink-0">
-                <img src="Home/images/carousel3.webp" class="w-full" alt="Slide 3">
-                <div class="carousel-caption absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-                    <h5 class="text-xl">Third Slide Label</h5>
-                    <p>Some representative placeholder content for the third slide.</p>
-                </div>
+            
+            <!-- Navigation Buttons with adjusted z-index -->
+            <button id="carousel-prev" class="carousel-control absolute top-1/2 left-4 transform -translate-y-1/2 bg-black/50 text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-black/70 transition-all z-20">
+                <i class="fas fa-chevron-left text-2xl"></i>
+            </button>
+            <button id="carousel-next" class="carousel-control absolute top-1/2 right-4 transform -translate-y-1/2 bg-black/50 text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-black/70 transition-all z-20">
+                <i class="fas fa-chevron-right text-2xl"></i>
+            </button>
+
+            <!-- Carousel Indicators with adjusted position -->
+            <div class="absolute bottom-8 left-0 right-0 flex justify-center space-x-2 z-20">
+                <button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-all indicator active"></button>
+                <button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-all indicator"></button>
+                <button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-all indicator"></button>
             </div>
         </div>
-        <button id="carousel-prev" class="carousel-control-prev absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button id="carousel-next" class="carousel-control-next absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
-            <i class="fas fa-chevron-right"></i>
-        </button>
     </div>
 
   
@@ -58,102 +78,125 @@ require_once './user/includes/header.php';
     <!-- Hero Banner Section -->
     <section class="relative w-full max-w-8xl mx-auto py-1.5  mt-6">
         <img src="Home/images/bridal.jpg" alt="Bridal Collection" class="w-full h-auto rounded-lg shadow-lg">
-        <img src="Home/images/mid_coruoser.jpg" alt="Mid Carousel" class="w-full max-h-[450px] object-cover rounded-lg shadow-lg mt-4">
+        <img src="Home/images/mid_coruoser.jpg" alt="Mid Carousel" class="w-full max-h-[450px] object-fit rounded-lg shadow-lg mt-4">
     </section>
 
     <!-- Product Categories Section -->
 
-    <h1 class="text-4xl font-semibold text-blue-900 text-center m-3 underline" >Shop by Categories</h1>
-    <section class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/saree.jpg" alt="Sarees" class="w-full h-50 object-cover rounded">
-            <h3 class="text-lg font-semibold mt-2">Sarees</h3>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/suit.jpg" alt="Suits" class="w-full h-50 object-cover rounded">
-            <h3 class="text-lg font-semibold mt-2">Suits</h3>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/suit.jpg" alt="Shirt Fabric" class="w-full h-50 object-cover rounded">
-            <h3 class="text-lg font-semibold mt-2">Shirt Fabric</h3>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/bedsheet.jpg" alt="Bedsheets" class="w-full h-50 object-cover rounded">
-            <h3 class="text-lg font-semibold mt-2">Bedsheets</h3>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <img src="./Home/images/mens.gif" alt="Men's Collection" class="w-full h-80 object-cover rounded">
-            <h3 class="text-lg font-semibold mt-2">Men's Collection</h3>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/saree.gif" alt="Saree Collection" class="w-full h-80 object-cover rounded">
-            <h3 class="text-lg font-semibold mt-2">Saree Collection</h3>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/curtain.gif" alt="Curtains" class="w-full h-80 object-cover rounded">
-            <h3 class="text-lg font-semibold mt-2">Curtains</h3>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-            <img src="Home/images/lahenga.gif" alt="Lehengas" class="w-full h-80 object-cover rounded">
-            <h3 class="text-lg font-semibold mt-2">Lehengas</h3>
+    <h1 class="text-4xl font-semibold text-blue-900 text-center my-8 underline">Shop by Categories</h1>
+    <section class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <a href="Home/landingpage.php?category=sarees" class="group">
+            <div class="bg-white p-4 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="Home/images/saree.jpg" alt="Sarees" class="w-full h-64 object-cover rounded-lg">
+                <h3 class="text-xl font-semibold mt-4 text-center group-hover:text-blue-900">Sarees</h3>
+                <p class="text-gray-600 text-center mt-2">Traditional & Designer Collections</p>
+            </div>
+        </a>
+        <a href="Home/landingpage.php?category=suits" class="group">
+            <div class="bg-white p-4 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="Home/images/suit.jpg" alt="Suits" class="w-full h-64 object-cover rounded-lg">
+                <h3 class="text-xl font-semibold mt-4 text-center group-hover:text-blue-900">Suits</h3>
+                <p class="text-gray-600 text-center mt-2">Designer Suit Materials</p>
+            </div>
+        </a>
+        <a href="Home/landingpage.php?category=lehenga" class="group">
+            <div class="bg-white p-4 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="https://5.imimg.com/data5/SELLER/Default/2023/4/297448710/UW/CX/SX/53170449/bridal-lehenga-1000x1000.jpg" alt="Lehengas" class="w-full h-64 object-fit rounded-lg">
+                <h3 class="text-xl font-semibold mt-4 text-center group-hover:text-blue-900">Lehengas</h3>
+                <p class="text-gray-600 text-center mt-2">Bridal & Party Wear</p>
+            </div>
+        </a>
+        <a href="Home/landingpage.php?category=shirts" class="group">
+            <div class="bg-white p-4 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="https://image.made-in-china.com/2f0j00JvCVRnlkZtzu/Luxury-Cotton-Oxford-Casual-Shirt-Mens-Formal-Dress-Shirts.webp" alt="Shirt Fabrics" class="w-full h-64 object-fit rounded-lg">
+                <h3 class="text-xl font-semibold mt-4 text-center group-hover:text-blue-900">Shirt Fabrics</h3>
+                <p class="text-gray-600 text-center mt-2">Premium Shirt Materials</p>
+            </div>
+        </a>
+        <a href="Home/landingpage.php?category=curtains" class="group">
+            <div class="bg-white p-4 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="Home/images/curtain.gif" alt="Curtains" class="w-full h-64 object-cover rounded-lg">
+                <h3 class="text-xl font-semibold mt-4 text-center group-hover:text-blue-900">Curtains</h3>
+                <p class="text-gray-600 text-center mt-2">Home Decor Collection</p>
+            </div>
+        </a>
+        <a href="Home/landingpage.php?category=bedsheets" class="group">
+            <div class="bg-white p-4 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="Home/images/bedsheet.jpg" alt="Bedsheets" class="w-full h-64 object-cover rounded-lg">
+                <h3 class="text-xl font-semibold mt-4 text-center group-hover:text-blue-900">Bedsheets</h3>
+                <p class="text-gray-600 text-center mt-2">Premium Bedding Collection</p>
+            </div>
+        </a>
+        <a href="Home/landingpage.php?category=blankets" class="group">
+            <div class="bg-white p-4 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="Home/images/blanket.jpg" alt="Blankets" class="w-full h-64 object-cover rounded-lg">
+                <h3 class="text-xl font-semibold mt-4 text-center group-hover:text-blue-900">Blankets</h3>
+                <p class="text-gray-600 text-center mt-2">Comfort & Warmth</p>
+            </div>
+        </a>
+        <a href="Home/landingpage.php?category=shawls" class="group">
+            <div class="bg-white p-4 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="https://pashtush.in/cdn/shop/products/pashtush-pashmina-pashtush-women-pure-wool-woolmark-certified-shawl-ethnic-weave-design-multicolour-31038810390582.jpg?v=1657368239&width=1080" alt="Shawls" class="w-full h-64 object-fit rounded-lg">
+                <h3 class="text-xl font-semibold mt-4 text-center group-hover:text-blue-900">Shawls</h3>
+                <p class="text-gray-600 text-center mt-2">Elegant Collection</p>
+            </div>
+        </a>
+    </section>
+
+    <!-- Special Collections Section -->
+    <section class="py-12 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-semibold text-blue-900 text-center mb-8">Special Collections</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Bridal Collection -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img src="https://medias.utsavfashion.com/media/wysiwyg/promotions/2024/2811/wedding-fashion-page-28nov_04.jpg" alt="Bridal Collection" class="w-full h-80 object-fit">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2">Bridal Collection</h3>
+                        <p class="text-gray-600 mb-4">Exclusive fabrics for your special day</p>
+                        <a href="Home/landingpage.php?category=bridal" class="inline-block bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800">Explore Now</a>
+                    </div>
+                </div>
+                <!-- Festival Collection -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img src="https://apisap.fabindia.com/medias/wmn-clp-sec07-11apr25-01.jpg?context=bWFzdGVyfGltYWdlc3w2MDI3NXxpbWFnZS9qcGVnfGFEQmtMMmhoWkM4NU5qZzNNek0zTmpnd09EazVNQzkzYlc0dFkyeHdMWE5sWXpBM0xURXhZWEJ5TWpVdE1ERXVhbkJufDUxOTY0ZmM3N2MwZmY0YjgyNTY0ZjE3MzdmNjQ0ZmFiM2Q1YzIzYTg5ZThkZDdjOGJiZDAyNzc4MDkzMTRjNzU" alt="Festival Collection" class="w-full h-80 object-fit">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2">Festival Collection</h3>
+                        <p class="text-gray-600 mb-4">Celebrate in style with our festive range</p>
+                        <a href="Home/landingpage.php?category=festival" class="inline-block bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800">Shop Now</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Men's Kurta Section -->
-    <section class="p-6 bg-gray-200 text-center">
-        <h2 class="text-3xl font-semibold text-blue-900">Men's Kurta Collection</h2>
-        <div class="flex flex-wrap justify-center items-center mt-4">
-            <div class="w-full md:w-1/2 lg:w-1/3 p-4">
-                <img src="Home/images/mens_kurta.webp" alt="Men's Kurta" class="w-full h-auto rounded-lg shadow-lg">
-            </div>
-            <div class="w-full md:w-1/2 lg:w-1/3 p-4 text-left">
-                <p class="text-gray-700 text-lg">Discover our premium collection of men's kurtas, perfect for every occasion. From casual to festive, our designs blend tradition with modern elegance.</p>
-                <button class="bg-blue-900 text-white px-4 py-2 rounded mt-4">Shop Now</button>
+    <!-- Features Section -->
+    <section class="py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                <div class="p-4">
+                    <i class="fas fa-truck text-4xl text-blue-900 mb-4"></i>
+                    <h3 class="text-lg font-semibold">Free Shipping</h3>
+                    <p class="text-gray-600">On orders above ₹999</p>
+                </div>
+                <div class="p-4">
+                    <i class="fas fa-medal text-4xl text-blue-900 mb-4"></i>
+                    <h3 class="text-lg font-semibold">Premium Quality</h3>
+                    <p class="text-gray-600">Guaranteed authentic fabrics</p>
+                </div>
+                <div class="p-4">
+                    <i class="fas fa-exchange-alt text-4xl text-blue-900 mb-4"></i>
+                    <h3 class="text-lg font-semibold">Easy Returns</h3>
+                    <p class="text-gray-600">7-day return policy</p>
+                </div>
+                <div class="p-4">
+                    <i class="fas fa-headset text-4xl text-blue-900 mb-4"></i>
+                    <h3 class="text-lg font-semibold">24/7 Support</h3>
+                    <p class="text-gray-600">Dedicated customer service</p>
+                </div>
             </div>
         </div>
     </section>
-
-    <section class="p-6 bg-gray-200 text-center">
-        <h2 class="text-3xl font-semibold text-blue-900">TRENDING NOW</h2>
-        <div class="flex flex-wrap justify-center items-center mt-4">
-            <div class="w-full md:w-1/2 lg:w-1/3 p-4">
-                <img src="https://images-static.nykaa.com/uploads/a312663b-caaa-464a-b5f1-e3522a636e26.jpg?tr=w-1200,cm-pad_resize" alt="Men's Kurta" class="w-full h-auto rounded-lg shadow-lg">
-            </div>
-            <div class="w-full md:w-1/2 lg:w-1/3 p-4 text-left">
-                <p class="text-gray-700 text-lg">Discover our premium collection of men's kurtas, perfect for every occasion. From casual to festive, our designs blend tradition with modern elegance.</p>
-                <button class="bg-blue-900 text-white px-4 py-2 rounded mt-4">Shop Now</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Express Shipping Banner -->
-    <!-- <section class="p-6 text-center">
-        <img src="https://images-static.nykaa.com/uploads/bf163ec1-190b-4e25-99df-93c400c971fa.gif?tr=w-1200,cm-pad_resize" alt="Express Shipping" class="w-full h-auto rounded-lg shadow-lg">
-    </section> -->
-
-    <!-- Shipping Banner -->
-    <div class="m-3 p-4">
-        <img src="https://images-static.nykaa.com/uploads/976c27dd-1f62-4a47-90ec-cd3171dbe1bf.gif?tr=w-1200,cm-pad_resize" class="w-full h-auto rounded-lg shadow-lg" alt="Shipping Banner">
-    </div>
-
-    <!-- Product Showcase Section -->
-    <div class="flex flex-wrap justify-center gap-3 p-4">
-        <div class="w-35 sm:w-48 md:w-56 lg:w-50 shadow-lg rounded-lg overflow-hidden">
-            <img src="https://images-static.nykaa.com/uploads/325e9399-4978-4565-a8fb-8fb98c343dec.jpg?tr=w-240,cm-pad_resize" class="w-full h-auto" alt="Product 1">
-        </div>
-        <div class="w-35 sm:w-48 md:w-56 lg:w-50 shadow-lg rounded-lg overflow-hidden">
-            <img src="https://images-static.nykaa.com/uploads/c0410067-a229-4fa9-aa0d-38f8f67364d8.jpg?tr=w-240,cm-pad_resize" class="w-full h-auto" alt="Product 2">
-        </div>
-        <div class="w-35 sm:w-48 md:w-56 lg:w-50 shadow-lg rounded-lg overflow-hidden">
-            <img src="https://images-static.nykaa.com/uploads/3031e2b6-fb85-42df-a219-b022bede91d9.jpg?tr=w-240,cm-pad_resize" class="w-full h-auto" alt="Product 3">
-        </div>
-        <div class="w-35 sm:w-48 md:w-56 lg:w-50 shadow-lg rounded-lg overflow-hidden">
-            <img src="https://images-static.nykaa.com/uploads/f1d678bc-a71e-4b9e-9062-c69e20f3c279.jpg?tr=w-240,cm-pad_resize" class="w-full h-auto" alt="Product 4">
-        </div>
-        <div class="w-35 sm:w-48 md:w-56 lg:w-50 shadow-lg rounded-lg overflow-hidden">
-            <img src="https://images-static.nykaa.com/uploads/4e5b5719-6a32-4443-acb0-46db0be1a18d.jpg?tr=w-240,cm-pad_resize" class="w-full h-auto" alt="Product 5">
-        </div>
-    </div>
 
     <!-- Footer Section -->
 
@@ -241,18 +284,43 @@ require_once './user/includes/header.php';
 
     <!-- Carousel Script -->
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
         const carouselInner = document.querySelector('.carousel-inner');
         const carouselItems = document.querySelectorAll('.carousel-item');
         const prevButton = document.getElementById('carousel-prev');
         const nextButton = document.getElementById('carousel-next');
-
+        const indicators = document.querySelectorAll('.indicator');
+        
         let currentIndex = 0;
         const totalItems = carouselItems.length;
 
-        // Function to update carousel position
+        // Function to update carousel position and indicators
         const updateCarousel = () => {
             const offset = -currentIndex * 100;
             carouselInner.style.transform = `translateX(${offset}%)`;
+            
+            // Update indicators
+            indicators.forEach((indicator, index) => {
+                if (index === currentIndex) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+
+            // Animate caption text
+            carouselItems.forEach((item, index) => {
+                const caption = item.querySelector('.carousel-caption');
+                if (index === currentIndex) {
+                    caption.style.opacity = '0';
+                    setTimeout(() => {
+                        caption.style.opacity = '1';
+                        caption.querySelector('h5').style.animation = 'fadeIn 0.5s ease-out forwards';
+                        caption.querySelector('p').style.animation = 'fadeIn 0.5s ease-out 0.2s forwards';
+                        caption.querySelector('a').style.animation = 'fadeIn 0.5s ease-out 0.4s forwards';
+                    }, 100);
+                }
+            });
         };
 
         // Next button functionality
@@ -267,12 +335,94 @@ require_once './user/includes/header.php';
             updateCarousel();
         });
 
-        // Auto-play carousel
-        setInterval(() => {
+        // Indicator functionality
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                currentIndex = index;
+                updateCarousel();
+            });
+        });
+
+        // Auto-play carousel with smooth transitions
+        let autoplayInterval = setInterval(() => {
             currentIndex = (currentIndex + 1) % totalItems;
             updateCarousel();
-        }, 5000); // Change slide every 5 seconds
+        }, 5000);
+
+        // Pause autoplay on hover
+        carouselInner.addEventListener('mouseenter', () => {
+            clearInterval(autoplayInterval);
+        });
+
+        // Resume autoplay when mouse leaves
+        carouselInner.addEventListener('mouseleave', () => {
+            autoplayInterval = setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalItems;
+                updateCarousel();
+            }, 5000);
+        });
+
+        // Initial setup
+        updateCarousel();
+    });
     </script>
+    
+    <!-- Update the style section -->
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .carousel-item {
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-caption {
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+            padding-top: 100px; /* Increased padding for better text visibility */
+        }
+
+        .indicator.active {
+            background-color: white;
+            width: 24px;
+            transition: all 0.3s ease;
+        }
+
+        /* Ensure carousel is positioned correctly */
+        #carousel {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Improve navigation button visibility */
+        .carousel-control {
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .carousel-control:hover {
+            opacity: 1;
+        }
+
+        /* Ensure proper stacking context */
+        .carousel-inner {
+            z-index: 1;
+        }
+
+        /* Improve text readability */
+        .carousel-caption h5 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .carousel-caption p {
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+    </style>
     
 <?php
 require './user/includes/footer.php';

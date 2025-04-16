@@ -160,23 +160,27 @@ if (!headers_sent()) {
         </button>
     
         <!-- Navigation Menu for Larger Screens -->
-        <nav class="hidden sm:flex items-center gap-6 text-lg">
+        <nav class="hidden sm:flex items-center gap-8 text-lg">
             <a href="/santoshvas/Ecommerce/index.php" class="nav-item font-semibold">
-                <i class="fas fa-home mr-1"></i> Home
+                <!-- <i class="fas fa-home mr-1"></i> -->
+                 Home
             </a>
             <a href="/santoshvas/Ecommerce/Home/landingpage.php" class="nav-item font-semibold">
-                <i class="fas fa-store mr-1"></i> Shop
+                <!-- <i class="fas fa-store mr-1"></i> -->
+                 Shop
             </a>
             <a href="/santoshvas/Ecommerce/Home/about.html" class="nav-item font-semibold">
-                <i class="fas fa-info-circle mr-1"></i> About us
+                <!-- <i class="fas fa-info-circle mr-1"></i> -->
+                 About us
             </a>
             <a href="/santoshvas/Ecommerce/Home/contact.php" class="nav-item font-semibold">
-                <i class="fas fa-envelope mr-1"></i> Contact
+                <!-- <i class="fas fa-envelope mr-1"></i> -->
+                 Contact
             </a>
         </nav>
     
         <!-- User Dropdown and Cart Icon -->
-        <div class="hidden sm:flex items-center space-x-6">
+        <div class="hidden sm:flex items-center space-x-8">
             <a href="/santoshvas/Ecommerce/Home/cart.php" class="text-white nav-item relative">
                 <i class="fas fa-shopping-cart text-xl"></i>
                 <span class="cart-badge"><?php echo getCartItemCount(); ?></span>

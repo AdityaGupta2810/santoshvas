@@ -1,6 +1,15 @@
 <?php
 include_once '../../includes/header.php';
 
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Check database connection
+if (!isset($db) || !$db) {
+    die("Database connection failed. Please check your configuration.");
+}
+
 // Initialize variables
 $midCatName = '';
 $topCatId = '';
@@ -28,8 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $midCatName = mysqli_real_escape_string($db, $midCatName);
         
         // Check if mid-category already exists
-        $checkQuery = "SELECT * FROM tbl_mid_category WHERE mcat_name = '$midCatName';
-        //  AND tcat_id = $topCatId";
+        $checkQuery = "SELECT * FROM tbl_mid_category WHERE mcat_name = '$midCatName' AND tcat_id = $topCatId";
         $checkResult = mysqli_query($db, $checkQuery);
         
         if (mysqli_num_rows($checkResult) > 0) {
