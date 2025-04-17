@@ -14,16 +14,6 @@ if (session_status() === PHP_SESSION_NONE) {
 $error_message = '';
 $success_message = '';
 
-// Load PHPMailer
-require __DIR__ . '/phpmailer/vendor/autoload.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
-
-// Load email configuration
-$mail_config = require __DIR__ . '/../config/mail-config.php';
-
 // Process message form submission
 if(isset($_POST['form1'])) {
     $valid = 1;
@@ -66,31 +56,10 @@ if(isset($_POST['form1'])) {
                 $error_message .= 'Payment information not found<br>';
                 $valid = 0;
             } else {
-                $row = mysqli_fetch_assoc($result);
-                
-                $payment_details = '';
-                if($row['payment_method'] == 'PayPal') {
-                    $payment_details = 'Transaction Id: '.$row['txnid'].'<br>';
-                } elseif($row['payment_method'] == 'Stripe') {
-                    $payment_details = 'Transaction Id: '.$row['txnid'].'<br>Card number: '.$row['card_number'].'<br>';
-                } elseif($row['payment_method'] == 'Bank Deposit') {
-                    $payment_details = 'Transaction Details: <br>'.$row['bank_transaction_info'];
-                }
-
-                $order_detail .= '
-                    Customer Name: '.$row['customer_name'].'<br>
-                    Customer Email: '.$row['customer_email'].'<br>
-                    Payment Method: '.$row['payment_method'].'<br>
-                    Payment Date: '.$row['payment_date'].'<br>
-                    Payment Details: <br>'.$payment_details.'<br>
-                    Paid Amount: '.$row['paid_amount'].'<br>
-                    Payment Status: '.$row['payment_status'].'<br>
-                    Shipping Status: '.$row['shipping_status'].'<br>
-                    Payment Id: '.$row['payment_id'].'<br>';
-
-                $i=0;
+                $i = 0;
                 $query = "SELECT * FROM tbl_order WHERE payment_id='" . mysqli_real_escape_string($db, $payment_id) . "'";
                 $result = mysqli_query($db, $query);
+                
                 if($result && mysqli_num_rows($result) > 0) {
                     while($row = mysqli_fetch_assoc($result)) {
                         $i++;
@@ -119,73 +88,34 @@ if(isset($_POST['form1'])) {
                 '.$order_detail.'
                 </body></html>';
 
-            // Create PHPMailer instance
-            $mail = new PHPMailer(true);
-            $mail_sent = false; // Track if email was actually sent
-            $db_insert_success = false; // Track if DB insert was successful
+            // Email headers
+            $headers = "From: Santosh Vastralay <santoshvastraly@gmail.com>\r\n";
+            $headers .= "Reply-To: santoshvastraly@gmail.com\r\n";
+            $headers .= "MIME-Version: 1.0\r\n";
+            $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+            $headers .= "X-Mailer: PHP/" . phpversion();
 
-            try {
-                // Server settings
-                $mail->SMTPDebug  = SMTP::DEBUG_OFF;
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'adityagupta112040@gmail.com';
-                $mail->Password   = 'qioy kvmi hjbp edqk';  // Consider using environment variables for credentials
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
+            // Send email using PHP mail()
+            $mail_sent = mail($cust_email, $subject_text, $message_body, $headers);
+            
+            if ($mail_sent) {
+                // Insert into database
+                $query = "INSERT INTO tbl_customer_message (subject, message, order_detail, cust_id) VALUES (
+                    '" . mysqli_real_escape_string($db, $subject_text) . "',
+                    '" . mysqli_real_escape_string($db, $message_text) . "',
+                    '" . mysqli_real_escape_string($db, $order_detail) . "',
+                    " . intval($cust_id) . "
+                )";
                 
-                // Timeout and SSL settings
-                $mail->Timeout = 60; // Increased timeout to 60 seconds
-                $mail->SMTPOptions = [
-                    'ssl' => [
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    ]
-                ];
-
-                // Recipients
-                $mail->setFrom('adityagupta112040@gmail.com', 'Santosh Vastralay');
-                $mail->addAddress($cust_email);
-                $mail->addReplyTo('adityagupta112040@gmail.com', 'Santosh Vastralay');
-
-                // Content
-                $mail->isHTML(true);
-                $mail->Subject = $subject_text;
-                $mail->Body    = $message_body;
-                $mail->AltBody = strip_tags($message_text);
-
-                // Send the email
-                $mail->send();
-                $mail_sent = true;
-                
-                // Only insert into database if email was sent successfully
-                if ($mail_sent) {
-                    // Insert into database
-                    $query = "INSERT INTO tbl_customer_message (subject, message, order_detail, cust_id) VALUES (
-                        '" . mysqli_real_escape_string($db, $subject_text) . "',
-                        '" . mysqli_real_escape_string($db, $message_text) . "',
-                        '" . mysqli_real_escape_string($db, $order_detail) . "',
-                        " . intval($cust_id) . "
-                    )";
-                    
-                    if (mysqli_query($db, $query)) {
-                        $db_insert_success = true;
-                    } else {
-                        $error_message = "Database error: " . mysqli_error($db);
-                    }
-                }
-                
-                if ($mail_sent && $db_insert_success) {
+                if (mysqli_query($db, $query)) {
                     $_SESSION['success_message'] = 'Email sent successfully!';
                     header("Location: " . $_SERVER['PHP_SELF']);
                     exit();
+                } else {
+                    $error_message = "Database error: " . mysqli_error($db);
                 }
-                
-            } catch (Exception $e) {
-                $error_message = "Email could not be sent. Error: " . $e->getMessage();
-                error_log("PHPMailer Error: " . $e->getMessage());
+            } else {
+                $error_message = "Failed to send email. Please try again.";
             }
         }
     }
@@ -293,7 +223,7 @@ if(isset($_SESSION['success_message'])) {
     unset($_SESSION['success_message']); // Clear the message after retrieving it
 }
 
-require_once __DIR__ . "/../../config.php";
+require_once __DIR__ . "/../../db.php";
 
 // Handle status update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
@@ -320,48 +250,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     $subject = $_POST['email_subject'];
     $message = $_POST['email_message'];
     
-    $mail = new PHPMailer(true);
+    // Create HTML message with better formatting
+    $htmlMessage = "
+    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+        <div style='background-color: #f8f9fa; padding: 20px; text-align: center;'>
+            <h1 style='color: #333;'>Santosh Vastralay</h1>
+        </div>
+        <div style='padding: 20px; background-color: #ffffff;'>
+            " . nl2br(htmlspecialchars($message)) . "
+        </div>
+        <div style='background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666;'>
+            <p>This is an automated message, please do not reply directly to this email.</p>
+        </div>
+    </div>";
     
-    try {
-        // Server settings
-        $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
-        $mail->isSMTP();                                            // Send using SMTP
-        $mail->Host       = $mail_config['smtp_host'];              // Set the SMTP server
-        $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-        $mail->Username   = $mail_config['smtp_username'];          // SMTP username
-        $mail->Password   = $mail_config['smtp_password'];          // SMTP password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;        // Enable TLS encryption
-        $mail->Port       = $mail_config['smtp_port'];             // TCP port to connect to
+    // Email headers
+    $headers = "From: Santosh Vastralay <santoshvastraly@gmail.com>\r\n";
+    $headers .= "Reply-To: santoshvastraly@gmail.com\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
 
-        // Recipients
-        $mail->setFrom($mail_config['from_email'], $mail_config['from_name']);
-        $mail->addAddress($customer_email);
-
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        
-        // Create HTML message with better formatting
-        $htmlMessage = "
-        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
-            <div style='background-color: #f8f9fa; padding: 20px; text-align: center;'>
-                <h1 style='color: #333;'>{$mail_config['from_name']}</h1>
-            </div>
-            <div style='padding: 20px; background-color: #ffffff;'>
-                " . nl2br(htmlspecialchars($message)) . "
-            </div>
-            <div style='background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666;'>
-                <p>This is an automated message, please do not reply directly to this email.</p>
-            </div>
-        </div>";
-        
-        $mail->Body = $htmlMessage;
-        $mail->AltBody = strip_tags($message); // Plain text version
-
-        $mail->send();
+    // Send email using PHP mail()
+    if(mail($customer_email, $subject, $htmlMessage, $headers)) {
         $_SESSION['success_msg'] = "Email sent successfully to customer!";
-    } catch (Exception $e) {
-        $_SESSION['error_msg'] = "Email could not be sent. Error: " . $mail->ErrorInfo;
+    } else {
+        $_SESSION['error_msg'] = "Failed to send email. Please try again.";
     }
     
     header("Location: ordermanagement.php");
@@ -466,7 +380,7 @@ $orders = $db->query($query);
                                         <div class="flex items-center mb-2">
                                             <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?php echo htmlspecialchars($item['p_featured_photo']); ?>" 
                                                  alt="<?php echo htmlspecialchars($item['p_name']); ?>"
-                                                 class="w-10 h-10 object-cover rounded mr-2">
+                                                 class="w-15 h-10 object-cover rounded mr-2">
                                             <div>
                                                 <p class="font-medium"><?php echo htmlspecialchars($item['p_name']); ?></p>
                                                 <p class="text-gray-500">Qty: <?php echo $item['quantity']; ?> × ₹<?php echo number_format($item['price'], 2); ?></p>
@@ -477,7 +391,7 @@ $orders = $db->query($query);
                         </td>
                             <td class="pl-8 py-4 whitespace-nowrap">
                                 ₹<?php echo number_format($order['total_amount'], 2); ?>
-                        </td>
+                            </td>
                             <td class="px-1 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
                             <?php
@@ -497,10 +411,10 @@ $orders = $db->query($query);
                                     ?>">
                                     <?php echo ucfirst($order['status']); ?>
                                 </span>
-                        </td>
+                            </td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <?php echo date('M d, Y H:i', strtotime($order['created_at'])); ?>
-                        </td>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <form method="post" class="inline-block">
                                     <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
@@ -514,12 +428,12 @@ $orders = $db->query($query);
                                         Update
                                     </button>
                                 </form>
-                                <button onclick="openEmailModal(<?php echo $order['id']; ?>, '<?php echo htmlspecialchars($order['customer_email']); ?>', '<?php echo $order['status']; ?>', '<?php echo htmlspecialchars($order['customer_name']); ?>')"
+                                <button onclick="openEmailModal(<?php echo $order['id']; ?>, '<?php echo htmlspecialchars($order['customer_email']); ?>', '<?php echo $order['status']; ?>', '<?php echo htmlspecialchars($order['customer_name']); ?>', <?php echo $order['total_amount']; ?>)"
                                         class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm ml-2">
                                     <i class="fas fa-envelope mr-1"></i> Email
                                 </button>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
@@ -544,7 +458,7 @@ $orders = $db->query($query);
                 <h3 class="text-xl font-medium leading-6 text-gray-900">Send Email to Customer</h3>
             </div>
             
-            <form method="post" id="emailForm" class="space-y-4">
+            <form method="post" id="emailForm" class="space-y-4" onsubmit="return validateEmailForm()">
                 <input type="hidden" name="order_id" id="email_order_id">
                 <input type="hidden" name="customer_email" id="email_customer_email">
                 
@@ -575,14 +489,14 @@ $orders = $db->query($query);
                     <div class="flex gap-3">
                         <button type="button" onclick="closeEmailModal()"
                                 class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Cancel
-                </button>
+                            Cancel
+                        </button>
                         <button type="submit" name="send_email"
                                 class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center">
                             <i class="fas fa-paper-plane mr-2"></i> Send Email
                         </button>
                     </div>
-            </div>
+                </div>
             </form>
         </div>
     </div>
@@ -605,7 +519,7 @@ Order Details:
 We will notify you once your order has been processed.
 
 Best regards,
-{storeName}`
+Santosh Vastralay`
     },
     processing: {
         subject: "Order #{orderId} is Being Processed",
@@ -621,7 +535,7 @@ Order Details:
 We will send you another notification once your order has been shipped.
 
 Best regards,
-{storeName}`
+Santosh Vastralay`
     },
     completed: {
         subject: "Order #{orderId} Completed",
@@ -637,7 +551,7 @@ Order Details:
 Thank you for shopping with us. We hope you enjoy your purchase!
 
 Best regards,
-{storeName}`
+Santosh Vastralay`
     },
     cancelled: {
         subject: "Order #{orderId} Cancelled",
@@ -653,7 +567,7 @@ Order Details:
 If you have any questions about this cancellation, please don't hesitate to contact us.
 
 Best regards,
-{storeName}`
+Santosh Vastralay`
     }
 };
 
@@ -665,21 +579,29 @@ function openEmailModal(orderId, customerEmail, orderStatus, customerName, total
         customerEmail,
         orderStatus,
         customerName,
-        totalAmount,
-        storeName: '<?php echo $mail_config['from_name']; ?>'
+        totalAmount: parseFloat(totalAmount).toFixed(2),
+        storeName: 'Santosh Vastralay'
     };
     
-    document.getElementById('emailModal').classList.remove('hidden');
-    document.getElementById('email_order_id').value = orderId;
-    document.getElementById('email_customer_email').value = customerEmail;
-    
-    insertTemplate();
+    const modal = document.getElementById('emailModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.getElementById('email_order_id').value = orderId;
+        document.getElementById('email_customer_email').value = customerEmail;
+        
+        insertTemplate();
+    } else {
+        console.error('Email modal element not found');
+    }
 }
 
 function insertTemplate() {
-    if (!currentOrderData) return;
+    if (!currentOrderData) {
+        console.error('No order data available');
+        return;
+    }
     
-    const template = emailTemplates[currentOrderData.orderStatus] || emailTemplates.pending;
+    const template = emailTemplates[currentOrderData.orderStatus.toLowerCase()] || emailTemplates.pending;
     
     let subject = template.subject.replace('{orderId}', currentOrderData.orderId);
     let message = template.message
@@ -693,8 +615,22 @@ function insertTemplate() {
 }
 
 function closeEmailModal() {
-    document.getElementById('emailModal').classList.add('hidden');
-    currentOrderData = null;
+    const modal = document.getElementById('emailModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        currentOrderData = null;
+    }
+}
+
+function validateEmailForm() {
+    const subject = document.getElementById('email_subject').value.trim();
+    const message = document.getElementById('email_message').value.trim();
+    
+    if (!subject || !message) {
+        alert('Please fill in both subject and message fields.');
+        return false;
+    }
+    return true;
 }
 
 // Close modal when clicking outside
