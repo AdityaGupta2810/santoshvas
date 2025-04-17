@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../db.php";
 include_once __DIR__ . "/../user/includes/header.php";
 
 // Get search query

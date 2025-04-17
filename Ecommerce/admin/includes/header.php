@@ -4,7 +4,7 @@ ob_start();
 
 // Use absolute path for includes
 require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/actions/function.class.php';
-require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/config.php';
+require_once 'C:/xampp/htdocs/santoshvas/Ecommerce/db.php';
 
 // Initialize database and function classes if needed
 if (!isset($db)) {
@@ -111,11 +111,11 @@ if (isset($_SESSION['admin_id'])) {
                             <span><i class='bx bxs-circle  hover:text-blue-700  bx-rotate-90 mr-5' ></i>Color</span>
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="#" class="flex items-center h-10 pl-5 text-gray-600   hover:text-blue-600 hover:bg-gray-100">
                             <span><i class='bx bxs-circle  hover:text-blue-700  bx-rotate-90 mr-5' ></i>Shipping Cost</span>
                         </a>
-                    </li>
+                    </li> -->
                     <li>
                         <a href="/santoshvas/Ecommerce/admin/dashboardpages/shopsettings/top-category.php" class="flex items-center h-10 pl-5 text-gray-600   hover:text-blue-600 hover:bg-gray-100">
                             <span><i class='bx bxs-circle  hover:text-blue-700  bx-rotate-90 mr-5' ></i>Top Level Catergory</span>
@@ -146,12 +146,12 @@ if (isset($_SESSION['admin_id'])) {
                     <span class="text ml-3 sidebar-text ">Order Management</span>
                 </a>
             </li>
-            <li>
+            <!-- <li>
                 <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-message-dots text-xl'></i>
                     <span class="text ml-3 sidebar-text">Messages</span>
                 </a>
-            </li>
+            </li> -->
             <!-- <li>
                 <a href="#" class="flex items-center h-12 px-4 text-gray-700 hover:text-blue-500">
                     <i class='bx bxs-group text-xl'></i>

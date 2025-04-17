@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../db.php";
 
 // Include header
 include_once __DIR__ . "/includes/header.php";

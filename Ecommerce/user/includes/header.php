@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../config.php";
+require_once __DIR__ . "/../../db.php";
 
 // Only proceed with HTML output if no headers have been sent
 if (!headers_sent()) {

@@ -1,6 +1,6 @@
 <?php
 require_once './function.class.php';
-require_once '../config.php';
+require_once '../db.php';
 // session_start();
 
 // Set the logged-out message in the session
@@ -10,7 +10,7 @@ $fn->setAlert('Logged out Successfully');
 // Destroy the session
 
 unset($_SESSION['customer']);
-session_destroy();
+// session_destroy();
 
 // Redirect to the login page
 

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../db.php";
 
 // Set the page title
 $title = "Products - Santosh Vastralay";
@@ -378,15 +378,15 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                 <ul class="space-y-2 text-gray-400">
                     <li class="flex items-center">
                         <i class="fas fa-map-marker-alt w-5"></i>
-                        <span>123 Main Street, City, State, India</span>
+                        <span>Bishunpura, Gopalganj, Bihar, India</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-phone w-5"></i>
-                        <span>+91 1234567890</span>
+                        <span>+91 9006645817</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-envelope w-5"></i>
-                        <span>info@santoshvastralay.com</span>
+                        <span>santoshvastralay@gmail.com</span>
                     </li>
                 </ul>
                 <!-- Social Media Links -->
@@ -410,7 +410,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
         <!-- Bottom Bar -->
         <div class="border-t border-gray-700 mt-8 pt-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400">© 2024 Santosh Vastralay. All rights reserved.</p>
+                <p class="text-gray-400">© 2025 Santosh Vastralay. All rights reserved.</p>
                 <div class="mt-4 md:mt-0">
                     <img src="/santoshvas/Ecommerce/assets/images/payment-methods.png" alt="Payment Methods" class="h-8">
                 </div>

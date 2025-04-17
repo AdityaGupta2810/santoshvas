@@ -22,35 +22,35 @@ require_once './user/includes/header.php';
    
 
     <!-- Carousel Section with proper spacing -->
-    <div class="mt-1"> 
-        <div id="carousel" class="relative w-full overflow-hidden ">
+    <div > 
+        <div id="carousel" class="relative w-full max-h-[600px] overflow-hidden ">
             <div class="carousel-inner flex transition-transform duration-500 ease-in-out h-full">
                 <div class="carousel-item w-full flex-shrink-0 relative">
-                    <img src="Home/images/carosel1.webp" class="w-full  object-fit" alt="Premium Saree Collection">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
-                    <div class="carousel-caption absolute bottom-0 left-0 right-0 p-8 text-center">
-                        <h5 class="text-4xl font-bold text-white mb-4 animate-fadeIn">Exclusive Saree Collection</h5>
+                    <img src="Home/images/carosel1.webp" class="w-full h-full object-fit" alt="Premium Saree Collection">
+                    <!-- <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
+                    <div class="carousel-caption absolute bottom-15 left-0 right-0 p-8 text-center">
+                        <h5 class="text-2xl font-bold text-white mb-4 animate-fadeIn">Exclusive Saree Collection</h5>
                         <p class="text-xl text-white mb-6">Discover our premium range of traditional and designer sarees</p>
                         
-                    </div>
+                    </div> -->
                 </div>
                 <div class="carousel-item w-full flex-shrink-0 relative">
                     <img src="Home/images/carousel2.webp" class="w-full h-full object-fit" alt="Designer Suits">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <div class="carousel-caption absolute bottom-0 left-0 right-0 p-8 text-center">
-                        <h5 class="text-4xl font-bold text-white mb-4 animate-fadeIn">Designer Suit Fabrics</h5>
+                    <!-- <div class="carousel-caption absolute bottom-15 left-0 right-0 p-8 text-center">
+                        <h5 class="text-2xl font-bold text-white mb-4 animate-fadeIn">Designer Suit Fabrics</h5>
                         <p class="text-xl text-white mb-6">Premium fabrics for your perfect outfit</p>
                         
-                    </div>
+                    </div> -->
                 </div>
                 <div class="carousel-item w-full flex-shrink-0 relative">
                     <img src="Home/images/carousel3.webp" class="w-full h-full object-fit" alt="Home Furnishing">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <div class="carousel-caption absolute bottom-0 left-0 right-0 p-8 text-center">
-                        <h5 class="text-4xl font-bold text-white mb-4 animate-fadeIn">Home Furnishing Collection</h5>
+                    <!-- <div class="carousel-caption absolute bottom-15 left-0 right-0 p-8 text-center">
+                        <h5 class="text-2xl font-bold text-white mb-4 animate-fadeIn">Home Furnishing Collection</h5>
                         <p class="text-xl text-white mb-6">Transform your home with our exclusive range</p>
                         
-                    </div>
+                    </div> -->
                 </div>
             </div>
             
@@ -76,7 +76,7 @@ require_once './user/includes/header.php';
     
 
     <!-- Hero Banner Section -->
-    <section class="relative w-full max-w-8xl mx-auto py-1.5  mt-6">
+    <section class="relative w-full max-w-8xl mx-auto py-1.5  mt-1">
         <img src="Home/images/bridal.jpg" alt="Bridal Collection" class="w-full h-auto rounded-lg shadow-lg">
         <img src="Home/images/mid_coruoser.jpg" alt="Mid Carousel" class="w-full max-h-[450px] object-fit rounded-lg shadow-lg mt-4">
     </section>

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../config.php";
+require_once __DIR__ . "/../../db.php";
 include_once __DIR__ . "/../includes/header.php";
 
 // Check if admin is logged in - no need to start session here as it's already started in header
@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="full_name" class="block text-sm font-medium text-gray-700">Full Name *</label>
                     <input type="text" name="full_name" id="full_name" 
                            value="<?php echo htmlspecialchars($admin_data['full_name']); ?>"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           class="mt-2 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                            required>
             </div>
 
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="email_id" class="block text-sm font-medium text-gray-700">Email Address *</label>
                     <input type="email" name="email_id" id="email_id" 
                            value="<?php echo htmlspecialchars($admin_data['email_id']); ?>"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           class="mt-2 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                            required>
                         </div>
 
@@ -163,21 +163,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div>
                     <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password *</label>
                     <input type="password" name="current_password" id="current_password"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           class="mt-2 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                            required>
                         </div>
 
                 <div>
                     <label for="new_password" class="block text-sm font-medium text-gray-700">New Password *</label>
                     <input type="password" name="new_password" id="new_password"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           class="mt-2 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                            required>
                 </div>
 
                 <div>
                     <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm New Password *</label>
                     <input type="password" name="confirm_password" id="confirm_password"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           class="mt-2 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                            required>
                         </div>
 
