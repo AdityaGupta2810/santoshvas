@@ -590,7 +590,7 @@ try {
                                 <?php foreach($product_photos as $photo): ?>
                                     <div class="border p-2 rounded">
                                         <img src="../../uploadimgs/<?php echo $photo['photo']; ?>" alt="Product Photo" class="w-full h-24 object-cover">
-                                        <a href="product-edit.php?id=<?php echo $product_id; ?>&delete_photo=1&photo_id=<?php echo $photo['pp_id']; ?>" 
+                                        <a href="products-edit.php?p_id=<?php echo $product_id; ?>&delete_photo=1&photo_id=<?php echo $photo['pp_id']; ?>" 
                                            class="block text-center bg-red-500 text-white py-1 px-2 mt-2 rounded text-sm hover:bg-red-600"
                                            onclick="return confirm('Are you sure you want to delete this photo?');">
                                             <i class="fas fa-trash-alt mr-1"></i> Delete

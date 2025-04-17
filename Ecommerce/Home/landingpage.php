@@ -252,7 +252,7 @@ while ($tcat = mysqli_fetch_assoc($tcat_result)) {
                     <a href="/santoshvas/Ecommerce/Home/product.php?p_id=<?= $product['p_id'] ?>">
                         <img src="/santoshvas/Ecommerce/admin/uploadimgs/<?= htmlspecialchars($product['p_featured_photo']) ?>" 
                              alt="<?= htmlspecialchars($product['p_name']) ?>" 
-                             class="w-full h-48 object-cover">
+                             class="w-full max-h-76 object-fit">
                     </a>
                     <div class="p-4">
                         <a href="/santoshvas/Ecommerce/Home/product.php?p_id=<?= $product['p_id'] ?>">
