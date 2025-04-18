@@ -1,7 +1,7 @@
 <?php 
 $title= "Login page";
 require(__DIR__."/includes/header.php");
-// include('./includes/header.php');
+
 ?>
 <section class=" transition-all duration-300 ease-in-out">
   
