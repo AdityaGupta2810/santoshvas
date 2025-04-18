@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     // Fetch size data for editing
     if ($sizeId > 0) {
-        $fetchQuery = "SELECT * FROM tbl_size WHERE id = $SizeId";
+        $fetchQuery = "SELECT * FROM tbl_size WHERE id = $sizeId";
         $fetchResult = mysqli_query($db, $fetchQuery);
         
         if (mysqli_num_rows($fetchResult) > 0) {
